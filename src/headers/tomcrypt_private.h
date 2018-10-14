@@ -420,6 +420,10 @@ int ecc_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key, ecc_ke
 int ecc_import_with_curve(const unsigned char *in, unsigned long inlen, int type, ecc_key *key);
 int ecc_import_with_oid(const unsigned char *in, unsigned long inlen, unsigned long *oid, unsigned long oid_len, int type, ecc_key *key);
 
+int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
+                           void *r, void *s, prng_state *prng, int wprng,
+                           int *recid, const ecc_key *key);
+
 #ifdef LTC_SSH
 int ecc_ssh_ecdsa_encode_name(char *buffer, unsigned long *buflen, const ecc_key *key);
 #endif

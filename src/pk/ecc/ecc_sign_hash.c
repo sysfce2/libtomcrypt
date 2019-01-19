@@ -11,8 +11,10 @@
   @param inlen     The length of the digest
   @param out       [out] The destination for the signature
   @param outlen    [in/out] The max size and resulting size of the signature
-  @param prng      An active PRNG state
-  @param wprng     The index of the PRNG you wish to use
+  @param prng      An active PRNG state, NULL for RFC6979 deterministic signatures
+  @param wprng     The index of the PRNG you wish to use, -1 for RFC6979 deterministic signatures
+  @param sigformat The format of the signature to generate (ecc_signature_type)
+  @param recid     [out] The recovery ID for this signature (optional)
   @param key       A private ECC key
   @return CRYPT_OK if successful
 */

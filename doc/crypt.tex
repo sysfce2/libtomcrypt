@@ -5827,8 +5827,11 @@ int ecc_sign_hash(const unsigned char *in,
 \end{verbatim}
 
 This function will \textit{ECDSA} sign the message digest stored in the array pointed to by \code{in} of length \code{inlen} octets.  The signature
-will be stored in the array pointed to by \code{out} of length \code{outlen} octets.  The function requires a properly seeded \textit{PRNG}, and
-the \textit{ECC} \code{key} provided must be a private key.
+will be stored in the array pointed to by \code{out} of length \code{outlen} octets.  The function requires that the \textit{ECC}
+\code{key} provided must be a private key.
+
+It requires a properly seeded \textit{PRNG} for standard \textit{ECDSA}, or if \code{prng} is NULL and/or \code{wprng} is less than zero,
+the private key and the message itself will be used to create a deterministic signature according to \textit{RFC6979}.
 
 \index{ecc\_sign\_hash\_rfc7518()}
 \begin{verbatim}

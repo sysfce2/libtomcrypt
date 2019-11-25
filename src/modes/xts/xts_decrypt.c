@@ -53,7 +53,7 @@ static int s_tweak_uncrypt(const unsigned char *C, unsigned char *P, unsigned ch
 int xts_decrypt(const unsigned char *ct, unsigned long ptlen, unsigned char *pt, unsigned char *tweak,
                 const symmetric_xts *xts)
 {
-   unsigned char PP[16], CC[16], T[16];
+   unsigned char PP[16] = {0}, CC[16], T[16];
    unsigned long i, m, mo, lim;
    int err;
 

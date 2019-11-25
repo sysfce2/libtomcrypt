@@ -68,7 +68,8 @@ int f8_start(                int  cipher, const unsigned char *IV,
 
    /* encrypt IV */
    if ((err = ecb_encrypt_block(IV, f8->MIV, &f8->ecb)) != CRYPT_OK) {
-      return ecb_done(&f8->ecb);
+      ecb_done(&f8->ecb);
+      return err;
    }
    zeromem(tkey, sizeof(tkey));
    zeromem(f8->IV, sizeof(f8->IV));

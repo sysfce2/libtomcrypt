@@ -55,7 +55,7 @@ static int s_tweak_crypt(const unsigned char *P, unsigned char *C, unsigned char
 int xts_encrypt(const unsigned char *pt, unsigned long ptlen, unsigned char *ct, unsigned char *tweak,
                 const symmetric_xts *xts)
 {
-   unsigned char PP[16], CC[16], T[16];
+   unsigned char PP[16], CC[16] = {0}, T[16];
    unsigned long i, m, mo, lim;
    int err;
 

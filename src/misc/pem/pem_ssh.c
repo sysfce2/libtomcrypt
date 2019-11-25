@@ -815,9 +815,11 @@ int ssh_read_authorized_keys_filehandle(FILE *f, ssh_authorized_key_cb cb, void 
    LTC_ARGCHK(f != NULL);
    LTC_ARGCHK(cb != NULL);
 
-   fseek(f, 0, SEEK_END);
+   if (fseek(f, 0, SEEK_END) == -1)
+      return CRYPT_ERROR;
    tot_data = ftell(f);
-   rewind(f);
+   if (fseek(f, 0, SEEK_SET) == -1)
+      return CRYPT_ERROR;
    buf = XMALLOC(tot_data);
    if (buf == NULL) {
       return CRYPT_MEM;

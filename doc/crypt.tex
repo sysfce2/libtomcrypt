@@ -8896,6 +8896,28 @@ else()
 endif()
 \end{verbatim}
 
+
+\mysection{Amalgamated library}
+
+LibTomCrypt can also be built as an amalgamated library, i.e. as a single C source file + the header files.
+
+A release of the library contains the amalgamation in the path \texttt{pre\_gen/tomcrypt\_amalgam.c}.
+
+To create the amalgamation one can run:
+
+\begin{verbatim}
+make pre_gen
+\end{verbatim}
+
+The makefiles also support building the amalgamated library via:
+
+\begin{verbatim}
+make CFLAGS="-DLTM_DESC" EXTRALIBS=-ltommath AMALGAM=1
+\end{verbatim}
+
+This will build the library and link against LibTomMath (which must be installed on your system).
+
+
 \mysection{Header Configuration}
 The file \textit{tomcrypt\_cfg.h} is what lets you control various high level macros which control the behaviour of the library.  Build options are also
 stored in \textit{tomcrypt\_custom.h} which allow the enabling and disabling of various algorithms.

@@ -143,3 +143,16 @@ coverage: $(call print-help,coverage,Create code-coverage of the library - but b
 
 # cleans everything - coverage output and standard 'clean'
 cleancov: cleancov-clean clean
+ifndef AMALGAM
+AMALGAM_FILTER_OUT = src/ciphers/aes/aes_tab.c src/ciphers/aes/aes_enc.c src/ciphers/aes/aes_enc_desc.c
+SOURCES = $(filter-out $(AMALGAM_FILTER_OUT),$(OBJECTS:.o=.c))
+pre_gen/tomcrypt_amalgam.c: $(SOURCES)
+	mkdir -p pre_gen
+	printf "/*\n * This file has been auto-generated, do not edit!\n */\n\n" > $@
+	cat $(SOURCES) >> $@
+
+pre_gen: pre_gen/tomcrypt_amalgam.c
+
+.PHONY: pre_gen
+endif
+

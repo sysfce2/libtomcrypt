@@ -198,7 +198,7 @@ static int s_ssh_decode_dsa(const unsigned char *in, unsigned long *inlen, ltc_p
                                         LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK) {
       goto cleanup;
    }
-   key->u.dsa.qord = mp_unsigned_bin_size(key->u.dsa.q);
+   key->u.dsa.qord = ltc_mp_unsigned_bin_size(key->u.dsa.q);
    if ((err = dsa_int_validate_pqg(&key->u.dsa, &stat)) != CRYPT_OK) {
       goto cleanup;
    }
@@ -281,7 +281,7 @@ static int s_ssh_decode_rsa(const unsigned char *in, unsigned long *inlen, ltc_p
       goto cleanup;
    }
 
-   if ((err = mp_init_multi(&tmp1, &tmp2, NULL)) != CRYPT_OK) {
+   if ((err = ltc_mp_init_multi(&tmp1, &tmp2, LTC_NULL)) != CRYPT_OK) {
       goto cleanup;
    }
 
@@ -294,16 +294,16 @@ static int s_ssh_decode_rsa(const unsigned char *in, unsigned long *inlen, ltc_p
       goto cleanup_tmps;
    }
 
-   if ((err = mp_sub_d(key->u.rsa.p, 1, tmp1)) != CRYPT_OK)                   { goto cleanup_tmps; } /* tmp1 = q-1 */
-   if ((err = mp_sub_d(key->u.rsa.q, 1, tmp2)) != CRYPT_OK)                   { goto cleanup_tmps; } /* tmp2 = p-1 */
-   if ((err = mp_mod(key->u.rsa.d, tmp1, key->u.rsa.dP)) != CRYPT_OK)         { goto cleanup_tmps; } /* dP = d mod p-1 */
-   if ((err = mp_mod(key->u.rsa.d, tmp2, key->u.rsa.dQ)) != CRYPT_OK)         { goto cleanup_tmps; } /* dQ = d mod q-1 */
+   if ((err = ltc_mp_sub_d(key->u.rsa.p, 1, tmp1)) != CRYPT_OK)                   { goto cleanup_tmps; } /* tmp1 = q-1 */
+   if ((err = ltc_mp_sub_d(key->u.rsa.q, 1, tmp2)) != CRYPT_OK)                   { goto cleanup_tmps; } /* tmp2 = p-1 */
+   if ((err = ltc_mp_mod(key->u.rsa.d, tmp1, key->u.rsa.dP)) != CRYPT_OK)         { goto cleanup_tmps; } /* dP = d mod p-1 */
+   if ((err = ltc_mp_mod(key->u.rsa.d, tmp2, key->u.rsa.dQ)) != CRYPT_OK)         { goto cleanup_tmps; } /* dQ = d mod q-1 */
 
    key->id = LTC_PKA_RSA;
    key->u.rsa.type = PK_PRIVATE;
 
 cleanup_tmps:
-   mp_clear_multi(tmp2, tmp1, NULL);
+   ltc_mp_deinit_multi(tmp2, tmp1, LTC_NULL);
 cleanup:
    if (err != CRYPT_OK) {
       rsa_free(&key->u.rsa);

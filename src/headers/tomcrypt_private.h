@@ -371,6 +371,7 @@ int pbes1_extract(const ltc_asn1_list *s, pbes_arg *res);
 int pbes2_extract(const ltc_asn1_list *s, pbes_arg *res);
 #endif
 
+#ifdef LTC_PEM
 int pem_decrypt(unsigned char *data, unsigned long *datalen,
                 unsigned char *key,  unsigned long keylen,
                 unsigned char *iv,   unsigned long ivlen,
@@ -382,6 +383,7 @@ int pem_get_char_from_file(struct get_char *g);
 #endif /* LTC_NO_FILE */
 int pem_get_char_from_buf(struct get_char *g);
 int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_char *g);
+#endif
 
 /* tomcrypt_pk.h */
 

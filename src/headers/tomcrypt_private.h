@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: Unlicense */
 
 #include "tomcrypt.h"
+#include <stdarg.h>
 
 /*
  * Internal Macros

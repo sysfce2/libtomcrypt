@@ -10,8 +10,10 @@
 
 #ifdef LTC_SOBER128
 
+#ifndef LTC_SOBER128TAB_C
 #define LTC_SOBER128TAB_C
 #include "sober128tab.c"
+#endif
 
 /* don't change these... */
 #define N                        17

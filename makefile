@@ -144,15 +144,21 @@ coverage: $(call print-help,coverage,Create code-coverage of the library - but b
 # cleans everything - coverage output and standard 'clean'
 cleancov: cleancov-clean clean
 ifndef AMALGAM
-AMALGAM_FILTER_OUT = src/ciphers/aes/aes_tab.c src/ciphers/aes/aes_enc.c src/ciphers/aes/aes_enc_desc.c
+AMALGAM_FILTER_OUT = src/ciphers/aes/aes_enc.c src/ciphers/aes/aes_enc_desc.c
+TAB_SOURCES = src/ciphers/aes/aes_tab.c src/ciphers/safer/safer_tab.c src/hashes/whirl/whirltab.c src/stream/sober128/sober128tab.c
 SOURCES = $(filter-out $(AMALGAM_FILTER_OUT),$(OBJECTS:.o=.c))
-pre_gen/tomcrypt_amalgam.c: $(SOURCES)
+pre_gen/tomcrypt_amalgam.c: $(TAB_SOURCES) $(SOURCES)
 	mkdir -p pre_gen
 	printf "/*\n * This file has been auto-generated, do not edit!\n */\n\n" > $@
-	cat $(SOURCES) >> $@
+	printf "#define LTC_AES_TAB_C\n" >> $@
+	printf "#define LTC_SAFER_TAB_C\n" >> $@
+	printf "#define LTC_SOBER128TAB_C\n" >> $@
+	printf "#define LTC_WHIRLTAB_C\n\n" >> $@
+	printf "#include \"tomcrypt_private.h\"\n\n" >> $@
+	cat $^ >> $@
 
 pre_gen: pre_gen/tomcrypt_amalgam.c
 
-.PHONY: pre_gen
+.PHONY: pre_gen/tomcrypt_amalgam.c
 endif
 

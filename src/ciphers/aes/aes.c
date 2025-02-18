@@ -62,8 +62,10 @@ const struct ltc_cipher_descriptor rijndael_enc_desc =
 
 #endif
 
+#ifndef LTC_AES_TAB_C
 #define LTC_AES_TAB_C
 #include "aes_tab.c"
+#endif
 
 static ulong32 setup_mix(ulong32 temp)
 {

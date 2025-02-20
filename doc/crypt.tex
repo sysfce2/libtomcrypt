@@ -8868,6 +8868,34 @@ Per default a static library in \textbf{Release} configuration is built, without
 A shared library build can be done by setting \textbf{-DBUILD\_SHARED\_LIBS=On} when invoking the \textbf{cmake} command.
 Tests can be enabled by setting \textbf{-DBUILD\_TESTING=On} when invoking the \textbf{cmake} command.
 
+\mysection{Building a libtomcrypt app with CMake}
+
+Depending on if libtomcrypt was built and installed using the
+available makefiles, or using CMake, different package files are
+provided.
+
+With the available makefiles, the pkg-config file
+\texttt{libtomcrypt.pc} is produced, while with CMake, the CMake
+config file \texttt{libtomcrypt-config.cmake} is produced.
+
+The result is that different installations have different package
+config files.
+
+This has proven problematic for other CMake-based projects.  That is,
+however, fairly easy to solve with this little CMake snippet (also
+found in \texttt{contrib/libtomcrypt.cmake}:
+
+\begin{verbatim}
+find_package(libtomcrypt QUIET)
+if (libtomcrypt_FOUND)
+  set(LIBTOMCRYPT libtomcrypt)
+else()
+  find_package(PkgConfig)
+  pkg_check_modules(libtomcrypt REQUIRED IMPORTED_TARGET libtomcrypt)
+  set(LIBTOMCRYPT PkgConfig::libtomcrypt)
+endif()
+\end{verbatim}
+
 \mysection{Header Configuration}
 The file \textit{tomcrypt\_cfg.h} is what lets you control various high level macros which control the behaviour of the library.  Build options are also
 stored in \textit{tomcrypt\_custom.h} which allow the enabling and disabling of various algorithms.

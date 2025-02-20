@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   Docs:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     container: texlive/texlive:latest-medium
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
     strategy:
       matrix:
         cc: [ gcc, clang ]
-        os: [ ubuntu-20.04, ubuntu-22.04 ]
+        os: [ ubuntu-22.04, ubuntu-24.04 ]
         config:
           - { BUILDNAME: 'META_BUILDS',             BUILDOPTIONS: '-DGMP_DESC',                                                           BUILDSCRIPT: '.ci/meta_builds.sh' }
           - { BUILDNAME: 'VALGRIND',                BUILDOPTIONS: '',                                                                     BUILDSCRIPT: '.ci/valgrind.sh' }

@@ -74,7 +74,7 @@ endef
 # Also note that we're extending the environments' CFLAGS.
 # If you think that our CFLAGS are not nice you can easily override them
 # by giving them as a parameter to make:
-#  make CFLAGS="-I./src/headers/ -DLTC_SOURCE ..." ...
+#  make CFLAGS="-I./src/headers/ ..." ...
 #
 ifneq ($(shell echo $(CFLAGS) | grep LTM_DESC),)
 LTC_CFLAGS+=$(shell PKG_CONFIG_PATH=$(LIBPATH)/pkgconfig pkg-config --cflags-only-I libtommath ${silent_stderr} || true)
@@ -85,7 +85,7 @@ endif
 ifneq ($(shell echo $(CFLAGS) | grep GMP_DESC),)
 LTC_CFLAGS+=$(shell PKG_CONFIG_PATH=$(LIBPATH)/pkgconfig pkg-config --cflags-only-I gmp ${silent_stderr} || true)
 endif
-LTC_CFLAGS += -I./src/headers/ -DLTC_SOURCE -Wall -Wsign-compare -Wshadow
+LTC_CFLAGS += -I./src/headers/ -Wall -Wsign-compare -Wshadow
 
 ifdef OLD_GCC
 LTC_CFLAGS += -W

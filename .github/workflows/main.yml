@@ -98,3 +98,24 @@ jobs:
           name: build-${{ github.run_id }}.tar.xz
           path: build-${{ github.run_id }}.tar.xz
           retention-days: 1
+
+  Amalgam:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        cc: [ gcc, clang ]
+        os: [ ubuntu-22.04, ubuntu-24.04 ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get remove -y libtommath1
+          curl -s https://packagecloud.io/install/repositories/libtom/packages/script.deb.sh | sudo bash
+          sudo apt-get install libtommath-git-dev
+      - name: run tests
+        env:
+          CC: "${{ matrix.cc }}"
+        run: |
+          make pre_gen
+          make CFLAGS="-DLTM_DESC -DUSE_LTM" EXTRALIBS="-ltommath" AMALGAM=1 -j$(nproc) check

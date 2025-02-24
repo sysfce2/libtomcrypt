@@ -1516,6 +1516,44 @@ static int s_ecc_import_export(void) {
 }
 
 #ifdef LTC_ECC_SHAMIR
+static int s_ecc_test_ethereum(void)
+{
+#ifdef LTC_ECC_SECP256K1
+   int stat;
+   const ltc_ecc_curve* dp;
+   ecc_key key, reckey;
+   unsigned char buf[128];
+   unsigned long len;
+   unsigned char data16[16] = { 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1 };
+
+   DO(ecc_find_curve("SECP256K1", &dp));
+
+   DO(ecc_make_key_ex(&yarrow_prng, find_prng ("yarrow"), &key, dp));
+
+   /* test Ethereum signature */
+   len = sizeof(buf);
+   DO(ecc_sign_hash_eth27(data16, 16, buf, &len, &yarrow_prng, find_prng ("yarrow"), &key));
+   stat = 0;
+   DO(ecc_verify_hash_eth27(buf, len, data16, 16, &stat, &key));
+   if (stat != 1) return CRYPT_FAIL_TESTVECTOR;
+
+   /* XXX-FIXME: TFM does not support sqrtmod_prime */
+   if (strcmp(ltc_mp.name, "TomsFastMath") != 0) {
+      DO(ecc_set_curve(dp, &reckey));
+      DO(ecc_recover_key(buf, len, data16, 16, -1, LTC_ECCSIG_ETH27, &reckey));
+      DO(ecc_key_cmp(PK_PUBLIC, &key, &reckey));
+
+      /* cleanup */
+      ecc_free(&reckey);
+   }
+   /* cleanup */
+   ecc_free(&key);
+   return CRYPT_OK;
+#else
+   return CRYPT_NOP;
+#endif
+}
+
 static int s_ecc_test_recovery(void)
 {
    int i, recid, stat;
@@ -1553,14 +1591,12 @@ static int s_ecc_test_recovery(void)
    DO(ecc_set_key(eth_pubkey, sizeof(eth_pubkey), PK_PUBLIC, &pubkey));
 
    DO(ecc_set_curve(dp, &reckey));
-   stat = ecc_recover_key(eth_sig, sizeof(eth_sig)-1, eth_hash, sizeof(eth_hash), 0, LTC_ECCSIG_RFC7518, &reckey);
-   if (stat != CRYPT_OK) return CRYPT_FAIL_TESTVECTOR;
+   DO(ecc_recover_key(eth_sig, sizeof(eth_sig)-1, eth_hash, sizeof(eth_hash), 0, LTC_ECCSIG_RFC7518, &reckey));
    DO(ecc_key_cmp(PK_PUBLIC, &pubkey, &reckey));
    ecc_free(&reckey);
 
    DO(ecc_set_curve(dp, &reckey));
-   stat = ecc_recover_key(eth_sig, sizeof(eth_sig), eth_hash, sizeof(eth_hash), -1, LTC_ECCSIG_ETH27, &reckey);
-   if (stat != CRYPT_OK) return CRYPT_FAIL_TESTVECTOR;
+   DO(ecc_recover_key(eth_sig, sizeof(eth_sig), eth_hash, sizeof(eth_hash), -1, LTC_ECCSIG_ETH27, &reckey));
    DO(ecc_key_cmp(PK_PUBLIC, &pubkey, &reckey));
    ecc_free(&reckey);
 
@@ -1632,6 +1668,7 @@ int ecc_test(void)
 #ifdef LTC_ECC_SHAMIR
    DO(s_ecc_test_shamir());
    DO(s_ecc_test_recovery());
+   DO(s_ecc_test_ethereum());
 #endif
    return CRYPT_OK;
 }

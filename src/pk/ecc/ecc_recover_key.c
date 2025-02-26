@@ -3,9 +3,7 @@
 
 #include "tomcrypt_private.h"
 
-#if defined(LTC_MECC) && defined(LTC_DER)
-
-#ifdef LTC_ECC_SHAMIR
+#if defined(LTC_MECC) && defined(LTC_ECC_SHAMIR)
 
 /**
   @file ecc_recover_key.c
@@ -67,14 +65,7 @@ int ecc_recover_key(const unsigned char *sig,  unsigned long siglen,
       goto error;
    }
 
-   if (sigformat == LTC_ECCSIG_ANSIX962) {
-      /* ANSI X9.62 format - ASN.1 encoded SEQUENCE{ INTEGER(r), INTEGER(s) }  */
-      if ((err = der_decode_sequence_multi_ex(sig, siglen, LTC_DER_SEQ_SEQUENCE | LTC_DER_SEQ_STRICT,
-                                     LTC_ASN1_INTEGER, 1UL, r,
-                                     LTC_ASN1_INTEGER, 1UL, s,
-                                     LTC_ASN1_EOL, 0UL, LTC_NULL)) != CRYPT_OK)                         { goto error; }
-   }
-   else if (sigformat == LTC_ECCSIG_RFC7518) {
+   if (sigformat == LTC_ECCSIG_RFC7518) {
       /* RFC7518 format - raw (r,s) */
       i = ltc_mp_unsigned_bin_size(key->dp.order);
       if (siglen != (2*i)) {
@@ -105,6 +96,15 @@ int ecc_recover_key(const unsigned char *sig,  unsigned long siglen,
       if ((err = ltc_mp_read_unsigned_bin(r, sig,  32)) != CRYPT_OK)                                    { goto error; }
       if ((err = ltc_mp_read_unsigned_bin(s, sig+32, 32)) != CRYPT_OK)                                  { goto error; }
    }
+#ifdef LTC_DER
+   else if (sigformat == LTC_ECCSIG_ANSIX962) {
+         /* ANSI X9.62 format - ASN.1 encoded SEQUENCE{ INTEGER(r), INTEGER(s) }  */
+         if ((err = der_decode_sequence_multi_ex(sig, siglen, LTC_DER_SEQ_SEQUENCE | LTC_DER_SEQ_STRICT,
+                                                 LTC_ASN1_INTEGER, 1UL, r,
+                                                 LTC_ASN1_INTEGER, 1UL, s,
+                                                 LTC_ASN1_EOL, 0UL, LTC_NULL)) != CRYPT_OK)             { goto error; }
+   }
+#endif
 #ifdef LTC_SSH
    else if (sigformat == LTC_ECCSIG_RFC5656) {
       char name[64], name2[64];
@@ -116,7 +116,7 @@ int ecc_recover_key(const unsigned char *sig,  unsigned long siglen,
                                            LTC_SSHDATA_STRING, name, &namelen,
                                            LTC_SSHDATA_MPINT,  r,
                                            LTC_SSHDATA_MPINT,  s,
-                                           LTC_SSHDATA_EOL,    NULL)) != CRYPT_OK)                      { goto error; }
+                                           LTC_SSHDATA_EOL,    LTC_NULL)) != CRYPT_OK)                  { goto error; }
 
 
       /* Check curve matches identifier string */
@@ -256,5 +256,4 @@ error:
    return err;
 }
 
-#endif
 #endif

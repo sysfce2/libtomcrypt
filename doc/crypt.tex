@@ -5953,18 +5953,18 @@ int ecc_recover_key(const unsigned char *sig,
                                 ecc_key *key);
 \end{verbatim}
 
-This function will recover (a) public key from the ECDSA signature in the array pointed to by \textit{sig} of length \textit{siglen} octets, the message digest
-pointed to by the array \textit{hash} of length \textit{hashlen}, and the recovery id \textit{recid}. It will store the recovered
-key into \textit{key} and return CRYPT\_OK if recovery succeeds, or an error if recovery fails.
+This function will recover (a) public key from the \textit{ECDSA} signature in the array pointed to by \code{sig} of length \code{siglen} octets, the message digest
+pointed to by the array \code{hash} of length \code{hashlen}, and the recovery id \code{recid}. It will store the recovered
+key into \code{key} and return \code{CRYPT\_OK} if recovery succeeds, or an error if recovery fails.
 This is for compatibility with the (v,r,s) signatures used in Ethereum, where public keys are not explicitly shared,
-only the parity of the public key. For curves like secp256k1, recid will take values of 0 or 1, corresponding to the
-parity of the public key's y coordinate. For curves like secp112r2, with a cofactor of 4, values 0..7 are possible,
+only the parity of the public key. For curves like \textit{secp256k1}, \code{recid} will take values of 0 or 1, corresponding to the
+parity of the public key's y coordinate. For curves like \textit{secp112r2}, with a cofactor of 4, values 0..7 are possible,
 with the low bit corresponding to the parity and the higher bits specifying the public key's x coordinate's multiple
 of the curve's order.
-If the signature format contains the recovery id (currently only \textit{LTC\_ECCSIG\_ETH27}), \textit{recid} can be -1
+If the signature format contains the recovery id (currently only \code{LTC\_ECCSIG\_ETH27}), \code{recid} can be -1
 which signals that the recovery id from the signature blob should be used. This means an application does not need to
 extract the recovery id from such a signature in order to use this function.
-The function \textit{ecc\_recover\_key} implements multiple signature formats, and the output is compliant for GF(p) curves.
+The function \code{ecc\_recover\_key()} implements multiple signature formats, and the output is compliant for GF(p) curves.
 
 \subsection{Signature Formats}
 The following signature formats are suported:
@@ -5987,9 +5987,13 @@ The following signature formats are suported:
 \label{fig:sigformat}
 \end{figure}
 
-The \textit{LTC\_ECCSIG\_ETH27} format is based on the Ethereum Yellow Paper, see \url{https://github.com/ethereum/yellowpaper}
+The \code{LTC\_ECCSIG\_ETH27} format is based on the Ethereum Yellow Paper, see \url{https://github.com/ethereum/yellowpaper}
 (Appendix F). However, convention allows the use of v=0,1 as equivalent to v=27,28 and both are accepted by
-\textit{ecc\_recover\_key}.
+\code{ecc\_recover\_key()}.
+
+\textbf{NOTE:} If you're using a tailored version of libtomcrypt, it is possible to disable \code{LTC\_DER} which will disable
+the option to use \code{LTC\_ECCSIG\_ANSIX962}. Also it is possible to disable \code{LTC\_SSH} which will disable
+the option to use \code{LTC\_ECCSIG\_RFC5656}.
 
 \mysection{Shared Secret (ECDH)}
 To construct a Diffie-Hellman shared secret with a private and public ECC key, use the following function:

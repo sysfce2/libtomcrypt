@@ -59,13 +59,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: install dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y libgmp-dev valgrind libtool-bin clang-tools lcov ruby clang
-          sudo apt-get remove -y libtommath1
-          sudo gem install coveralls-lcov
-          curl -s https://packagecloud.io/install/repositories/libtom/packages/script.deb.sh | sudo bash
-          sudo apt-get install libtfm-git-dev libtommath-git-dev
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_on: error
+          command: |
+            sudo apt-get update -qq
+            sudo apt-get install -y libgmp-dev valgrind libtool-bin clang-tools lcov ruby clang
+            sudo apt-get remove -y libtommath1
+            sudo gem install coveralls-lcov
+            curl -s https://packagecloud.io/install/repositories/libtom/packages/script.deb.sh | sudo bash
+            sudo apt-get install libtfm-git-dev libtommath-git-dev
       - name: run tests
         env:
           CC: "${{ matrix.cc }}"
@@ -108,11 +113,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: install dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get remove -y libtommath1
-          curl -s https://packagecloud.io/install/repositories/libtom/packages/script.deb.sh | sudo bash
-          sudo apt-get install libtommath-git-dev
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          retry_on: error
+          command: |
+            sudo apt-get update -qq
+            sudo apt-get remove -y libtommath1
+            curl -s https://packagecloud.io/install/repositories/libtom/packages/script.deb.sh | sudo bash
+            sudo apt-get install libtommath-git-dev
       - name: run tests
         env:
           CC: "${{ matrix.cc }}"

@@ -426,9 +426,17 @@ src/pk/ecc/ecc_set_curve_internal.c
 src/pk/ecc/ecc_set_key.c
 src/pk/ecc/ecc_shared_secret.c
 src/pk/ecc/ecc_sign_hash.c
+src/pk/ecc/ecc_sign_hash_eth27.c
+src/pk/ecc/ecc_sign_hash_internal.c
+src/pk/ecc/ecc_sign_hash_rfc5656.c
+src/pk/ecc/ecc_sign_hash_rfc7518.c
 src/pk/ecc/ecc_sizes.c
 src/pk/ecc/ecc_ssh_ecdsa_encode_name.c
 src/pk/ecc/ecc_verify_hash.c
+src/pk/ecc/ecc_verify_hash_eth27.c
+src/pk/ecc/ecc_verify_hash_internal.c
+src/pk/ecc/ecc_verify_hash_rfc5656.c
+src/pk/ecc/ecc_verify_hash_rfc7518.c
 src/pk/ecc/ltc_ecc_export_point.c
 src/pk/ecc/ltc_ecc_import_point.c
 src/pk/ecc/ltc_ecc_is_point.c

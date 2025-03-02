@@ -84,6 +84,7 @@ typedef int (*fn_kdf_t)(const struct password *pwd,
                               int iteration_count,  int hash_idx,
                               unsigned char *out,   unsigned long *outlen);
 
+#if defined(LTC_PBES)
 typedef struct {
    /* KDF */
    fn_kdf_t kdf;
@@ -107,6 +108,7 @@ typedef struct
    /* only used for RC2 */
    unsigned long key_bits;
 } pbes_arg;
+#endif
 
 typedef struct {
    const pbes_properties *data;
@@ -362,11 +364,14 @@ struct get_char {
 void copy_or_zeromem(const unsigned char* src, unsigned char* dest, unsigned long len, int coz);
 void password_free(struct password *pw, const struct password_ctx *ctx);
 
+#if defined(LTC_PBES)
 int pbes_decrypt(const pbes_arg  *arg, unsigned char *dec_data, unsigned long *dec_size);
 
 int pbes1_extract(const ltc_asn1_list *s, pbes_arg *res);
 int pbes2_extract(const ltc_asn1_list *s, pbes_arg *res);
+#endif
 
+#ifdef LTC_PEM
 int pem_decrypt(unsigned char *data, unsigned long *datalen,
                 unsigned char *key,  unsigned long keylen,
                 unsigned char *iv,   unsigned long ivlen,
@@ -378,6 +383,7 @@ int pem_get_char_from_file(struct get_char *g);
 #endif /* LTC_NO_FILE */
 int pem_get_char_from_buf(struct get_char *g);
 int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_char *g);
+#endif
 
 /* tomcrypt_pk.h */
 
@@ -387,9 +393,13 @@ int rand_bn_upto(void *N, void *limit, prng_state *prng, int wprng);
 int pk_get_oid(enum ltc_oid_id id, const char **st);
 int pk_get_pka_id(enum ltc_oid_id id, enum ltc_pka_id *pka);
 int pk_get_oid_id(enum ltc_pka_id pka, enum ltc_oid_id *oid);
+#ifdef LTC_DER
 int pk_get_oid_from_asn1(const ltc_asn1_list *oid, enum ltc_oid_id *id);
+#endif
 int pk_oid_str_to_num(const char *OID, unsigned long *oid, unsigned long *oidlen);
 int pk_oid_num_to_str(const unsigned long *oid, unsigned long oidlen, char *OID, unsigned long *outlen);
+
+int pk_oid_cmp_with_ulong(const char *o1, const unsigned long *o2, unsigned long o2size);
 
 /* ---- DH Routines ---- */
 #ifdef LTC_MRSA
@@ -416,9 +426,19 @@ int ecc_set_curve_from_mpis(void *a, void *b, void *prime, void *order, void *gx
 int ecc_copy_curve(const ecc_key *srckey, ecc_key *key);
 int ecc_set_curve_by_size(int size, ecc_key *key);
 int ecc_import_subject_public_key_info(const unsigned char *in, unsigned long inlen, ecc_key *key);
+#ifdef LTC_DER
 int ecc_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key, ecc_key *key);
+#endif
 int ecc_import_with_curve(const unsigned char *in, unsigned long inlen, int type, ecc_key *key);
 int ecc_import_with_oid(const unsigned char *in, unsigned long inlen, unsigned long *oid, unsigned long oid_len, int type, ecc_key *key);
+
+int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
+                           void *r, void *s, prng_state *prng, int wprng,
+                           int *recid, const ecc_key *key);
+
+int ecc_verify_hash_internal(void *r, void *s,
+                             const unsigned char *hash, unsigned long hashlen,
+                             int *stat, const ecc_key *key);
 
 #ifdef LTC_SSH
 int ecc_ssh_ecdsa_encode_name(char *buffer, unsigned long *buflen, const ecc_key *key);
@@ -604,7 +624,6 @@ int x509_decode_subject_public_key_info(const unsigned char *in, unsigned long i
         enum ltc_oid_id algorithm, void *public_key, unsigned long *public_key_len,
         ltc_asn1_type parameters_type, ltc_asn1_list* parameters, unsigned long *parameters_len);
 
-int pk_oid_cmp_with_ulong(const char *o1, const unsigned long *o2, unsigned long o2size);
 int pk_oid_cmp_with_asn1(const char *o1, const ltc_asn1_list *o2);
 
 #endif /* LTC_DER */

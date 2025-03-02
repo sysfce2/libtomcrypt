@@ -1,4 +1,5 @@
 \documentclass[synpaper]{book}
+\usepackage[T1]{fontenc}
 \usepackage{geometry}
 \usepackage{hyperref}
 \usepackage{makeidx}
@@ -44,6 +45,7 @@
 \def\C{{\mathbb C}}
 \def\Q{{\mathbb Q}}
 \definecolor{DGray}{gray}{0.5}
+\newcommand{\code}[1]{\texttt{\textit{#1}}}
 \newcommand{\emailaddr}[1]{\mbox{$<${#1}$>$}}
 \def\twiddle{\raisebox{0.3ex}{\mbox{\tiny $\sim$}}}
 \def\gap{\vspace{0.5ex}}
@@ -5801,8 +5803,14 @@ The imported key is stored in the ECC key pointed to by \textit{key}.  The funct
 
 
 \mysection{Signatures (ECDSA)}
-There are also functions to sign and verify messages. They use the ANSI X9.62 ECDSA algorithm to generate and verify signatures in the
-ANSI X9.62 format.
+There are also functions to sign and verify messages. They use the \textit{ANSI X9.62} \textit{ECDSA} algorithm to generate and verify signatures in the
+\textit{ANSI X9.62} format.
+
+\textbf{BEWARE:} With \textit{ECC} if you try to sign a hash that is bigger than your \textit{ECC} key you can run into problems. The math
+will still work, and in effect the signature will still work.  With \textit{ECC} keys the strength of the signature is limited
+by the size of the hash, or the size of the key, whichever is smaller.  For example, if you sign with SHA256 and a
+P--192 key, you have in effect 96--bits of security. The library will not warn you if you make this mistake, so it
+is important to check yourself before using the signatures.
 
 \subsection{Signature Generation}
 To sign a message digest (hash) use the following function:
@@ -5815,12 +5823,12 @@ int ecc_sign_hash(const unsigned char *in,
                         unsigned long *outlen,
                            prng_state *prng,
                                   int  wprng,
-                              ecc_key *key);
+                  const       ecc_key *key);
 \end{verbatim}
 
-This function will ECDSA sign the message digest stored in the array pointed to by \textit{in} of length \textit{inlen} octets.  The signature
-will be stored in the array pointed to by \textit{out} of length \textit{outlen} octets.  The function requires a properly seeded PRNG, and
-the ECC \textit{key} provided must be a private key.
+This function will \textit{ECDSA} sign the message digest stored in the array pointed to by \code{in} of length \code{inlen} octets.  The signature
+will be stored in the array pointed to by \code{out} of length \code{outlen} octets.  The function requires a properly seeded \textit{PRNG}, and
+the \textit{ECC} \code{key} provided must be a private key.
 
 \index{ecc\_sign\_hash\_rfc7518()}
 \begin{verbatim}
@@ -5830,27 +5838,53 @@ int ecc_sign_hash_rfc7518(const unsigned char *in,
                                 unsigned long *outlen,
                                    prng_state *prng,
                                           int  wprng,
-                                      ecc_key *key);
+                          const       ecc_key *key);
 \end{verbatim}
 
-This function creates the same ECDSA signature as \textit{ecc\_sign\_hash} only the output format is different.
+This function creates the same \textit{ECDSA} signature as \code{ecc\_sign\_hash()} only the output format is different.
 The format follows \url{https://tools.ietf.org/html/rfc7518#section-3.4}, sometimes it is also called plain signature.
 
-\index{ecc\_sign\_hash\_ex()}
+\index{ecc\_sign\_hash\_rfc7518\_ex()}
 \begin{verbatim}
-int ecc_sign_hash_ex(const unsigned char *in,
-                           unsigned long  inlen,
-                           unsigned char *out,
-                           unsigned long *outlen,
-                              prng_state *prng,
-                                     int  wprng,
-                      ecc_signature_type  sigformat,
-                                     int *recid,
-                                 ecc_key *key);
+int ecc_sign_hash_rfc7518_ex(const unsigned char *in,
+                                   unsigned long  inlen,
+                                   unsigned char *out,
+                                   unsigned long *outlen,
+                                      prng_state *prng,
+                                             int  wprng,
+                                             int *recid,
+                             const       ecc_key *key);
 \end{verbatim}
 
-This function is an extended version of the ECDSA signature in \textit{ecc\_sign\_hash}, but with a choice of output formats
-and an optional output of the recovery ID for use with \textit{ecc\_recover\_key}.
+This function is an extended version of the \textit{ECDSA} signature in \code{ecc\_sign\_hash\_rfc7518()}, but with an additional output of the recovery ID
+for use with \code{ecc\_recover\_key()}.
+
+\index{ecc\_sign\_hash\_rfc5656()}
+\begin{verbatim}
+int ecc_sign_hash_rfc5656(const unsigned char *in,
+                                unsigned long  inlen,
+                                unsigned char *out,
+                                unsigned long *outlen,
+                                   prng_state *prng,
+                                          int  wprng,
+                          const       ecc_key *key);
+\end{verbatim}
+
+This function creates an \textit{ECDSA} signature and the output format is according to \textit{RFC5656}, i.e. \textit{SSH} compatible.
+
+\index{ecc\_sign\_hash\_eth27()}
+\begin{verbatim}
+int ecc_sign_hash_eth27(const unsigned char *in,
+                              unsigned long  inlen,
+                              unsigned char *out,
+                              unsigned long *outlen,
+                                 prng_state *prng,
+                                        int  wprng,
+                        const       ecc_key *key);
+\end{verbatim}
+
+This function creates an \textit{ECDSA} signature and the output format is according to the Ethereum format.
+With this API the curve is limited to \textit{secp256k1}.
 
 \subsection{Signature Verification}
 \index{ecc\_verify\_hash()}
@@ -5860,14 +5894,14 @@ int ecc_verify_hash(const unsigned char *sig,
                     const unsigned char *hash,
                           unsigned long  hashlen,
                                     int *stat,
-                                ecc_key *key);
+                    const       ecc_key *key);
 \end{verbatim}
 
-This function will verify the ECDSA signature in the array pointed to by \textit{sig} of length \textit{siglen} octets, against the message digest
-pointed to by the array \textit{hash} of length \textit{hashlen}. It will store a non--zero value in \textit{stat} if the signature is valid.  Note:
+This function will verify the \textit{ECDSA} signature in the array pointed to by \code{sig} of length \code{siglen} octets, against the message digest
+pointed to by the array \code{hash} of length \code{hashlen}. It will store a non--zero value in \code{stat} if the signature is valid.  Note:
 the function will not return an error if the signature is invalid. It will return an error, if the actual signature payload is an invalid format.
-The ECC \textit{key} must be the public (or private) ECC key corresponding to the key that performed the signature.
-The function \textit{ecc\_verify\_hash} implements signature format according to X9.62 ECDSA, and the output is compliant for GF(p) curves.
+The \textit{ECC} \code{key} must be the public (or private) \textit{ECC} key corresponding to the key that performed the signature.
+The function \code{ecc\_verify\_hash()} implements signature format according to \textit{ANSI X9.62} EC\textit{DSA}, and the output is compliant for GF(p) curves.
 
 \index{ecc\_verify\_hash\_rfc7518()}
 \begin{verbatim}
@@ -5876,30 +5910,36 @@ int ecc_verify_hash_rfc7518(const unsigned char *sig,
                             const unsigned char *hash,
                                   unsigned long  hashlen,
                                             int *stat,
-                                        ecc_key *key);
+                            const       ecc_key *key);
 \end{verbatim}
 
-This function validate the ECDSA signature as \textit{ecc\_verify\_hash} only the signature input format
+This function validates the \textit{ECDSA} signature as \code{ecc\_verify\_hash()}, only the signature input format
 follows \url{https://tools.ietf.org/html/rfc7518#section-3.4}.
 
-\index{ecc\_verify\_hash\_ex()}
+\index{ecc\_verify\_hash\_rfc5656()}
 \begin{verbatim}
-int ecc_verify_hash_ex(const unsigned char *sig,
-                             unsigned long  siglen,
-                       const unsigned char *hash,
-                             unsigned long  hashlen,
-                        ecc_signature_type  sigformat,
-                                       int *stat,
-                                   ecc_key *key);
+int ecc_verify_hash_rfc5656(const unsigned char *sig,
+                                  unsigned long  siglen,
+                            const unsigned char *hash,
+                                  unsigned long  hashlen,
+                                            int *stat,
+                            const       ecc_key *key);
 \end{verbatim}
 
-This function validates an ECDSA signature as \textit{ecc\_verify\_hash} but with a choice of signature formats.
+This function validates the \textit{ECDSA} signature according to the format defined in \textit{RFC5656}, i.e. \textit{SSH} compatible.
 
-{\bf BEWARE:} With ECC if you try to sign a hash that is bigger than your ECC key you can run into problems. The math
-will still work, and in effect the signature will still work.  With ECC keys the strength of the signature is limited
-by the size of the hash, or the size of the key, whichever is smaller.  For example, if you sign with SHA256 and a
-P--192 key, you have in effect 96--bits of security. The library will not warn you if you make this mistake, so it
-is important to check yourself before using the signatures.
+
+\index{ecc\_verify\_hash\_eth27()}
+\begin{verbatim}
+int ecc_verify_hash_eth27(const unsigned char *sig,
+                                unsigned long  siglen,
+                          const unsigned char *hash,
+                                unsigned long  hashlen,
+                                          int *stat,
+                          const       ecc_key *key);
+\end{verbatim}
+
+This function validates the \textit{ECDSA} signature according to the Ethereum format.
 
 \subsection{Public Key Recovery}
 \index{ecc\_recover\_key()}
@@ -5913,18 +5953,18 @@ int ecc_recover_key(const unsigned char *sig,
                                 ecc_key *key);
 \end{verbatim}
 
-This function will recover (a) public key from the ECDSA signature in the array pointed to by \textit{sig} of length \textit{siglen} octets, the message digest
-pointed to by the array \textit{hash} of length \textit{hashlen}, and the recovery id \textit{recid}. It will store the recovered
-key into \textit{key} and return CRYPT\_OK if recovery succeeds, or an error if recovery fails.
+This function will recover (a) public key from the \textit{ECDSA} signature in the array pointed to by \code{sig} of length \code{siglen} octets, the message digest
+pointed to by the array \code{hash} of length \code{hashlen}, and the recovery id \code{recid}. It will store the recovered
+key into \code{key} and return \code{CRYPT\_OK} if recovery succeeds, or an error if recovery fails.
 This is for compatibility with the (v,r,s) signatures used in Ethereum, where public keys are not explicitly shared,
-only the parity of the public key. For curves like secp256k1, recid will take values of 0 or 1, corresponding to the
-parity of the public key's y coordinate. For curves like secp112r2, with a cofactor of 4, values 0..7 are possible,
+only the parity of the public key. For curves like \textit{secp256k1}, \code{recid} will take values of 0 or 1, corresponding to the
+parity of the public key's y coordinate. For curves like \textit{secp112r2}, with a cofactor of 4, values 0..7 are possible,
 with the low bit corresponding to the parity and the higher bits specifying the public key's x coordinate's multiple
 of the curve's order.
-If the signature format contains the recovery id (currently only \textit{LTC\_ECCSIG\_ETH27}), \textit{recid} can be -1
+If the signature format contains the recovery id (currently only \code{LTC\_ECCSIG\_ETH27}), \code{recid} can be -1
 which signals that the recovery id from the signature blob should be used. This means an application does not need to
 extract the recovery id from such a signature in order to use this function.
-The function \textit{ecc\_recover\_key} implements multiple signature formats, and the output is compliant for GF(p) curves.
+The function \code{ecc\_recover\_key()} implements multiple signature formats, and the output is compliant for GF(p) curves.
 
 \subsection{Signature Formats}
 The following signature formats are suported:
@@ -5935,10 +5975,10 @@ The following signature formats are suported:
 \begin{center}
 \begin{tabular}{|l|l|}
 \hline \textbf{sigformat} & \textbf{description} \\
-\hline LTC\_ECCSIG\_ANSIX962 & ASN.1 encoded, ANSI X9.62 \\
-\hline LTC\_ECCSIG\_RFC7518 & raw R, S values as defined in RFC7518 \\
+\hline LTC\_ECCSIG\_ANSIX962 & ASN.1 encoded, \textit{ANSI X9.62} \\
+\hline LTC\_ECCSIG\_RFC7518 & raw R, S values as defined in \textit{RFC7518} \\
 \hline LTC\_ECCSIG\_ETH27 & raw R, S, V values (V has 27 added) \\
-\hline LTC\_ECCSIG\_RFC5656 & SSH+ECDSA format as defined in RFC5656 \\
+\hline LTC\_ECCSIG\_RFC5656 & \textit{SSH+ECDSA} format as defined in \textit{RFC5656} \\
 \hline
 \end{tabular}
 \end{center}
@@ -5947,9 +5987,13 @@ The following signature formats are suported:
 \label{fig:sigformat}
 \end{figure}
 
-The \textit{LTC\_ECCSIG\_ETH27} format is based on the Ethereum Yellow Paper, see \url{https://github.com/ethereum/yellowpaper}
+The \code{LTC\_ECCSIG\_ETH27} format is based on the Ethereum Yellow Paper, see \url{https://github.com/ethereum/yellowpaper}
 (Appendix F). However, convention allows the use of v=0,1 as equivalent to v=27,28 and both are accepted by
-\textit{ecc\_recover\_key}.
+\code{ecc\_recover\_key()}.
+
+\textbf{NOTE:} If you're using a tailored version of libtomcrypt, it is possible to disable \code{LTC\_DER} which will disable
+the option to use \code{LTC\_ECCSIG\_ANSIX962}. Also it is possible to disable \code{LTC\_SSH} which will disable
+the option to use \code{LTC\_ECCSIG\_RFC5656}.
 
 \mysection{Shared Secret (ECDH)}
 To construct a Diffie-Hellman shared secret with a private and public ECC key, use the following function:

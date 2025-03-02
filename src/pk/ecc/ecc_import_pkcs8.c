@@ -3,7 +3,7 @@
 
 #include "tomcrypt_private.h"
 
-#ifdef LTC_MECC
+#if defined(LTC_MECC) && defined(LTC_DER)
 
 int ecc_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key, ecc_key *key)
 {

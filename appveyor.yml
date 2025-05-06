@@ -21,9 +21,19 @@ build_script:
       cd..
       git clone https://github.com/libtom/libtommath.git --branch=master
       cd libtommath
+      mkdir build
+      cd build
+      cmake -G "Ninja" ..
+      ninja
+      cd..
       nmake -f makefile.msvc
       cd..
       cd libtomcrypt
+      mkdir build
+      cd build
+      cmake -G "Ninja" ..
+      ninja
+      cd..
       nmake -f makefile.msvc all
 test_script:
 - cmd: test.exe

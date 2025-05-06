@@ -119,17 +119,6 @@ if(CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
     list(APPEND LTC_C_FLAGS -no-undefined)
 endif()
 
-if(MSVC)
-    cmake_push_check_state()
-    set(CMAKE_REQUIRED_LIBRARIES bcrypt)
-    check_symbol_exists(BCryptGenRandom "Windows.h;bcrypt.h" BCRYPT_AVAILABLE)
-    cmake_pop_check_state()
-    if(BCRYPT_AVAILABLE)
-        target_link_libraries(${PROJECT_NAME} PRIVATE Bcrypt)
-        list(APPEND LTC_C_FLAGS -DLTC_WIN32_BCRYPT)
-    endif()
-endif()
-
 # If the user set the environment variables at generate-time, append them in order to allow
 # overriding our defaults.
 # ~~~
@@ -159,6 +148,17 @@ set_target_properties(
                SOVERSION ${PROJECT_VERSION_MAJOR}
                PUBLIC_HEADER "${PUBLIC_HEADERS}"
 )
+
+if(MSVC)
+    cmake_push_check_state()
+    set(CMAKE_REQUIRED_LIBRARIES bcrypt)
+    check_symbol_exists(BCryptGenRandom "Windows.h;bcrypt.h" BCRYPT_AVAILABLE)
+    cmake_pop_check_state()
+    if(BCRYPT_AVAILABLE)
+        target_link_libraries(${PROJECT_NAME} PRIVATE Bcrypt)
+        list(APPEND LTC_C_FLAGS -DLTC_WIN32_BCRYPT)
+    endif()
+endif()
 
 option(COMPILE_LTO "Build with LTO enabled")
 if(COMPILE_LTO)

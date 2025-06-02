@@ -387,7 +387,7 @@ int pem_decrypt(unsigned char *data, unsigned long *datalen,
 int pem_get_char_from_file(struct get_char *g);
 #endif /* LTC_NO_FILE */
 int pem_get_char_from_buf(struct get_char *g);
-int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_char *g);
+int pem_read(void *asn1_cert, unsigned long *asn1_len, struct pem_headers *hdr, struct get_char *g);
 #endif
 
 /* tomcrypt_pk.h */

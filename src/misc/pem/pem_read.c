@@ -176,11 +176,11 @@ static int s_pem_decode_headers(struct pem_headers *hdr, struct get_char *g)
    return CRYPT_OK;
 }
 
-int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_char *g)
+int pem_read(void *asn1_cert, unsigned long *asn1_len, struct pem_headers *hdr, struct get_char *g)
 {
    char buf[LTC_PEM_DECODE_BUFSZ];
-   char *wpem = pem;
-   char *end = wpem + *w;
+   char *wpem = asn1_cert;
+   char *end = wpem + *asn1_len;
    unsigned long slen, linelen;
    int err, hdr_ok = 0;
    int would_overflow = 0;
@@ -226,16 +226,16 @@ int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_ch
       /* NUL termination */
       wpem++;
       /* prevent a wrap-around */
-      if (wpem < (char*)pem)
+      if (wpem < (char*)asn1_cert)
          return CRYPT_OVERFLOW;
-      *w = wpem - (char*)pem;
+      *asn1_len = wpem - (char*)asn1_cert;
       return CRYPT_BUFFER_OVERFLOW;
    }
 
-   *w = wpem - (char*)pem;
+   *asn1_len = wpem - (char*)asn1_cert;
    *wpem++ = '\0';
 
-   if ((err = base64_strict_decode(pem, *w, pem, w)) != CRYPT_OK) {
+   if ((err = base64_strict_decode(asn1_cert, *asn1_len, asn1_cert, asn1_len)) != CRYPT_OK) {
       return err;
    }
    return CRYPT_OK;

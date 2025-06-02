@@ -494,7 +494,7 @@ $(DESTDIR)$(BINPATH):
 	install -p -d $(DESTDIR)$(BINPATH)
 
 .common_install_bins: $(USEFUL_DEMOS) $(DESTDIR)$(BINPATH)
-	for d in $(USEFUL_DEMOS); do $(INSTALL_CMD) -p -m 775 $$d $(DESTDIR)$(BINPATH)/ltc-$$d
+	for d in $(USEFUL_DEMOS); do $(INSTALL_CMD) -p -m 775 $$d $(DESTDIR)$(BINPATH)/ltc-$$d; done
 	$(INSTALL_CMD) -p -m 775 demos/ltc $(DESTDIR)$(BINPATH)
 
 install_docs: $(call print-help,install_docs,Installs the Developer Manual) doc/crypt.pdf
@@ -502,7 +502,7 @@ install_docs: $(call print-help,install_docs,Installs the Developer Manual) doc/
 	install -p -m 644 doc/crypt.pdf $(DESTDIR)$(DATAPATH)
 
 install_test: $(call print-help,install_test,Installs the self-test binary) test $(DESTDIR)$(BINPATH)
-	$(INSTALL_CMD) -p -m 775 $< $(DESTDIR)$(BINPATH)
+	$(INSTALL_CMD) -p -m 775 $< $(DESTDIR)$(BINPATH)/ltc-$<
 
 install_hooks: $(call print-help,install_hooks,Installs the git hooks)
 	for s in `ls hooks/`; do ln -s ../../hooks/$$s .git/hooks/$$s; done
@@ -510,6 +510,7 @@ install_hooks: $(call print-help,install_hooks,Installs the git hooks)
 HEADER_FILES=$(notdir $(HEADERS_PUB))
 .common_uninstall:
 	$(UNINSTALL_CMD) $(DESTDIR)$(LIBPATH)/$(LIBNAME)
+	for d in $(USEFUL_DEMOS) test; do rm -f $(DESTDIR)$(BINPATH)/ltc-$$d; done
 	$(UNINSTALL_CMD) $(HEADER_FILES:%=$(DESTDIR)$(INCPATH)/%)
 
 #This rule cleans the source tree of all compiled code, not including the pdf

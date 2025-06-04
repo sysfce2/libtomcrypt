@@ -302,6 +302,13 @@ int keccak_224_test(void);
 int keccak_done(hash_state *md, unsigned char *out);
 #endif
 
+#ifdef LTC_TURBO_SHAKE
+#define turbo_shake_init(a, b) sha3_shake_init(a, b)
+int turbo_shake_process(hash_state *md, const unsigned char *in, unsigned long inlen);
+int turbo_shake_done(hash_state *md, unsigned char *out, unsigned long outlen);
+int turbo_shake_test(void);
+#endif
+
 #ifdef LTC_SHA512
 int sha512_init(hash_state * md);
 int sha512_process(hash_state * md, const unsigned char *in, unsigned long inlen);

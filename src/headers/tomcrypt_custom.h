@@ -258,6 +258,7 @@
 #define LTC_WHIRLPOOL
 #define LTC_SHA3
 #define LTC_KECCAK
+#define LTC_TURBO_SHAKE
 #define LTC_SHA512
 #define LTC_SHA512_256
 #define LTC_SHA512_224

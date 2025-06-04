@@ -60,6 +60,9 @@ int cipher_hash_test(void)
    /* SHAKE128 + SHAKE256 tests are a bit special */
    DOX(sha3_shake_test(), "sha3_shake");
 #endif
+#ifdef LTC_TURBO_SHAKE
+   DO(turbo_shake_test());
+#endif
 
    return 0;
 }

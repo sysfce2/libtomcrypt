@@ -207,32 +207,32 @@ static int rsa_compat_test(void)
    /* now try to export private/public and compare */
    len = sizeof(buf);
    DO(rsa_export(buf, &len, PK_PRIVATE, &key));
-   DO(do_compare_testvector(buf, len, ltc_rsa_private_test_key, sizeof(ltc_rsa_private_test_key), "RSA private export (from OpenSSL)", 0));
+   COMPARE_TESTVECTOR(buf, len, ltc_rsa_private_test_key, sizeof(ltc_rsa_private_test_key), "RSA private export (from OpenSSL)", 0);
 
    len = sizeof(buf);
    DO(rsa_export(buf, &len, PK_PUBLIC, &key));
-   DO(do_compare_testvector(buf, len, openssl_public_rsa_stripped, sizeof(openssl_public_rsa_stripped), "RSA public export (from OpenSSL private key)", 0));
+   COMPARE_TESTVECTOR(buf, len, openssl_public_rsa_stripped, sizeof(openssl_public_rsa_stripped), "RSA public export (from OpenSSL private key)", 0);
    rsa_free(&key);
 
    /* try reading the public key */
    DO(rsa_import(openssl_public_rsa_stripped, sizeof(openssl_public_rsa_stripped), &key));
    len = sizeof(buf);
    DO(rsa_export(buf, &len, PK_PUBLIC, &key));
-   DO(do_compare_testvector(buf, len, openssl_public_rsa_stripped, sizeof(openssl_public_rsa_stripped), "RSA public export (from stripped OpenSSL)", 0));
+   COMPARE_TESTVECTOR(buf, len, openssl_public_rsa_stripped, sizeof(openssl_public_rsa_stripped), "RSA public export (from stripped OpenSSL)", 0);
    rsa_free(&key);
 
    /* try reading the public key */
    DO(rsa_import(openssl_public_rsa, sizeof(openssl_public_rsa), &key));
    len = sizeof(buf);
    DO(rsa_export(buf, &len, PK_PUBLIC, &key));
-   DO(do_compare_testvector(buf, len, openssl_public_rsa_stripped, sizeof(openssl_public_rsa_stripped), "RSA public export (from OpenSSL)", 0));
+   COMPARE_TESTVECTOR(buf, len, openssl_public_rsa_stripped, sizeof(openssl_public_rsa_stripped), "RSA public export (from OpenSSL)", 0);
    rsa_free(&key);
 
    /* try import private key in pkcs8 format */
    DO(rsa_import_pkcs8(pkcs8_private_rsa, sizeof(pkcs8_private_rsa), NULL, &key));
    len = sizeof(buf);
    DO(rsa_export(buf, &len, PK_PRIVATE, &key));
-   DO(do_compare_testvector(buf, len, ltc_rsa_private_test_key, sizeof(ltc_rsa_private_test_key), "RSA private export (from PKCS#8)", 0));
+   COMPARE_TESTVECTOR(buf, len, ltc_rsa_private_test_key, sizeof(ltc_rsa_private_test_key), "RSA private export (from PKCS#8)", 0);
    rsa_free(&key);
 
    /* convert raw hexadecimal numbers to binary */
@@ -246,21 +246,21 @@ static int rsa_compat_test(void)
    DO(rsa_set_crt_params(key_parts[pk_dP], key_lens[pk_dP], key_parts[pk_dQ], key_lens[pk_dQ], key_parts[pk_qP], key_lens[pk_qP], &key));
    len = sizeof(buf);
    DO(rsa_export(buf, &len, PK_PRIVATE, &key));
-   DO(do_compare_testvector(buf, len, ltc_rsa_private_test_key, sizeof(ltc_rsa_private_test_key), "RSA private export (from hex)", 0));
+   COMPARE_TESTVECTOR(buf, len, ltc_rsa_private_test_key, sizeof(ltc_rsa_private_test_key), "RSA private export (from hex)", 0);
    rsa_free(&key);
 
    /* try import public key from converted raw hexadecimal numbers */
    DO(rsa_set_key(key_parts[pk_N], key_lens[pk_N], key_parts[pk_e], key_lens[pk_e], NULL, 0, &key));
    len = sizeof(buf);
    DO(rsa_export(buf, &len, PK_PUBLIC, &key));
-   DO(do_compare_testvector(buf, len, openssl_public_rsa_stripped, sizeof(openssl_public_rsa_stripped), "RSA public export (from hex)", 0));
+   COMPARE_TESTVECTOR(buf, len, openssl_public_rsa_stripped, sizeof(openssl_public_rsa_stripped), "RSA public export (from hex)", 0);
    rsa_free(&key);
 
    /* try export in SubjectPublicKeyInfo format of the public key */
    DO(rsa_import(openssl_public_rsa, sizeof(openssl_public_rsa), &key));
    len = sizeof(buf);
    DO(rsa_export(buf, &len, PK_PUBLIC | PK_STD, &key));
-   DO(do_compare_testvector(buf, len, openssl_public_rsa, sizeof(openssl_public_rsa),  "RSA public export (X.509)", 0));
+   COMPARE_TESTVECTOR(buf, len, openssl_public_rsa, sizeof(openssl_public_rsa),  "RSA public export (X.509)", 0);
    rsa_free(&key);
 
    return 0;
@@ -546,7 +546,7 @@ print_hex("q", tmp, len);
             len2 = rsa_msgsize;
             DO(rsa_decrypt_key_ex(out, len, tmp, &len2, NULL, 0, mgf_hash, label_hash, LTC_PKCS_1_OAEP, &stat, &key));
             ENSUREX(stat == 1 && stat2 == 0, "rsa_decrypt_key (without lparam)");
-            DO(do_compare_testvector(tmp, len2, in, rsa_msgsize,  "rsa_decrypt_key (without lparam)", cnt << 8 | rsa_msgsize));
+            COMPARE_TESTVECTOR(tmp, len2, in, rsa_msgsize,  "rsa_decrypt_key (without lparam)", cnt << 8 | rsa_msgsize);
          }
 
          /* encrypt the key (with lparam) */
@@ -565,7 +565,7 @@ print_hex("q", tmp, len);
             len2 = rsa_msgsize;
             DO(rsa_decrypt_key_ex(out, len, tmp, &len2, lparam, sizeof(lparam), mgf_hash, label_hash, LTC_PKCS_1_OAEP, &stat, &key));
             ENSURE(stat == 1 && stat2 == 0);
-            DO(do_compare_testvector(tmp, len2, in, rsa_msgsize,  "rsa_decrypt_key (with lparam)", rsa_msgsize));
+            COMPARE_TESTVECTOR(tmp, len2, in, rsa_msgsize,  "rsa_decrypt_key (with lparam)", rsa_msgsize);
          }
 
       }
@@ -582,7 +582,7 @@ print_hex("q", tmp, len);
       len2 = rsa_msgsize;
       DO(rsa_decrypt_key_ex(out, len, tmp, &len2, NULL, 0, 0, -1, LTC_PKCS_1_V1_5, &stat, &key));
       ENSURE(stat == 1);
-      DO(do_compare_testvector(tmp, len2, in, rsa_msgsize,  "rsa_decrypt_key_ex", rsa_msgsize));
+      COMPARE_TESTVECTOR(tmp, len2, in, rsa_msgsize,  "rsa_decrypt_key_ex", rsa_msgsize);
    }
 
    /* sign a message (unsalted, lower cholestorol and Atkins approved) now */

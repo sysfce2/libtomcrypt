@@ -125,7 +125,7 @@ static int s_dhparam_test(void)
       return CRYPT_ERROR;
    }
    DO(ltc_mp_to_unsigned_bin(k.prime, buf));
-   DO(do_compare_testvector(buf, sizeof(prime), prime, sizeof(prime), "dhparam_test: prime mismatch", 1));
+   COMPARE_TESTVECTOR(buf, sizeof(prime), prime, sizeof(prime), "dhparam_test: prime mismatch", 1);
    if (ltc_mp_cmp_d(k.base, 2) != LTC_MP_EQ) {
       printf("dhparam_test: base mismatch\n");
       dh_free(&k);
@@ -259,16 +259,16 @@ static int s_set_test(void)
 
       len = sizeof(buf);
       DO(dh_export(buf, &len, PK_PRIVATE, &k1));
-      DO(do_compare_testvector(buf, len, export_private, sizeof(export_private), "radix_test: dh_export+PK_PRIVATE mismatch", i*10 + 0));
+      COMPARE_TESTVECTOR(buf, len, export_private, sizeof(export_private), "radix_test: dh_export+PK_PRIVATE mismatch", i*10 + 0);
       len = sizeof(buf);
       DO(dh_export(buf, &len, PK_PUBLIC, &k1));
-      DO(do_compare_testvector(buf, len, export_public, sizeof(export_public), "radix_test: dh_export+PK_PUBLIC mismatch", i*10 + 1));
+      COMPARE_TESTVECTOR(buf, len, export_public, sizeof(export_public), "radix_test: dh_export+PK_PUBLIC mismatch", i*10 + 1);
       len = sizeof(buf);
       DO(dh_export_key(buf, &len, PK_PRIVATE, &k1));
-      DO(do_compare_testvector(buf, len, xbin, sizeof(xbin), "radix_test: dh_export+PK_PRIVATE mismatch", i*10 + 2));
+      COMPARE_TESTVECTOR(buf, len, xbin, sizeof(xbin), "radix_test: dh_export+PK_PRIVATE mismatch", i*10 + 2);
       len = sizeof(buf);
       DO(dh_export_key(buf, &len, PK_PUBLIC, &k1));
-      DO(do_compare_testvector(buf, len, ybin, sizeof(ybin), "radix_test: dh_export+PK_PUBLIC mismatch", i*10 + 3));
+      COMPARE_TESTVECTOR(buf, len, ybin, sizeof(ybin), "radix_test: dh_export+PK_PUBLIC mismatch", i*10 + 3);
       dh_free(&k1);
 
       DO(dh_set_pg(test[i].p, test[i].plen, test[i].g, test[i].glen, &k1));
@@ -276,10 +276,10 @@ static int s_set_test(void)
 
       len = sizeof(buf);
       DO(dh_export(buf, &len, PK_PRIVATE, &k1));
-      DO(do_compare_testvector(buf, len, export_private, sizeof(export_private), "radix_test: dh_export+PK_PRIVATE mismatc", i*10 + 4));
+      COMPARE_TESTVECTOR(buf, len, export_private, sizeof(export_private), "radix_test: dh_export+PK_PRIVATE mismatc", i*10 + 4);
       len = sizeof(buf);
       DO(dh_export(buf, &len, PK_PUBLIC, &k1));
-      DO(do_compare_testvector(buf, len, export_public, sizeof(export_public), "radix_test: dh_export+PK_PUBLIC mismatch", i*10 + 5));
+      COMPARE_TESTVECTOR(buf, len, export_public, sizeof(export_public), "radix_test: dh_export+PK_PUBLIC mismatch", i*10 + 5);
       dh_free(&k1);
 
       DO(dh_set_pg(test[i].p, test[i].plen, test[i].g, test[i].glen, &k2));
@@ -287,10 +287,10 @@ static int s_set_test(void)
 
       len = sizeof(buf);
       DO(dh_export(buf, &len, PK_PUBLIC, &k2));
-      DO(do_compare_testvector(buf, len, export_public, sizeof(export_public), "radix_test: dh_export+PK_PUBLIC mismatch", i*10 + 6));
+      COMPARE_TESTVECTOR(buf, len, export_public, sizeof(export_public), "radix_test: dh_export+PK_PUBLIC mismatch", i*10 + 6);
       len = sizeof(buf);
       DO(dh_export_key(buf, &len, PK_PUBLIC, &k2));
-      DO(do_compare_testvector(buf, len, ybin, sizeof(ybin), "radix_test: dh_export+PK_PUBLIC mismatch", i*10 + 7));
+      COMPARE_TESTVECTOR(buf, len, ybin, sizeof(ybin), "radix_test: dh_export+PK_PUBLIC mismatch", i*10 + 7);
       dh_free(&k2);
 
       DO(dh_set_pg(test[i].p, test[i].plen, test[i].g, test[i].glen, &k3));
@@ -298,10 +298,10 @@ static int s_set_test(void)
 
       len = ltc_mp_unsigned_bin_size(k3.prime);
       DO(ltc_mp_to_unsigned_bin(k3.prime, buf));
-      DO(do_compare_testvector(buf, len, pbin, sizeof(pbin), "radix_test: dh_make_key_ex prime mismatch", i*10 + 8));
+      COMPARE_TESTVECTOR(buf, len, pbin, sizeof(pbin), "radix_test: dh_make_key_ex prime mismatch", i*10 + 8);
       len = ltc_mp_unsigned_bin_size(k3.base);
       DO(ltc_mp_to_unsigned_bin(k3.base, buf));
-      DO(do_compare_testvector(buf, len, gbin, sizeof(gbin), "radix_test: dh_make_key_ex base mismatch", i*10 + 9));
+      COMPARE_TESTVECTOR(buf, len, gbin, sizeof(gbin), "radix_test: dh_make_key_ex base mismatch", i*10 + 9);
       dh_free(&k3);
    }
 

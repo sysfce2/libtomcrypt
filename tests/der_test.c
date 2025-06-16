@@ -733,7 +733,7 @@ static void s_der_oid_test(void)
    DO(der_encode_object_identifier(decoded_list->data, decoded_list->size, buf, &len));
    der_sequence_free(decoded_list);
 
-   DO(do_compare_testvector(buf, len, oid_x690_8_19_5_example, sizeof(oid_x690_8_19_5_example), "OID X6.90 Ch. 8.19.5 Example", 0));
+   COMPARE_TESTVECTOR(buf, len, oid_x690_8_19_5_example, sizeof(oid_x690_8_19_5_example), "OID X6.90 Ch. 8.19.5 Example", 0);
 
    oid[0] = 3;
    oid[1] = 4;
@@ -1295,7 +1295,7 @@ static void der_Xcode_run(const der_Xcode_t* x)
       d2 = XREALLOC(d2, l2 * x->type_sz);
    }
    DO(x->decode(d1, l1, d2, &l2));
-   DO(do_compare_testvector(d2, (l2/x->factor) * x->type_sz, x->in, x->in_sz, x->what, __LINE__));
+   COMPARE_TESTVECTOR(d2, (l2/x->factor) * x->type_sz, x->in, x->in_sz, x->what, __LINE__);
    XFREE(d2);
    XFREE(d1);
 }

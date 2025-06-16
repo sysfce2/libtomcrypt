@@ -92,7 +92,7 @@ static int s_rfc_8410_10_test(void)
          DO(ed25519_export(buf, &buflen, rfc_8410_10[n].type, &key));
          tmplen = sizeof(tmp);
          DO(base64_encode(buf, buflen, tmp, &tmplen));
-         DO(do_compare_testvector(tmp, tmplen, rfc_8410_10[n].b64, XSTRLEN(rfc_8410_10[n].b64), "Ed25519 export-import", n));
+         COMPARE_TESTVECTOR(tmp, tmplen, rfc_8410_10[n].b64, XSTRLEN(rfc_8410_10[n].b64), "Ed25519 export-import", n);
       }
    }
    return CRYPT_OK;
@@ -225,9 +225,9 @@ static int s_rfc_8032_7_1_test(void)
       DO(ed25519_import_raw(sec, slen, PK_PRIVATE, &key));
       buflen = sizeof(buf);
       DO(ed25519_sign(msg, mlen, buf, &buflen, &key));
-      DO(do_compare_testvector(buf, buflen, sig, siglen, "Ed25519 RFC8032 7.1 - sign", n));
+      COMPARE_TESTVECTOR(buf, buflen, sig, siglen, "Ed25519 RFC8032 7.1 - sign", n);
       DO(ed25519_verify(msg, mlen, sig, siglen, &ret, &key));
-      DO(do_compare_testvector(&ret, sizeof(ret), &should, sizeof(should), "Ed25519 RFC8032 7.1 - verify w/ privkey", n));
+      COMPARE_TESTVECTOR(&ret, sizeof(ret), &should, sizeof(should), "Ed25519 RFC8032 7.1 - verify w/ privkey", n);
 
       xor_shuffle(sig, siglen, 0x8u);
       DO( ed25519_verify(msg, mlen, sig, siglen, &ret, &key));
@@ -244,7 +244,7 @@ static int s_rfc_8032_7_1_test(void)
       DO(base16_decode(rfc_8032_7_1[n].signature, XSTRLEN(rfc_8032_7_1[n].signature), sig, &siglen));
       DO(ed25519_import_raw(pub, plen, PK_PUBLIC, &key2));
       DO(ed25519_verify(msg, mlen, sig, siglen, &ret, &key2));
-      DO(do_compare_testvector(&ret, sizeof(ret), &should, sizeof(should), "Ed25519 RFC8032 7.1 - verify w/ pubkey", n));
+      COMPARE_TESTVECTOR(&ret, sizeof(ret), &should, sizeof(should), "Ed25519 RFC8032 7.1 - verify w/ pubkey", n);
 
       zeromem(&key, sizeof(key));
       zeromem(&key2, sizeof(key2));
@@ -331,7 +331,7 @@ static int s_rfc_8032_7_2_test(void)
 
       DO(ed25519_import_raw(sec, slen, PK_PRIVATE, &key));
       DO(ed25519ctx_sign(msg, mlen, buf, &buflen, ctx, ctxlen, &key));
-      DO(do_compare_testvector(buf, buflen, sig, siglen, "Ed25519 RFC8032 7.2 - sign", n));
+      COMPARE_TESTVECTOR(buf, buflen, sig, siglen, "Ed25519 RFC8032 7.2 - sign", n);
       DO(ed25519ctx_verify(msg, mlen, buf, buflen, ctx, ctxlen, &ret, &key));
       ENSUREX(ret == should, "Ed25519 RFC8032 7.2 - verify w/ privkey");
 
@@ -389,7 +389,7 @@ static int s_rfc_8032_7_3_test(void)
 
    DO(ed25519_import_raw(sec, slen, PK_PRIVATE, &key));
    DO(ed25519ph_sign(msg, mlen, buf, &buflen, NULL, 0, &key));
-   DO(do_compare_testvector(buf, buflen, sig, siglen, "Ed25519 RFC8032 7.3 - sign", 0));
+   COMPARE_TESTVECTOR(buf, buflen, sig, siglen, "Ed25519 RFC8032 7.3 - sign", 0);
    DO(ed25519ph_verify(msg, mlen, buf, buflen, NULL, 0, &ret, &key));
    ENSUREX(ret == should, "Ed25519 RFC8032 7.3 - verify w/ privkey");
 

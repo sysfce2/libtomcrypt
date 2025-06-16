@@ -420,7 +420,7 @@ static int s_ecc_old_api(void)
       y = sizeof(buf[1]);
       DO(ecc_shared_secret (&userb, &usera, buf[1], &y));
 
-      DO(do_compare_testvector(buf[0], x, buf[1], y, "ecc Shared keys", s));
+      COMPARE_TESTVECTOR(buf[0], x, buf[1], y, "ecc Shared keys", s);
 
       /* now export userb */
       y = sizeof(buf[0]);

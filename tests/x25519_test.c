@@ -197,7 +197,7 @@ static int s_x25519_compat_test(void)
 
    DO(x25519_export(buf, &buflen, PK_PRIVATE | PK_STD, &priv));
    DO(x25519_import_pkcs8(buf, buflen, NULL, &imported));
-   DO(do_compare_testvector(&priv, sizeof(priv), &imported, sizeof(imported), "priv after ex-&import", __LINE__));
+   COMPARE_TESTVECTOR(&priv, sizeof(priv), &imported, sizeof(imported), "priv after ex-&import", __LINE__);
    XMEMSET(&imported, 0, sizeof(imported));
 
    buflen = sizeof(buf);
@@ -208,14 +208,14 @@ static int s_x25519_compat_test(void)
    DO(x25519_export(buf, &buflen, PK_PUBLIC | PK_STD, &priv));
    DO(x25519_import(buf, buflen, &imported));
 
-   DO(do_compare_testvector(&pub, sizeof(pub), &imported, sizeof(imported), "pub after private ex-&import", __LINE__));
+   COMPARE_TESTVECTOR(&pub, sizeof(pub), &imported, sizeof(imported), "pub after private ex-&import", __LINE__);
    XMEMSET(&imported, 0, sizeof(imported));
 
    buflen = sizeof(buf);
    DO(x25519_export(buf, &buflen, PK_PUBLIC | PK_STD, &pub));
    DO(x25519_import(buf, buflen, &imported));
 
-   DO(do_compare_testvector(&pub, sizeof(pub), &imported, sizeof(imported), "pub after public ex-&import", __LINE__));
+   COMPARE_TESTVECTOR(&pub, sizeof(pub), &imported, sizeof(imported), "pub after public ex-&import", __LINE__);
 
    return CRYPT_OK;
 }

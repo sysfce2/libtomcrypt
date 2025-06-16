@@ -767,7 +767,7 @@ print_hex("q", tmp, len);
    DO(rsa_import_x509(tmp, len3, &key));
    len = sizeof(tmp);
    DO(rsa_export(tmp, &len, PK_PUBLIC, &key));
-   DO(do_compare_testvector(tmp, len, openssl_public_rsa_stripped, sizeof(openssl_public_rsa_stripped),  "RSA public export failed to match rsa_import_x509", 0));
+   COMPARE_TESTVECTOR(tmp, len, openssl_public_rsa_stripped, sizeof(openssl_public_rsa_stripped),  "RSA public export to match rsa_import_x509", 0);
    rsa_free(&key);
 
    len3 = sizeof(tmp);

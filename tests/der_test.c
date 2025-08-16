@@ -691,32 +691,6 @@ static void der_set_test(void)
 
 }
 
-
-/* we are encoding
-
-  SEQUENCE {
-     PRINTABLE "printable"
-     IA5       "ia5"
-     SEQUENCE {
-        INTEGER 12345678
-        UTCTIME { 91, 5, 6, 16, 45, 40, 1, 7, 0 }
-        GENERALIZEDTIME { 2017, 03, 21, 10, 21, 12, 4, 1, 2, 0 }
-        SEQUENCE {
-           OCTET STRING { 1, 2, 3, 4 }
-           BIT STRING   { 1, 0, 0, 1 }
-           SEQUENCE {
-              OID       { 1, 2, 840, 113549 }
-              NULL
-              SET OF {
-                 PRINTABLE "333"  -- WILL GET SORTED
-                 PRINTABLE "222"
-           }
-        }
-     }
-  }
-
-*/
-
 static void s_der_oid_test(void)
 {
    static const unsigned char oid_x690_8_19_5_example[] = { 0x06, 0x03, 0x88, 0x37, 0x03 };
@@ -745,6 +719,30 @@ static void s_der_oid_test(void)
    SHOULD_FAIL(der_length_object_identifier(oid, 3, &len));
 }
 
+/* we are encoding
+
+  SEQUENCE {
+     PRINTABLE "printable"
+     IA5       "ia5"
+     SEQUENCE {
+        INTEGER 12345678
+        UTCTIME { 91, 5, 6, 16, 45, 40, 1, 7, 0 }
+        GENERALIZEDTIME { 2017, 03, 21, 10, 21, 12, 4, 1, 2, 0 }
+        SEQUENCE {
+           OCTET STRING { 1, 2, 3, 4 }
+           BIT STRING   { 1, 0, 0, 1 }
+           SEQUENCE {
+              OID       { 1, 2, 840, 113549 }
+              NULL
+              SET OF {
+                 PRINTABLE "333"  -- WILL GET SORTED
+                 PRINTABLE "222"
+           }
+        }
+     }
+  }
+
+*/
 static void der_flexi_test(void)
 {
    static const char printable_str[]    = "printable";

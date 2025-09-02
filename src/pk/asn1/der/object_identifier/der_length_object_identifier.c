@@ -12,7 +12,6 @@
 unsigned long der_object_identifier_bits(unsigned long x)
 {
    unsigned long c;
-   x &= 0xFFFFFFFF;
    c  = 0;
    while (x) {
      ++c;

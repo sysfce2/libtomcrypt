@@ -59,7 +59,7 @@ int der_encode_object_identifier(const unsigned long *words, unsigned long  nwor
    wordbuf = words[0] * 40 + words[1];
    for (i = 1; i < nwords; i++) {
       /* store 7 bit words in little endian */
-      t    = wordbuf & 0xFFFFFFFF;
+      t    = wordbuf;
       if (t) {
          y    = x;
          mask = 0;

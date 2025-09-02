@@ -363,6 +363,7 @@ struct get_char {
    } data;
    struct str unget_buf;
    char unget_buf_[LTC_PEM_DECODE_BUFSZ];
+   int prev_get;
 };
 #endif
 

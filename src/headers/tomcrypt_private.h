@@ -588,6 +588,16 @@ int der_length_asn1_length(unsigned long len, unsigned long *outlen);
 int der_length_sequence_ex(const ltc_asn1_list *list, unsigned long inlen,
                            unsigned long *outlen, unsigned long *payloadlen);
 
+unsigned long der_object_identifier_bits(unsigned long x);
+
+int der_ia5_char_encode(int c);
+int der_ia5_value_decode(int v);
+
+int der_printable_char_encode(int c);
+int der_printable_value_decode(int v);
+
+unsigned long der_utf8_charsize(const wchar_t c);
+
 typedef struct {
    ltc_asn1_type t;
    ltc_asn1_list **pp;

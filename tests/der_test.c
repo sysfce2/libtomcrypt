@@ -1014,7 +1014,7 @@ static void der_flexi_test(void)
          exit(EXIT_FAILURE);
       }
 
-      if (l->size != sizeof(oid_str)/sizeof(oid_str[0]) || memcmp(oid_str, l->data, l->size*sizeof(oid_str[0]))) {
+      if (l->size != LTC_ARRAY_SIZE(oid_str) || memcmp(oid_str, l->data, l->size*sizeof(oid_str[0]))) {
          fprintf(stderr, "(%d), %d, %lu, next=%p, prev=%p, parent=%p, child=%p\n", __LINE__, l->type, l->size, l->next, l->prev, l->parent, l->child);
          exit(EXIT_FAILURE);
       }
@@ -1097,13 +1097,13 @@ static int der_choice_n_custom_test(void)
    for (x = 0; x < sizeof(octetbuf); x++) { octetbuf[x] = x;     }
    for (x = 0; x < sizeof(ia5buf); x++)   { ia5buf[x]   = 'a';   }
    for (x = 0; x < sizeof(printbuf); x++) { printbuf[x] = 'a';   }
-   for (x = 0; x < sizeof(utf8buf)/sizeof(utf8buf[0]); x++) { utf8buf[x] = L'a';   }
+   for (x = 0; x < LTC_ARRAY_SIZE(utf8buf); x++) { utf8buf[x] = L'a';   }
    integer = 1;
    boolean[0] = 1;
-   for (x = 0; x < sizeof(oidbuf)/sizeof(oidbuf[0]); x++)   { oidbuf[x] = x + 1;   }
+   for (x = 0; x < LTC_ARRAY_SIZE(oidbuf); x++)   { oidbuf[x] = x + 1;   }
    DO(ltc_mp_init(&mpinteger));
 
-   n = sizeof(types)/sizeof(types[0]);
+   n = LTC_ARRAY_SIZE(types);
    for (x = 0; x < n * 2; x++) {
        /* setup list */
        y = 0;
@@ -1115,13 +1115,13 @@ static int der_choice_n_custom_test(void)
        }
        LTC_SET_ASN1(types, y++, LTC_ASN1_OCTET_STRING, octetbuf, sizeof(octetbuf));
        LTC_SET_ASN1(types, y++, LTC_ASN1_IA5_STRING, ia5buf, sizeof(ia5buf));
-       LTC_SET_ASN1(types, y++, LTC_ASN1_BOOLEAN, boolean, sizeof(boolean)/sizeof(boolean[0]));
+       LTC_SET_ASN1(types, y++, LTC_ASN1_BOOLEAN, boolean, LTC_ARRAY_SIZE(boolean));
        if (x > n) {
           LTC_SET_ASN1(types, y++, LTC_ASN1_SHORT_INTEGER, &integer, 1);
        } else {
           LTC_SET_ASN1(types, y++, LTC_ASN1_INTEGER, mpinteger, 1);
        }
-       LTC_SET_ASN1(types, y++, LTC_ASN1_OBJECT_IDENTIFIER, oidbuf, sizeof(oidbuf)/sizeof(oidbuf[0]));
+       LTC_SET_ASN1(types, y++, LTC_ASN1_OBJECT_IDENTIFIER, oidbuf, LTC_ARRAY_SIZE(oidbuf));
        if (x > n) {
           LTC_SET_ASN1(types, y++, LTC_ASN1_UTCTIME, &utctime, 1);
        } else {
@@ -1131,7 +1131,7 @@ static int der_choice_n_custom_test(void)
        LTC_SET_ASN1(custom, 0, LTC_ASN1_NULL, NULL, 0);
        LTC_SET_ASN1_CUSTOM_CONSTRUCTED(types, y++, LTC_ASN1_CL_CONTEXT_SPECIFIC, 0, custom);
 
-       LTC_SET_ASN1(types, y++, LTC_ASN1_UTF8_STRING, utf8buf, sizeof(utf8buf)/sizeof(utf8buf[0]));
+       LTC_SET_ASN1(types, y++, LTC_ASN1_UTF8_STRING, utf8buf, LTC_ARRAY_SIZE(utf8buf));
 
        LTC_SET_ASN1(host, 0, LTC_ASN1_CHOICE, types, n);
 
@@ -1344,7 +1344,7 @@ static void der_Xcode_test(void)
     DER_XCODE(utf8_string, wchar_string),
    };
 
-   for (i = 0; i < sizeof(xcode_tests)/sizeof(xcode_tests[0]); ++i) {
+   for (i = 0; i < LTC_ARRAY_SIZE(xcode_tests); ++i) {
       der_Xcode_run(&xcode_tests[i]);
    }
 
@@ -1425,7 +1425,7 @@ static void s_der_regression_test(void)
    SHOULD_FAIL(der_decode_sequence_flexi(issue_507, &len, &l));
 
    len = sizeof(utf8_length);
-   outlen = sizeof(wtmp)/sizeof(wtmp[0]);
+   outlen = LTC_ARRAY_SIZE(wtmp);
    DO(der_decode_utf8_string(utf8_length, len, wtmp, &outlen));
    ENSURE(outlen == 2);
 }
@@ -1544,7 +1544,7 @@ static void der_toolong_test(void)
 
    ltc_mp_deinit_multi(int1, int2, LTC_NULL);
 
-   LTC_SET_ASN1(seqoid,  0, LTC_ASN1_OBJECT_IDENTIFIER, oid, sizeof(oid)/sizeof(oid[0]));
+   LTC_SET_ASN1(seqoid,  0, LTC_ASN1_OBJECT_IDENTIFIER, oid, LTC_ARRAY_SIZE(oid));
    LTC_SET_ASN1(seqoid,  1, LTC_ASN1_NULL,              NULL,   0);
    LTC_SET_ASN1(seqmain, 0, LTC_ASN1_SEQUENCE,          seqoid, 2);
    LTC_SET_ASN1(seqmain, 1, LTC_ASN1_OCTET_STRING,      buf32,  32);
@@ -1805,7 +1805,7 @@ int der_test(void)
 
 /* test OID */
    x = sizeof(buf[0]);
-   DO(der_encode_object_identifier((unsigned long*)rsa_oid, sizeof(rsa_oid)/sizeof(rsa_oid[0]), buf[0], &x));
+   DO(der_encode_object_identifier((unsigned long*)rsa_oid, LTC_ARRAY_SIZE(rsa_oid), buf[0], &x));
    if (x != sizeof(rsa_oid_der) || memcmp(rsa_oid_der, buf[0], x)) {
       fprintf(stderr, "rsa_oid_der encode failed to match, %lu, ", x);
       for (y = 0; y < x; y++) fprintf(stderr, "%02x ", buf[0][y]);
@@ -1813,9 +1813,9 @@ int der_test(void)
       return 1;
    }
 
-   y = sizeof(oid[0])/sizeof(oid[0][0]);
+   y = LTC_ARRAY_SIZE(oid[0]);
    DO(der_decode_object_identifier(buf[0], x, oid[0], &y));
-   if (y != sizeof(rsa_oid)/sizeof(rsa_oid[0]) || memcmp(rsa_oid, oid[0], sizeof(rsa_oid))) {
+   if (y != LTC_ARRAY_SIZE(rsa_oid) || memcmp(rsa_oid, oid[0], sizeof(rsa_oid))) {
       fprintf(stderr, "rsa_oid_der decode failed to match, %lu, ", y);
       for (z = 0; z < y; z++) fprintf(stderr, "%lu ", oid[0][z]);
       fprintf(stderr, "\n");
@@ -1827,7 +1827,7 @@ int der_test(void)
        /* pick a random number of words */
        ENSURE(yarrow_read(buf[0], 4, &yarrow_prng) == 4);
        LOAD32L(z, buf[0]);
-       z = 2 + (z % ((sizeof(oid[0])/sizeof(oid[0][0])) - 2));
+       z = 2 + (z % (LTC_ARRAY_SIZE(oid[0]) - 2));
 
        /* fill them in */
        oid[0][0] = buf[0][0] % 3;
@@ -1849,7 +1849,7 @@ int der_test(void)
        }
 
        /* decode it */
-       y = sizeof(oid[0])/sizeof(oid[0][0]);
+       y = LTC_ARRAY_SIZE(oid[0]);
        DO(der_decode_object_identifier(buf[0], x, oid[1], &y));
        if (y != z) {
           fprintf(stderr, "Random OID %lu test failed, decode length mismatch: %lu, %lu\n", z, x, y);

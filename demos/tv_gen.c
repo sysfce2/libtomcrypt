@@ -535,7 +535,7 @@ static void ccm_gen(void)
           nonce[z] = z;
       }
 
-      for (t = 0; t < sizeof(taglen)/sizeof(taglen[0]); ++t) {
+      for (t = 0; t < LTC_ARRAY_SIZE(taglen); ++t) {
          for (y1 = 0; y1 <= (int)(cipher_descriptor[x].block_length*2); y1++){
             for (z = 0; z < y1; z++) {
                plaintext[z] = (unsigned char)(z & 255);

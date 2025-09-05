@@ -45,6 +45,8 @@ LTC_STATIC_ASSERT(correct_ltc_uintptr_size, sizeof(ltc_uintptr) == sizeof(void*)
    #define LTC_NULL ((void *)0)
 #endif
 
+#define LTC_ARRAY_SIZE(arr) (sizeof(arr)/sizeof(arr[0]))
+
 /*
  * Internal Enums
  */

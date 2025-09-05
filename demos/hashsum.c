@@ -30,6 +30,10 @@
             '\255')
 #define HEXOF(x) (x - s_base(x))
 
+#ifndef LTC_ARRAY_SIZE
+#define LTC_ARRAY_SIZE(arr) (sizeof(arr)/sizeof(arr[0]))
+#endif
+
 static char* hashsum;
 
 static void cleanup(void)
@@ -190,7 +194,7 @@ int main(int argc, char **argv)
       die(EXIT_FAILURE);
    }
 
-   for (x = 0; x < sizeof(idxs)/sizeof(idxs[0]); ++x) {
+   for (x = 0; x < LTC_ARRAY_SIZE(idxs); ++x) {
       idxs[x] = -2;
    }
    argn = 1;
@@ -243,7 +247,7 @@ int main(int argc, char **argv)
                die(EXIT_FAILURE);
             }
             idx++;
-            if ((size_t)idx >= sizeof(idxs)/sizeof(idxs[0])) {
+            if ((size_t)idx >= LTC_ARRAY_SIZE(idxs)) {
                fprintf(stderr, "%s: Too many '-a' options chosen\n", hashsum);
                die(EXIT_FAILURE);
             }

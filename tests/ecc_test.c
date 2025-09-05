@@ -156,7 +156,7 @@ static int s_ecc_test_shamir(void)
    LTC_ARGCHK((C1 = ltc_ecc_new_point()) != NULL);
    LTC_ARGCHK((C2 = ltc_ecc_new_point()) != NULL);
 
-   for (x = 0; x < (int)(sizeof(sizes)/sizeof(sizes[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(sizes); x++) {
        /* get the base point */
        for (z = 0; ltc_ecc_curves[z].prime != NULL; z++) {
            DO(ltc_mp_read_radix(modulus, ltc_ecc_curves[z].prime, 16));
@@ -406,7 +406,7 @@ static int s_ecc_old_api(void)
    ecc_sizes(&low, &high);
    if (low < 14 || high < 14 || low > 100 || high > 100 || high < low) return CRYPT_FAIL_TESTVECTOR;
 
-   for (s = 0; s < (sizeof(sizes)/sizeof(sizes[0])); s++) {
+   for (s = 0; s < LTC_ARRAY_SIZE(sizes); s++) {
       /* make up two keys */
       DO(ecc_make_key (&yarrow_prng, find_prng ("yarrow"), sizes[s], &usera));
       DO(ecc_make_key (&yarrow_prng, find_prng ("yarrow"), sizes[s], &userb));
@@ -557,7 +557,7 @@ static int s_ecc_new_api(void)
    unsigned char data16[16] = { 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1 };
    unsigned long len16;
 
-   for (i = 0; i < (int)(sizeof(curvenames)/sizeof(curvenames[0])); i++) {
+   for (i = 0; i < (int)LTC_ARRAY_SIZE(curvenames); i++) {
       DO(ecc_find_curve(curvenames[i], &dp));
       /* make new key */
       DO(ecc_make_key_ex(&yarrow_prng, find_prng ("yarrow"), &key, dp));
@@ -1985,7 +1985,7 @@ static int s_ecc_test_recovery(void)
    ecc_free(&pubkey);
 #endif
 
-   for (i = 0; i < (int)(sizeof(curvenames)/sizeof(curvenames[0])); i++) {
+   for (i = 0; i < (int)LTC_ARRAY_SIZE(curvenames); i++) {
       DO(ecc_find_curve(curvenames[i], &dp));
 
       /* generate new key */

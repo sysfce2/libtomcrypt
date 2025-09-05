@@ -356,7 +356,7 @@ int main(int argc, char **argv)
    }
 
 #ifdef LTC_PTHREAD
-   tinfo = XCALLOC(sizeof(test_functions)/sizeof(test_functions[0]), sizeof(thread_info));
+   tinfo = XCALLOC(LTC_ARRAY_SIZE(test_functions), sizeof(thread_info));
    if (tinfo == NULL) {
       printf("\n\nFAILURE: XCALLOC\n");
       return EXIT_FAILURE;
@@ -385,7 +385,7 @@ int main(int argc, char **argv)
    if (argc > 1) single_test = argv[1];
 
    dur = epoch_usec();
-   for (i = 0; i < sizeof(test_functions)/sizeof(test_functions[0]); ++i) {
+   for (i = 0; i < LTC_ARRAY_SIZE(test_functions); ++i) {
       if (single_test && strstr(test_functions[i].name, single_test) == NULL) {
         continue;
       }

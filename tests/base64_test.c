@@ -71,7 +71,7 @@ int base64_test(void)
          {"vuiSPKIl8PiR5O-rC4z9_xTQK", invalid},
    };
 
-   for (x = 0; x < sizeof(url_cases)/sizeof(url_cases[0]); ++x) {
+   for (x = 0; x < LTC_ARRAY_SIZE(url_cases); ++x) {
        slen1 = XSTRLEN(url_cases[x].s);
        l1 = sizeof(tmp);
        if(url_cases[x].flag == strict) {
@@ -113,7 +113,7 @@ int base64_test(void)
 #endif
 
 #if defined(LTC_BASE64)
-   for (x = 0; x < sizeof(cases)/sizeof(cases[0]); ++x) {
+   for (x = 0; x < LTC_ARRAY_SIZE(cases); ++x) {
        memset(out, 0, sizeof(out));
        memset(tmp, 0, sizeof(tmp));
        slen1 = XSTRLEN(cases[x].s);

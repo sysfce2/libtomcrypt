@@ -96,7 +96,7 @@ static int s_import_x509(unsigned char *asn1_cert, unsigned long asn1_len, ltc_p
       return err;
    }
    if (pka < 0
-         || pka > sizeof(s_import_x509_fns)/sizeof(s_import_x509_fns[0])
+         || pka > LTC_ARRAY_SIZE(s_import_x509_fns)
          || s_import_x509_fns[pka] == NULL) {
       return CRYPT_PK_INVALID_TYPE;
    }
@@ -251,7 +251,7 @@ retry:
    }
 
    if (pka < 0
-         || pka > sizeof(s_import_openssl_fns)/sizeof(s_import_openssl_fns[0])
+         || pka > LTC_ARRAY_SIZE(s_import_openssl_fns)
          || s_import_openssl_fns[pka] == NULL) {
       err = CRYPT_PK_INVALID_TYPE;
       goto cleanup;

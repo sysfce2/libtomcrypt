@@ -66,7 +66,7 @@ static int s_rfc_8410_10_test(void)
    char tmp[512];
    unsigned long buflen, tmplen;
    password_ctx pw_ctx = { .callback = password_get };
-   for (n = 0; n < sizeof(rfc_8410_10)/sizeof(rfc_8410_10[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(rfc_8410_10); ++n) {
       buflen = sizeof(buf);
       DO(base64_decode(rfc_8410_10[n].b64, XSTRLEN(rfc_8410_10[n].b64), buf, &buflen));
       switch (n) {
@@ -213,7 +213,7 @@ static int s_rfc_8032_7_1_test(void)
    curve25519_key key, key2;
    int ret;
    const int should = 1;
-   for (n = 0; n < sizeof(rfc_8032_7_1)/sizeof(rfc_8032_7_1[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(rfc_8032_7_1); ++n) {
       slen = sizeof(sec);
       DO(base16_decode(rfc_8032_7_1[n].secret_key, XSTRLEN(rfc_8032_7_1[n].secret_key), sec, &slen));
       plen = sizeof(pub);
@@ -316,7 +316,7 @@ static int s_rfc_8032_7_2_test(void)
    int ret;
    const int should = 1;
 
-   for (n = 0; n < sizeof(rfc_8032_7_2)/sizeof(rfc_8032_7_2[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(rfc_8032_7_2); ++n) {
       slen = sizeof(sec);
       DO(base16_decode(rfc_8032_7_2[n].secret_key, XSTRLEN(rfc_8032_7_2[n].secret_key), sec, &slen));
       plen = sizeof(pub);

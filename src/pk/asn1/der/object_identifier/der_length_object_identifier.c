@@ -11,6 +11,11 @@
 
 unsigned long der_object_identifier_bits(unsigned long x)
 {
+#if defined(LTC_HAVE_CLZL_BUILTIN)
+   if (x == 0)
+      return 0;
+   return sizeof(unsigned long) * CHAR_BIT - __builtin_clzl(x);
+#else
    unsigned long c;
    c  = 0;
    while (x) {
@@ -18,8 +23,8 @@ unsigned long der_object_identifier_bits(unsigned long x)
      x >>= 1;
    }
    return c;
+#endif
 }
-
 
 /**
   Gets length of DER encoding of Object Identifier

@@ -197,7 +197,7 @@ int pem_decrypt(unsigned char *data, unsigned long *datalen,
             goto error_out;
          }
 
-         if ((err = padding_depad(data, datalen, padding | s.ctx.cbc.blocklen)) != CRYPT_OK) {
+         if ((err = padding_depad(data, datalen, padding | s.ctx.cbc.ecb.blocklen)) != CRYPT_OK) {
             goto error_out;
          }
 #else

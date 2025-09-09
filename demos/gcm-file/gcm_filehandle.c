@@ -116,7 +116,7 @@ int gcm_filehandle(      int           cipher,
     if (direction == GCM_DECRYPT) {
        tot_data -= taglen;
     }
-    rewind(in);
+    fseek(in, 0, SEEK_SET);
     do {
        x = MIN(tot_data, LTC_FILE_READ_BUFSIZE);
        x = fread(buf, 1, x, in);
@@ -140,6 +140,10 @@ int gcm_filehandle(      int           cipher,
     }
 
     if (direction == GCM_DECRYPT) {
+       if (feof(in) || ferror(in)) {
+          err = CRYPT_ERROR;
+          goto LBL_CLEANBUF;
+       }
        x = fread(buf, 1, taglen, in);
        if (x != taglen) {
           err = CRYPT_ERROR;
@@ -170,7 +174,7 @@ LBL_ERR:
 #endif
     if(*res == 0) {
        x = ftell(out);
-       rewind(out);
+       fseek(in, 0, SEEK_SET);
        while((size_t)ftell(out) < x) {
           fwrite(buf, 1, LTC_FILE_READ_BUFSIZE, out);
        }

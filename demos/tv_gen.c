@@ -2,6 +2,14 @@
 /* SPDX-License-Identifier: Unlicense */
 #include "tomcrypt_private.h"
 
+#define OPEN_FILE(f, o) do { \
+   o = fopen(f, "w");                     \
+   if (o == NULL) {                       \
+      perror("can't open " f);   \
+      return;                    \
+   }                             \
+} while(0)
+
 static void hash_gen(void)
 {
    unsigned char md[MAXBLOCKSIZE], *buf;
@@ -9,11 +17,7 @@ static void hash_gen(void)
    FILE *out;
    int   err;
 
-   out = fopen("hash_tv.txt", "w");
-   if (out == NULL) {
-      perror("can't open hash_tv.txt");
-      return;
-   }
+   OPEN_FILE("hash_tv.txt", out);
 
    fprintf(out, "Hash Test Vectors:\n\nThese are the hashes of nn bytes '00 01 02 03 .. (nn-1)'\n\n");
    for (x = 0; hash_descriptor[x].name != NULL; x++) {
@@ -52,7 +56,7 @@ static void cipher_gen(void)
    FILE *out;
    symmetric_key skey;
 
-   out = fopen("cipher_tv.txt", "w");
+   OPEN_FILE("cipher_tv.txt", out);
 
    fprintf(out,
 "Cipher Test Vectors\n\nThese are test encryptions with key of nn bytes '00 01 02 03 .. (nn-1)' and original PT of the same style.\n"
@@ -126,7 +130,7 @@ static void hmac_gen(void)
    FILE *out;
    unsigned long len;
 
-   out = fopen("hmac_tv.txt", "w");
+   OPEN_FILE("hmac_tv.txt", out);
 
    fprintf(out,
 "HMAC Tests.  In these tests messages of N bytes long (00,01,02,...,NN-1) are HMACed.  The initial key is\n"
@@ -179,7 +183,7 @@ static void omac_gen(void)
    FILE *out;
    unsigned long len;
 
-   out = fopen("omac_tv.txt", "w");
+   OPEN_FILE("omac_tv.txt", out);
 
    fprintf(out,
 "OMAC Tests.  In these tests messages of N bytes long (00,01,02,...,NN-1) are OMAC'ed.  The initial key is\n"
@@ -240,7 +244,7 @@ static void pmac_gen(void)
    FILE *out;
    unsigned long len;
 
-   out = fopen("pmac_tv.txt", "w");
+   OPEN_FILE("pmac_tv.txt", out);
 
    fprintf(out,
 "PMAC Tests.  In these tests messages of N bytes long (00,01,02,...,NN-1) are PMAC'ed.  The initial key is\n"
@@ -302,7 +306,7 @@ static void eax_gen(void)
                  plaintext[MAXBLOCKSIZE*2], tag[MAXBLOCKSIZE];
    unsigned long len;
 
-   out = fopen("eax_tv.txt", "w");
+   OPEN_FILE("eax_tv.txt", out);
    fprintf(out, "EAX Test Vectors.  Uses the 00010203...NN-1 pattern for header/nonce/plaintext/key.  The outputs\n"
                 "are of the form ciphertext,tag for a given NN.  The key for step N>1 is the tag of the previous\n"
                 "step repeated sufficiently.\n\n");
@@ -368,7 +372,7 @@ static void ocb_gen(void)
                  plaintext[MAXBLOCKSIZE*2], tag[MAXBLOCKSIZE];
    unsigned long len;
 
-   out = fopen("ocb_tv.txt", "w");
+   OPEN_FILE("ocb_tv.txt", out);
    fprintf(out, "OCB Test Vectors.  Uses the 00010203...NN-1 pattern for nonce/plaintext/key.  The outputs\n"
                 "are of the form ciphertext,tag for a given NN.  The key for step N>1 is the tag of the previous\n"
                 "step repeated sufficiently.  The nonce is fixed throughout.\n\n");
@@ -437,7 +441,7 @@ static void ocb3_gen(void)
                  plaintext[MAXBLOCKSIZE*2], tag[MAXBLOCKSIZE];
    unsigned long len;
 
-   out = fopen("ocb3_tv.txt", "w");
+   OPEN_FILE("ocb3_tv.txt", out);
    fprintf(out, "OCB3 Test Vectors.  Uses the 00010203...NN-1 pattern for nonce/plaintext/key.  The outputs\n"
                 "are of the form ciphertext,tag for a given NN.  The key for step N>1 is the tag of the previous\n"
                 "step repeated sufficiently.  The nonce is fixed throughout. AAD is fixed to 3 bytes (ASCII) 'AAD'.\n\n");
@@ -509,7 +513,7 @@ static void ccm_gen(void)
    unsigned long len;
    const unsigned int taglen[] = {4, 6, 8, 10, 12, 14, 16};
 
-   out = fopen("ccm_tv.txt", "w");
+   OPEN_FILE("ccm_tv.txt", out);
    fprintf(out, "CCM Test Vectors.  Uses the 00010203...NN-1 pattern for nonce/header/plaintext/key.  The outputs\n"
                 "are of the form ciphertext,tag for a given NN.  The key for step N>1 is the tag of the previous\n"
                 "step repeated sufficiently.  The nonce is fixed throughout at 13 bytes 000102...\n\n");
@@ -579,7 +583,7 @@ static void gcm_gen(void)
    unsigned char key[MAXBLOCKSIZE], plaintext[MAXBLOCKSIZE*2], tag[MAXBLOCKSIZE];
    unsigned long len;
 
-   out = fopen("gcm_tv.txt", "w");
+   OPEN_FILE("gcm_tv.txt", out);
    fprintf(out, "GCM Test Vectors.  Uses the 00010203...NN-1 pattern for nonce/header/plaintext/key.  The outputs\n"
                 "are of the form ciphertext,tag for a given NN.  The key for step N>1 is the tag of the previous\n"
                 "step repeated sufficiently.  The nonce is fixed throughout at 13 bytes 000102...\n\n");
@@ -641,7 +645,7 @@ static void base64_gen(void)
    char dst[256];
    unsigned long x, len;
 
-   out = fopen("base64_tv.txt", "w");
+   OPEN_FILE("base64_tv.txt", out);
    fprintf(out, "Base64 vectors.  These are the base64 encodings of the strings 00,01,02...NN-1\n\n");
    for (x = 0; x <= 32; x++) {
        for (ch = 0; ch < x; ch++) {
@@ -666,7 +670,7 @@ static void ecc_gen(void)
    ecc_point    *G, *R;
    int           x;
 
-   out = fopen("ecc_tv.txt", "w");
+   OPEN_FILE("ecc_tv.txt", out);
    fprintf(out, "ecc vectors.  These are for kG for k=1,3,9,27,...,3**n until k > order of the curve outputs are <k,x,y> triplets\n\n");
    G = ltc_ecc_new_point();
    R = ltc_ecc_new_point();
@@ -713,7 +717,7 @@ static void lrw_gen(void)
       tweak[x] = key[x] = iv[x] = x;
    }
 
-   out = fopen("lrw_tv.txt", "w");
+   OPEN_FILE("lrw_tv.txt", out);
    for (x = 16; x < (int)(sizeof(buf)); x += 16) {
        if ((err = lrw_start(find_cipher("aes"), iv, key, 16, tweak, 0, &lrw)) != CRYPT_OK) {
           fprintf(stderr, "Error starting LRW-AES: %s\n", error_to_string(err));

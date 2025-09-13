@@ -588,7 +588,8 @@ int der_length_asn1_length(unsigned long len, unsigned long *outlen);
 int der_length_sequence_ex(const ltc_asn1_list *list, unsigned long inlen,
                            unsigned long *outlen, unsigned long *payloadlen);
 
-unsigned long der_object_identifier_bits(unsigned long x);
+int der_length_object_identifier_full(const unsigned long *words,  unsigned long  nwords,
+                                            unsigned long *outlen, unsigned long *datalen);
 
 int der_ia5_char_encode(int c);
 int der_ia5_value_decode(int v);

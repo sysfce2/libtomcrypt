@@ -9,7 +9,7 @@
 
 #ifdef LTC_DER
 
-unsigned long der_object_identifier_bits(unsigned long x)
+static LTC_INLINE unsigned long s_der_object_identifier_bits(unsigned long x)
 {
 #if defined(LTC_HAVE_CLZL_BUILTIN)
    if (x == 0)
@@ -26,14 +26,7 @@ unsigned long der_object_identifier_bits(unsigned long x)
 #endif
 }
 
-/**
-  Gets length of DER encoding of Object Identifier
-  @param nwords   The number of OID words
-  @param words    The actual OID words to get the size of
-  @param outlen   [out] The length of the DER encoding for the given string
-  @return CRYPT_OK if successful
-*/
-int der_length_object_identifier(const unsigned long *words, unsigned long nwords, unsigned long *outlen)
+int der_length_object_identifier_full(const unsigned long *words, unsigned long nwords, unsigned long *outlen, unsigned long *datalen)
 {
    unsigned long y, z, t, wordbuf;
 
@@ -55,7 +48,7 @@ int der_length_object_identifier(const unsigned long *words, unsigned long nword
    z = 0;
    wordbuf = words[0] * 40 + words[1];
    for (y = 1; y < nwords; y++) {
-       t = der_object_identifier_bits(wordbuf);
+       t = s_der_object_identifier_bits(wordbuf);
        z += t/7 + ((t%7) ? 1 : 0) + (wordbuf == 0 ? 1 : 0);
        if (y < nwords - 1) {
           /* grab next word */
@@ -63,6 +56,9 @@ int der_length_object_identifier(const unsigned long *words, unsigned long nword
        }
    }
 
+   if (datalen) {
+      *datalen = z;
+   }
    /* now depending on the length our length encoding changes */
    if (z < 128) {
       z += 2;
@@ -76,6 +72,18 @@ int der_length_object_identifier(const unsigned long *words, unsigned long nword
 
    *outlen = z;
    return CRYPT_OK;
+}
+
+/**
+  Gets length of DER encoding of Object Identifier
+  @param nwords   The number of OID words
+  @param words    The actual OID words to get the size of
+  @param outlen   [out] The length of the DER encoding for the given string
+  @return CRYPT_OK if successful
+*/
+int der_length_object_identifier(const unsigned long *words, unsigned long nwords, unsigned long *outlen)
+{
+   return der_length_object_identifier_full(words, nwords, outlen, NULL);
 }
 
 #endif

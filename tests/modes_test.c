@@ -108,7 +108,7 @@ int modes_test(void)
    l = sizeof(w); \
    DO(base16_decode(e . w, XSTRLEN(e . w), w, &l)); \
 } while(0)
-   for (n = 0; n < sizeof(cfb_testvectors)/sizeof(cfb_testvectors[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(cfb_testvectors); ++n) {
       b16(cfb_testvectors[n], key);
       b16(cfb_testvectors[n], iv);
       b16(cfb_testvectors[n], pt);

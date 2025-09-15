@@ -188,11 +188,11 @@ int padding_test(void)
    unsigned char buf[256 + 16];
    unsigned long l;
 
-   for (i = 0; i < sizeof(cases)/sizeof(cases[0]); ++i) {
+   for (i = 0; i < LTC_ARRAY_SIZE(cases); ++i) {
       DOX(s_padding_testrun(&cases[i]), cases[i].name);
    }
 
-   for (i = 0; i < sizeof(tv)/sizeof(tv[0]); ++i) {
+   for (i = 0; i < LTC_ARRAY_SIZE(tv); ++i) {
       XMEMCPY(buf, tv[i].data, sizeof(tv[i].data));
       l = sizeof(tv[i].data);
       DO(padding_depad(buf, &l, tv[i].mode));

@@ -658,7 +658,7 @@ static const struct {
 
    if (ltc_mp.name == NULL) return;
 
-   for (x = 0; x < (sizeof(groups)/sizeof(groups[0])); x++) {
+   for (x = 0; x < LTC_ARRAY_SIZE(groups); x++) {
        t2 = 0;
        for (y = 0; y < 4; y++) {
            t_start();
@@ -1408,7 +1408,7 @@ if (argc > 1) {
    if (strstr(argv[1], "-h")) {
       die(EXIT_SUCCESS);
    } else if (strstr(argv[1], "-l")) {
-      for (i = 0; i < sizeof(test_functions)/sizeof(test_functions[0]); ++i) {
+      for (i = 0; i < LTC_ARRAY_SIZE(test_functions); ++i) {
          printf("%s\n", test_functions[i].name);
       }
       exit(0);
@@ -1446,7 +1446,7 @@ if ((err = rng_make_prng(128, find_prng("yarrow"), &yarrow_prng, NULL)) != CRYPT
 /* single test name from commandline */
 if (argc > 1) single_test = argv[1];
 
-for (i = 0; i < sizeof(test_functions)/sizeof(test_functions[0]); ++i) {
+for (i = 0; i < LTC_ARRAY_SIZE(test_functions); ++i) {
    if (single_test && strstr(test_functions[i].name, single_test) == NULL) {
      continue;
    }

@@ -51,12 +51,12 @@ int pmac_init(pmac_state *pmac, int cipher, const unsigned char *key, unsigned l
 
    /* determine which polys to use */
    pmac->block_len = cipher_descriptor[cipher].block_length;
-   for (poly = 0; poly < (int)(sizeof(polys)/sizeof(polys[0])); poly++) {
+   for (poly = 0; poly < (int)LTC_ARRAY_SIZE(polys); poly++) {
        if (polys[poly].len == pmac->block_len) {
           break;
        }
    }
-   if (poly >= (int)(sizeof(polys)/sizeof(polys[0]))) {
+   if (poly >= (int)LTC_ARRAY_SIZE(polys)) {
       return CRYPT_INVALID_ARG;
     }
    if (polys[poly].len != pmac->block_len) {

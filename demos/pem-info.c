@@ -34,7 +34,7 @@ static const struct {
 static const char *s_map_cipher(const char *name)
 {
    unsigned long n;
-   for (n = 0; n < sizeof(cipher_name_map)/sizeof(cipher_name_map[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(cipher_name_map); ++n) {
       if (strcmp(name, cipher_name_map[n].is) == 0)
          return cipher_name_map[n].should;
    }
@@ -61,7 +61,7 @@ static const char *s_map_mode(enum cipher_mode mode)
 {
    size_t n;
    mode &= cm_modes | cm_1bit | cm_8bit;
-   for (n = 0; n < sizeof(cipher_mode_map)/sizeof(cipher_mode_map[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(cipher_mode_map); ++n) {
       if (cipher_mode_map[n].mode == mode)
          return cipher_mode_map[n].name;
    }

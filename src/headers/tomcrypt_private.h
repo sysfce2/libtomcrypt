@@ -45,6 +45,8 @@ LTC_STATIC_ASSERT(correct_ltc_uintptr_size, sizeof(ltc_uintptr) == sizeof(void*)
    #define LTC_NULL ((void *)0)
 #endif
 
+#define LTC_ARRAY_SIZE(arr) (sizeof(arr)/sizeof(arr[0]))
+
 /*
  * Internal Enums
  */
@@ -361,6 +363,7 @@ struct get_char {
    } data;
    struct str unget_buf;
    char unget_buf_[LTC_PEM_DECODE_BUFSZ];
+   int prev_get;
 };
 #endif
 
@@ -387,7 +390,7 @@ int pem_decrypt(unsigned char *data, unsigned long *datalen,
 int pem_get_char_from_file(struct get_char *g);
 #endif /* LTC_NO_FILE */
 int pem_get_char_from_buf(struct get_char *g);
-int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_char *g);
+int pem_read(void *asn1_cert, unsigned long *asn1_len, struct pem_headers *hdr, struct get_char *g);
 #endif
 
 /* tomcrypt_pk.h */
@@ -584,6 +587,17 @@ int der_length_asn1_length(unsigned long len, unsigned long *outlen);
 
 int der_length_sequence_ex(const ltc_asn1_list *list, unsigned long inlen,
                            unsigned long *outlen, unsigned long *payloadlen);
+
+int der_length_object_identifier_full(const unsigned long *words,  unsigned long  nwords,
+                                            unsigned long *outlen, unsigned long *datalen);
+
+int der_ia5_char_encode(int c);
+int der_ia5_value_decode(int v);
+
+int der_printable_char_encode(int c);
+int der_printable_value_decode(int v);
+
+unsigned long der_utf8_charsize(const wchar_t c);
 
 typedef struct {
    ltc_asn1_type t;

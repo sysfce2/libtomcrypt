@@ -121,7 +121,7 @@ int ccm_test(void)
       }
    }
 
-   for (x = 0; x < (sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < LTC_ARRAY_SIZE(tests); x++) {
       for (y = 0; y < 2; y++) {
          taglen = tests[x].taglen;
          if (y == 0) {

@@ -18,7 +18,7 @@ int pkcs_1_emsa_test(void)
 
   DO(hash_is_valid(hash_idx));
 
-  for (i = 0; i < sizeof(testcases_emsa)/sizeof(testcases_emsa[0]); ++i) {
+  for (i = 0; i < LTC_ARRAY_SIZE(testcases_emsa); ++i) {
     testcase_t* t = &testcases_emsa[i];
     rsa_key k, *key = &k;
     DOX(ltc_mp_init_multi(&key->e, &key->d, &key->N, &key->dQ,
@@ -34,7 +34,7 @@ int pkcs_1_emsa_test(void)
     DOX(ltc_mp_read_unsigned_bin(key->p, t->rsa.p, t->rsa.p_l), t->name);
     key->type = PK_PRIVATE;
 
-    for (j = 0; j < sizeof(t->data)/sizeof(t->data[0]); ++j) {
+    for (j = 0; j < LTC_ARRAY_SIZE(t->data); ++j) {
         rsaData_t* s = &t->data[j];
         unsigned char buf[20], obuf[256];
         unsigned long buflen = sizeof(buf), obuflen = sizeof(obuf);

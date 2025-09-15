@@ -116,7 +116,7 @@ int ocb3_init(ocb3_state *ocb, int cipher,
 
    /* determine which polys to use */
    ocb->block_len = cipher_descriptor[cipher].block_length;
-   x = (int)(sizeof(polys)/sizeof(polys[0]));
+   x = (int)LTC_ARRAY_SIZE(polys);
    for (poly = 0; poly < x; poly++) {
        if (polys[poly].len == ocb->block_len) {
           break;

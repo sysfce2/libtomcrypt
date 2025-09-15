@@ -49,7 +49,7 @@ static int s_rfc_7748_5_2_test(void)
    unsigned char out[32];
    unsigned long n;
 
-   for (n = 0; n < sizeof(rfc_7748_5_2)/sizeof(rfc_7748_5_2[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(rfc_7748_5_2); ++n) {
       tweetnacl_crypto_scalarmult(out, rfc_7748_5_2[n].scalar, rfc_7748_5_2[n].u_in);
       if (compare_testvector(out, sizeof(out), rfc_7748_5_2[n].u_out, sizeof(rfc_7748_5_2[n].u_out), "x25519 RFC 7748 Ch. 5.2", n) != 0) {
          return CRYPT_FAIL_TESTVECTOR;
@@ -130,7 +130,7 @@ static int s_rfc_8410_10_test(void)
    curve25519_key key;
    unsigned char buf[1024];
    unsigned long buflen;
-   for (n = 0; n < sizeof(rfc_8410_10)/sizeof(rfc_8410_10[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(rfc_8410_10); ++n) {
       buflen = sizeof(buf);
       DO(base64_decode(rfc_8410_10[n].b64, XSTRLEN(rfc_8410_10[n].b64), buf, &buflen));
       DO(x25519_import_x509(buf, buflen, &key));
@@ -170,7 +170,7 @@ static int s_x25519_pkcs8_test(void)
    unsigned char buf[1024];
    unsigned long buflen;
    password_ctx *p_pw_ctx, pw_ctx = { .callback = password_get };
-   for (n = 0; n < sizeof(s_x25519_pkcs8)/sizeof(s_x25519_pkcs8[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(s_x25519_pkcs8); ++n) {
       buflen = sizeof(buf);
       DO(base64_decode(s_x25519_pkcs8[n].b64, XSTRLEN(s_x25519_pkcs8[n].b64), buf, &buflen));
       pw_ctx.userdata = (void*)s_x25519_pkcs8[n].pass;
@@ -197,7 +197,7 @@ static int s_x25519_compat_test(void)
 
    DO(x25519_export(buf, &buflen, PK_PRIVATE | PK_STD, &priv));
    DO(x25519_import_pkcs8(buf, buflen, NULL, &imported));
-   DO(do_compare_testvector(&priv, sizeof(priv), &imported, sizeof(imported), "priv after ex-&import", __LINE__));
+   COMPARE_TESTVECTOR(&priv, sizeof(priv), &imported, sizeof(imported), "priv after ex-&import", __LINE__);
    XMEMSET(&imported, 0, sizeof(imported));
 
    buflen = sizeof(buf);
@@ -208,14 +208,14 @@ static int s_x25519_compat_test(void)
    DO(x25519_export(buf, &buflen, PK_PUBLIC | PK_STD, &priv));
    DO(x25519_import(buf, buflen, &imported));
 
-   DO(do_compare_testvector(&pub, sizeof(pub), &imported, sizeof(imported), "pub after private ex-&import", __LINE__));
+   COMPARE_TESTVECTOR(&pub, sizeof(pub), &imported, sizeof(imported), "pub after private ex-&import", __LINE__);
    XMEMSET(&imported, 0, sizeof(imported));
 
    buflen = sizeof(buf);
    DO(x25519_export(buf, &buflen, PK_PUBLIC | PK_STD, &pub));
    DO(x25519_import(buf, buflen, &imported));
 
-   DO(do_compare_testvector(&pub, sizeof(pub), &imported, sizeof(imported), "pub after public ex-&import", __LINE__));
+   COMPARE_TESTVECTOR(&pub, sizeof(pub), &imported, sizeof(imported), "pub after public ex-&import", __LINE__);
 
    return CRYPT_OK;
 }

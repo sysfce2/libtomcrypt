@@ -107,7 +107,7 @@ doxygen/
 *.lof
 *.bak
 
-coverage/
+coverage*/
 coverage*.info
 
 # coverity intermediate directory etc.

@@ -1,13 +1,6 @@
 # -----------------------------------------------------------------------------
 # Options
 # -----------------------------------------------------------------------------
-option(BUILD_USEFUL_DEMOS "Build useful demos (hashsum)" FALSE)
-option(
-    BUILD_USABLE_DEMOS
-    "Build usable demos (aesgcm constants crypt openssh-privkey openssl-enc latex-tables sizes timing)"
-    FALSE
-)
-option(BUILD_TEST_DEMOS "Build test demos (small tv_gen)" FALSE)
 
 option(INSTALL_DEMOS "Install enabled demos (USEFUL and/or USABLE) and ltc wrapper script" FALSE)
 
@@ -16,11 +9,13 @@ option(INSTALL_DEMOS "Install enabled demos (USEFUL and/or USABLE) and ltc wrapp
 #
 # Demos that are even somehow useful and could be installed as a system-tool
 #
-# * USEFUL_DEMOS   = hashsum
 # -----------------------------------------------------------------------------
+set(USEFUL_DEMOS hashsum)
+list(JOIN USEFUL_DEMOS " " USEFUL_DEMOS_STR)
+option(BUILD_USEFUL_DEMOS "Build useful demos (${USEFUL_DEMOS_STR})" FALSE)
 
 if(BUILD_USEFUL_DEMOS)
-    list(APPEND USABLE_DEMOS_TARGETS hashsum)
+    list(APPEND USABLE_DEMOS_TARGETS ${USEFUL_DEMOS})
 endif()
 
 # -----------------------------------------------------------------------------
@@ -28,23 +23,13 @@ endif()
 #
 # Demos that are usable but only rarely make sense to be installed
 #
-# USEABLE_DEMOS  = aesgcm constants crypt der_print_flexi latex-tables openssh-privkey openssl-enc sizes timing
 # -----------------------------------------------------------------------------
+set(USABLE_DEMOS aesgcm constants crypt der_print_flexi latex-tables openssh-privkey openssl-enc sizes timing)
+list(JOIN USABLE_DEMOS " " USABLE_DEMOS_STR)
+option(BUILD_USABLE_DEMOS "Build usable demos (${USABLE_DEMOS_STR})" FALSE)
 
 if(BUILD_USABLE_DEMOS)
-    list(
-        APPEND
-        USABLE_DEMOS_TARGETS
-        aesgcm
-        constants
-        crypt
-        der_print_flexi
-        latex-tables
-        openssh-privkey
-        openssl-enc
-        sizes
-        timing
-    )
+    list(APPEND USABLE_DEMOS_TARGETS ${USABLE_DEMOS})
 endif()
 
 # -----------------------------------------------------------------------------
@@ -52,11 +37,13 @@ endif()
 #
 # Demos that are used for testing or measuring
 #
-# * TEST_DEMOS     = small tv_gen
 # -----------------------------------------------------------------------------
+set(TEST_DEMOS small tv_gen)
+list(JOIN TEST_DEMOS " " TEST_DEMOS_STR)
+option(BUILD_TEST_DEMOS "Build test demos (${TEST_DEMOS_STR})" FALSE)
 
 if(BUILD_TEST_DEMOS)
-    list(APPEND ALL_DEMOS_TARGETS small tv_gen)
+    list(APPEND ALL_DEMOS_TARGETS ${TEST_DEMOS})
 endif()
 
 # -----------------------------------------------------------------------------

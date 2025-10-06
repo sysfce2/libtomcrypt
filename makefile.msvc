@@ -294,13 +294,15 @@ test.exe: $(LIBMAIN_S) $(TOBJECTS)
 	cl $(LTC_CFLAGS) $(TOBJECTS) $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
 	@echo NOTICE: start the tests by launching test.exe
 
-all: $(LIBMAIN_S) hashsum.exe crypt.exe small.exe tv_gen.exe sizes.exe constants.exe timing.exe test.exe
+ALL_TEST=hashsum.exe crypt.exe small.exe tv_gen.exe sizes.exe constants.exe timing.exe test.exe
+
+all: $(LIBMAIN_S) $(ALL_TEST)
 
 test: test.exe
 
 clean:
 	@-cmd /c del /Q *_tv.txt 2>nul
-	@-cmd /c del /Q /S *.OBJ *.LIB *.EXE *.DLL 2>nul
+	@-cmd /c del /Q /S *.OBJ *.LIB $(ALL_TEST) *.DLL 2>nul
 
 #Install the library + headers
 install: $(LIBMAIN_S)

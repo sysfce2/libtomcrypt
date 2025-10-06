@@ -4,7 +4,7 @@
 option(BUILD_USEFUL_DEMOS "Build useful demos (hashsum)" FALSE)
 option(
     BUILD_USABLE_DEMOS
-    "Build usable demos (aesgcm constants crypt openssh-privkey openssl-enc pem-info sizes timing)"
+    "Build usable demos (aesgcm constants crypt openssh-privkey openssl-enc latex-tables sizes timing)"
     FALSE
 )
 option(BUILD_TEST_DEMOS "Build test demos (small tv_gen)" FALSE)
@@ -28,7 +28,7 @@ endif()
 #
 # Demos that are usable but only rarely make sense to be installed
 #
-# USEABLE_DEMOS  = aesgcm constants crypt der_print_flexi openssh-privkey openssl-enc pem-info sizes timing
+# USEABLE_DEMOS  = aesgcm constants crypt der_print_flexi latex-tables openssh-privkey openssl-enc sizes timing
 # -----------------------------------------------------------------------------
 
 if(BUILD_USABLE_DEMOS)
@@ -39,9 +39,9 @@ if(BUILD_USABLE_DEMOS)
         constants
         crypt
         der_print_flexi
+        latex-tables
         openssh-privkey
         openssl-enc
-        pem-info
         sizes
         timing
     )

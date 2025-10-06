@@ -51,20 +51,6 @@ option(BUILD_SHARED_LIBS
 option(WITH_PTHREAD "Build with pthread support" FALSE)
 
 # -----------------------------------------------------------------------------
-# Add support for ccache if desired
-# -----------------------------------------------------------------------------
-find_program(CCACHE ccache)
-
-if(CCACHE)
-    option(ENABLE_CCACHE "Enable ccache." ON)
-endif()
-
-# use ccache if installed
-if(CCACHE AND ENABLE_CCACHE)
-    set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE})
-endif()
-
-# -----------------------------------------------------------------------------
 # Compose CFLAGS
 # -----------------------------------------------------------------------------
 

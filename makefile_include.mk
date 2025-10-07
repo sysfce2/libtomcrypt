@@ -148,6 +148,12 @@ ifneq ($(GIT_VERSION),)
 LTC_CFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
 endif
 
+ifndef LTC_DEBUG
+ifeq ($(findstring -DARGTYPE,$(CFLAGS)),)
+LTC_CFLAGS += -DARGTYPE=4
+endif
+endif
+
 LTC_CFLAGS := $(LTC_CFLAGS) $(CFLAGS)
 
 ifneq ($(findstring -DLTC_PTHREAD,$(LTC_CFLAGS)),)

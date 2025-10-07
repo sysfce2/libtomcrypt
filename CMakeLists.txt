@@ -53,6 +53,8 @@ option(WITH_PTHREAD "Build with pthread support" FALSE)
 # -----------------------------------------------------------------------------
 # Compose CFLAGS
 # -----------------------------------------------------------------------------
+set(LTC_CFLAGS "" CACHE STRING "Optional user-specific CFLAGS")
+set(LTC_LDFLAGS "" CACHE STRING "Optional user-specific LDFLAGS")
 
 # Some information ported from makefile_include.mk
 
@@ -80,8 +82,17 @@ else()
         -Wsystem-headers
     )
     set(CMAKE_C_FLAGS_DEBUG "-g3")
-    set(CMAKE_C_FLAGS_RELEASE "-O3 -funroll-loops -fomit-frame-pointer")
-    set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g3 -O2")
+    if(LTC_CFLAGS MATCHES "-DARGTYPE")
+        set(ARGTYPE "")
+    else()
+        set(ARGTYPE "-DARGTYPE=4")
+    endif()
+    set(CMAKE_C_FLAGS_RELEASE "-O3 -funroll-loops -fomit-frame-pointer ${ARGTYPE}")
+    if(BUILD_SHARED_LIBS)
+        set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g3 -O2 ${ARGTYPE}")
+    else()
+        set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g3 -O2")
+    endif()
     set(CMAKE_C_FLAGS_MINSIZEREL "-Os")
 endif()
 

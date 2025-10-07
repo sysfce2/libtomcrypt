@@ -8726,6 +8726,7 @@ pthreads based mutex locking in various routines such as the Yarrow and Fortuna 
 
 \chapter{Configuring and Building the Library}
 \mysection{Introduction}
+\index{math descriptor} \index{MPI provider}
 The library is fairly flexible about how it can be built, used, and generally distributed.  Additions are being made with
 each new release that will make the library even more flexible.  Each of the classes of functions can be disabled during
 the build process to make a smaller library.  This is particularly useful for shared libraries.
@@ -8737,6 +8738,13 @@ The build process now consists of installing a math library first, and then buil
 configured.  Note that LibTomCrypt can be built with no internal math descriptors.  This means that one must be provided at either
 build, or run time for the application.  LibTomCrypt comes with three math descriptors that provide a standard interface to math
 libraries.
+
+Clarification regarding the wording in this area: 'MPI provider' and 'math descriptor' can be used synonymous.
+Where the former usually means 'one of the entire set' and the latter means 'a specific'.
+E.g. 'One can enable multiple MPI providers at build time, but has to select one of those MPI providers at run time.',
+or 'The math descriptor for TomsFastMath is missing an implementation of \code{sqrtmod\_prime()}.'.
+
+Please check Ch. \ref{mp-init} for details on the selection of an MPI provider at build, resp. run time.
 
 \mysection{Makefile variables}
 
@@ -9121,6 +9129,8 @@ When this has been defined the RSA modular exponentiation will do some sanity ch
 This is enabled by default and can be disabled by defining \textbf{LTC\_NO\_RSA\_CRT\_HARDENING}.
 
 \subsection{Math Descriptors}
+\index{math descriptor} \index{MPI provider}
+\label{mp-init}
 The library comes with three math descriptors that allow you to interface the public key cryptography API to freely available math
 libraries.  When \textbf{GMP\_DESC}, \textbf{LTM\_DESC}, or \textbf{TFM\_DESC} are defined
 descriptors for the respective library are built and included in the library as \textit{gmp\_desc}, \textit{ltm\_desc}, or \textit{tfm\_desc} respectively.
@@ -10368,7 +10378,7 @@ void init_TFM(void);
 void init_GMP(void);
 \end{verbatim}
 
-These three MPI init functions have been introduced in version 1.18.0 and have been deprecated in the same version in favor of \textit{crypt\_mp\_init()}.
+These three MPI init functions have been introduced in version 1.18.0 and have been deprecated in the same version in favor of \code{crypt\_mp\_init()}, c.f. Ch. \ref{mp-init}.
 
 \clearpage
 \addcontentsline{toc}{chapter}{Index}

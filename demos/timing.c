@@ -872,7 +872,7 @@ static void time_ecc(void)
    unsigned char buf[2][256] = { 0 };
    unsigned long i, w, x, y, z;
    int           err, stat;
-   static unsigned long sizes[] = {
+   const unsigned long sizes[] = {
 #ifdef LTC_ECC_SECP112R1
 112/8,
 #endif
@@ -898,6 +898,11 @@ static void time_ecc(void)
 521/8,
 #endif
 100000};
+   ltc_ecc_sig_opts sig_opts = {
+                                .type = LTC_ECCSIG_RFC7518,
+                                .prng = &yarrow_prng,
+                                .wprng = find_prng ("yarrow")
+   };
 
    if (ltc_mp.name == NULL) return;
 
@@ -969,8 +974,7 @@ static void time_ecc(void)
           t_start();
           t1 = t_read();
           z = sizeof(buf[1]);
-          if ((err = ecc_sign_hash(buf[0], 20, buf[1], &z, &yarrow_prng,
-                                   find_prng("yarrow"), &key)) != CRYPT_OK) {
+          if ((err = ecc_sign_hash_v2(buf[0], 20, buf[1], &z, &sig_opts, &key)) != CRYPT_OK) {
               fprintf(stderr, "\n\necc_sign_hash says %s, wait...no it should say %s...damn you!\n", error_to_string(err), error_to_string(CRYPT_OK));
               exit(EXIT_FAILURE);
            }
@@ -988,7 +992,7 @@ static void time_ecc(void)
        for (y = 0; y < 256; y++) {
           t_start();
           t1 = t_read();
-          if ((err = ecc_verify_hash(buf[1], z, buf[0], 20, &stat, &key)) != CRYPT_OK) {
+          if ((err = ecc_verify_hash_v2(buf[1], z, buf[0], 20, &sig_opts, &stat, &key)) != CRYPT_OK) {
               fprintf(stderr, "\n\necc_verify_hash says %s, wait...no it should say %s...damn you!\n", error_to_string(err), error_to_string(CRYPT_OK));
               exit(EXIT_FAILURE);
           }

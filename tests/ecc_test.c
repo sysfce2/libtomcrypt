@@ -316,7 +316,7 @@ static int s_ecc_issue443_447(void)
    DO(ecc_find_curve("secp256r1", &cu));
    DO(ecc_set_curve(cu, &key));
    DO(ecc_set_key(pub1, sizeof(pub1), PK_PUBLIC, &key));
-   err = ecc_verify_hash_rfc7518(sig1, sizeof(sig1), hash, hashlen, &stat, &key); /* should fail */
+   err = ecc_verify_hash_rfc7518_internal(sig1, sizeof(sig1), hash, hashlen, &stat, &key); /* should fail */
    ecc_free(&key);
    if (err != CRYPT_INVALID_PACKET) return CRYPT_FAIL_TESTVECTOR;
 
@@ -325,7 +325,7 @@ static int s_ecc_issue443_447(void)
    DO(ecc_find_curve("secp521r1", &cu));
    DO(ecc_set_curve(cu, &key));
    DO(ecc_set_key(pub2, sizeof(pub2), PK_PUBLIC, &key));
-   err = ecc_verify_hash_rfc7518(sig2, sizeof(sig2), hash, hashlen, &stat, &key); /* should fail */
+   err = ecc_verify_hash_rfc7518_internal(sig2, sizeof(sig2), hash, hashlen, &stat, &key); /* should fail */
    ecc_free(&key);
    if (err != CRYPT_INVALID_PACKET) return CRYPT_FAIL_TESTVECTOR;
 
@@ -401,6 +401,10 @@ static int s_ecc_old_api(void)
    unsigned long x, y, z, s;
    int           stat, stat2;
    ecc_key usera, userb, pubKey, privKey;
+   ltc_ecc_sig_opts sig_opts = {
+                                .prng = &yarrow_prng,
+                                .wprng = find_prng ("yarrow")
+   };
    int low, high;
 
    ecc_sizes(&low, &high);
@@ -500,10 +504,10 @@ static int s_ecc_old_api(void)
          buf[0][ch] = ch;
       }
       x = sizeof (buf[1]);
-      DO(ecc_sign_hash (buf[0], 16, buf[1], &x, &yarrow_prng, find_prng ("yarrow"), &privKey));
-      DO(ecc_verify_hash (buf[1], x, buf[0], 16, &stat, &pubKey));
+      DO(ecc_sign_hash_v2(buf[0], 16, buf[1], &x, &sig_opts, &privKey));
+      DO(ecc_verify_hash_v2(buf[1], x, buf[0], 16, &sig_opts, &stat, &pubKey));
       buf[0][0] ^= 1;
-      DO(ecc_verify_hash (buf[1], x, buf[0], 16, &stat2, &privKey));
+      DO(ecc_verify_hash_v2(buf[1], x, buf[0], 16, &sig_opts, &stat2, &privKey));
       if (!(stat == 1 && stat2 == 0)) {
          fprintf(stderr, "ecc_verify_hash failed %d, %d, ", stat, stat2);
          return 1;
@@ -513,10 +517,10 @@ static int s_ecc_old_api(void)
          buf[0][ch] = ch;
       }
       x = sizeof (buf[1]);
-      DO(ecc_sign_hash_rfc7518(buf[0], 16, buf[1], &x, &yarrow_prng, find_prng ("yarrow"), &privKey));
-      DO(ecc_verify_hash_rfc7518(buf[1], x, buf[0], 16, &stat, &pubKey));
+      DO(ecc_sign_hash_v2(buf[0], 16, buf[1], &x, &sig_opts, &privKey));
+      DO(ecc_verify_hash_v2(buf[1], x, buf[0], 16, &sig_opts, &stat, &pubKey));
       buf[0][0] ^= 1;
-      DO(ecc_verify_hash_rfc7518(buf[1], x, buf[0], 16, &stat2, &privKey));
+      DO(ecc_verify_hash_v2(buf[1], x, buf[0], 16, &sig_opts, &stat2, &privKey));
       if (!(stat == 1 && stat2 == 0)) {
          fprintf(stderr, "ecc_verify_hash_rfc7518 failed %d, %d, ", stat, stat2);
          return 1;
@@ -549,13 +553,32 @@ int ecc_key_cmp(const int should_type, const ecc_key *should, const ecc_key *is)
 
 static int s_ecc_new_api(void)
 {
-   int i, j, stat;
+   int i, stat;
    const ltc_ecc_curve* dp;
    ecc_key key, privkey, pubkey;
    unsigned char buf[1000];
-   unsigned long len;
-   unsigned char data16[16] = { 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1 };
+   unsigned long len, j;
+#ifdef LTC_ECC_SHAMIR
+   unsigned long k;
+#endif
+   unsigned char data16[MAXBLOCKSIZE];
    unsigned long len16;
+   const ecc_signature_type sig_algs[] = {
+#ifdef LTC_DER
+                                          LTC_ECCSIG_ANSIX962,
+#endif
+                                          LTC_ECCSIG_RFC7518,
+                                          LTC_ECCSIG_ETH27,
+#ifdef LTC_SSH
+                                          LTC_ECCSIG_RFC5656,
+#endif
+   };
+   ltc_ecc_sig_opts sig_opts = {
+                                .type = LTC_ECCSIG_ANSIX962,
+                                .prng = &yarrow_prng,
+                                .wprng = find_prng ("yarrow")
+   };
+   XMEMSET(data16, 0xd1, sizeof(data16));
 
    for (i = 0; i < (int)LTC_ARRAY_SIZE(curvenames); i++) {
       DO(ecc_find_curve(curvenames[i], &dp));
@@ -606,41 +629,41 @@ static int s_ecc_new_api(void)
       DO(ecc_set_curve(dp, &pubkey));
       DO(ecc_set_key(buf, len, PK_PUBLIC, &pubkey));
 
-      /* test signature */
-      len = sizeof(buf);
-      DO(ecc_sign_hash(data16, 16, buf, &len, &yarrow_prng, find_prng ("yarrow"), &privkey));
-      stat = 0;
-      DO(ecc_verify_hash(buf, len, data16, 16, &stat, &pubkey));
-      if (stat != 1) return CRYPT_FAIL_TESTVECTOR;
-
-#ifdef LTC_SSH
-      /* test SSH+ECDSA/RFC5656 signature */
-      len = sizeof(buf);
-      DO(ecc_sign_hash_rfc5656(data16, 16, buf, &len, &yarrow_prng, find_prng ("yarrow"), &privkey));
-      stat = 0;
-      DO(ecc_verify_hash_rfc5656(buf, len, data16, 16, &stat, &pubkey));
-      if (stat != 1) return CRYPT_FAIL_TESTVECTOR;
-#endif
+      for (j = 0; j < LTC_ARRAY_SIZE(sig_algs); ++j) {
+         /* test signature */
+         if (sig_algs[j] == LTC_ECCSIG_ETH27 && XSTRCMP(dp->OID, "1.3.132.0.10"))
+            continue;
+         len = sizeof(buf);
+         sig_opts.type = sig_algs[j];
+         DO(ecc_sign_hash_v2(data16, privkey.dp.size, buf, &len, &sig_opts, &privkey));
+         stat = 0;
+         DO(ecc_verify_hash_v2(buf, len, data16, privkey.dp.size, &sig_opts, &stat, &pubkey));
+         if (stat != 1) return CRYPT_FAIL_TESTVECTOR;
 
 #ifdef LTC_ECC_SHAMIR
-      if (strcmp(ltc_mp.name, "TomsFastMath") != 0) {
-         /* XXX-FIXME: TFM does not support sqrtmod_prime */
-         int found = 0;
-         ecc_key reckey;
-         /* test recovery */
-         len = sizeof(buf);
-         DO(ecc_sign_hash(data16, 16, buf, &len, &yarrow_prng, find_prng ("yarrow"), &privkey));
-         DO(ecc_set_curve(dp, &reckey));
-         for (j = 0; j < 2*(1+(int)privkey.dp.cofactor); j++) {
-            stat = ecc_recover_key(buf, len, data16, 16, j, LTC_ECCSIG_ANSIX962, &reckey);
-            if (stat != CRYPT_OK) continue; /* last two will almost always fail, only possible if x<(prime mod order) */
-            stat = ecc_key_cmp(PK_PUBLIC, &pubkey, &reckey);
-            if (stat == CRYPT_OK) found++;
+         if (strcmp(ltc_mp.name, "TomsFastMath") != 0) {
+            /* XXX-FIXME: TFM does not support sqrtmod_prime */
+            int found = 0, recid;
+            ecc_key reckey;
+            /* test recovery */
+            sig_opts.recid = &recid;
+            len = sizeof(buf);
+            DO(ecc_sign_hash_v2(data16, privkey.dp.size, buf, &len, &sig_opts, &privkey));
+            DO(ecc_set_curve(dp, &reckey));
+            for (k = 0; k < 2*(1+privkey.dp.cofactor); k++) {
+               recid = k;
+               stat = ecc_recover_key(buf, len, data16, privkey.dp.size, &sig_opts, &reckey);
+               if (stat != CRYPT_OK) continue; /* last two will almost always fail, only possible if x<(prime mod order) */
+               stat = ecc_key_cmp(PK_PUBLIC, &pubkey, &reckey);
+               if (stat == CRYPT_OK) found++;
+            }
+            sig_opts.recid = NULL;
+            if (found != 1) return CRYPT_FAIL_TESTVECTOR; /* unique match */
+            ecc_free(&reckey);
          }
-         if (found != 1) return CRYPT_FAIL_TESTVECTOR; /* unique match */
-         ecc_free(&reckey);
-      }
 #endif
+
+      }
 
       /* test encryption */
       len = sizeof(buf);
@@ -648,8 +671,8 @@ static int s_ecc_new_api(void)
       zeromem(data16, 16);
       len16 = 16;
       DO(ecc_decrypt_key(buf, len, data16, &len16, &privkey));
-      if (len16 != 16) return CRYPT_FAIL_TESTVECTOR;
-      for (j = 0; j < 16; j++) if (data16[j] != 0xd1) return CRYPT_FAIL_TESTVECTOR;
+      if ((int)len16 != 16) return CRYPT_FAIL_TESTVECTOR;
+      for (j = 0; (int)j < 16; j++) if (data16[j] != 0xd1) return CRYPT_FAIL_TESTVECTOR;
 
       /* cleanup */
       ecc_free(&privkey);
@@ -993,6 +1016,11 @@ static int s_ecc_rfc6979(void)
    char name[128], tmp[MAXBLOCKSIZE];
    unsigned int t, s, i, h;
    unsigned long pklen, hashlen, curvelen, inputlen, siglen, shouldlen, shouldlen2;
+   ltc_ecc_sig_opts sig_opts = {
+                                .type = LTC_ECCSIG_RFC7518,
+                                .prng = &yarrow_prng,
+                                .wprng = find_prng ("yarrow")
+   };
    for (t = 0; tests[t].curve; ++t) {
       curvelen = XSTRLEN(tests[t].curve);
       XMEMCPY(name, tests[t].curve, curvelen);
@@ -1020,9 +1048,9 @@ static int s_ecc_rfc6979(void)
          XMEMCPY(&name[curvelen + inputlen], hashes[h], 7);
          hashlen = sizeof(hash);
          DOX(hash_memory(find_hash(hashes[h]), inputs[i], XSTRLEN(inputs[i]), hash, &hashlen), name);
-         ECC_SET_RFC6979_HASH_ALG(&key, hashes[h]);
+         sig_opts.rfc6979_hash_alg = hashes[h];
          siglen = sizeof(sig);
-         DOX(ecc_sign_hash_rfc7518(hash, hashlen, sig, &siglen, &yarrow_prng, find_prng ("yarrow"), &key), name);
+         DOX(ecc_sign_hash_v2(hash, hashlen, sig, &siglen, &sig_opts, &key), name);
          XMEMSET(should, 0, sizeof(should));
          shouldlen = sizeof(should);
          DOX(base16_decode(tests[t].signatures[s].r, XSTRLEN(tests[t].signatures[s].r), should, &shouldlen), name);
@@ -1907,6 +1935,11 @@ static int s_ecc_test_ethereum(void)
    unsigned char buf[128];
    unsigned long len;
    unsigned char data16[16] = { 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1, 0xd1 };
+   ltc_ecc_sig_opts sig_opts = {
+                                .type = LTC_ECCSIG_ETH27,
+                                .prng = &yarrow_prng,
+                                .wprng = find_prng ("yarrow"),
+   };
 
    DO(ecc_find_curve("SECP256K1", &dp));
 
@@ -1914,15 +1947,15 @@ static int s_ecc_test_ethereum(void)
 
    /* test Ethereum signature */
    len = sizeof(buf);
-   DO(ecc_sign_hash_eth27(data16, 16, buf, &len, &yarrow_prng, find_prng ("yarrow"), &key));
+   DO(ecc_sign_hash_v2(data16, 16, buf, &len, &sig_opts, &key));
    stat = 0;
-   DO(ecc_verify_hash_eth27(buf, len, data16, 16, &stat, &key));
+   DO(ecc_verify_hash_v2(buf, len, data16, 16, &sig_opts, &stat, &key));
    if (stat != 1) return CRYPT_FAIL_TESTVECTOR;
 
    /* XXX-FIXME: TFM does not support sqrtmod_prime */
    if (strcmp(ltc_mp.name, "TomsFastMath") != 0) {
       DO(ecc_set_curve(dp, &reckey));
-      DO(ecc_recover_key(buf, len, data16, 16, -1, LTC_ECCSIG_ETH27, &reckey));
+      DO(ecc_recover_key(buf, len, data16, 16, &sig_opts, &reckey));
       DO(ecc_key_cmp(PK_PUBLIC, &key, &reckey));
 
       /* cleanup */
@@ -1962,6 +1995,11 @@ static int s_ecc_test_recovery(void)
       0xb7, 0x3c, 0x97, 0x55, 0xfa, 0x69, 0xf8, 0xef, 0xe9, 0xcf, 0x12, 0xaf, 0x48, 0x25, 0xe3, 0xe0,
       0x1b
    };
+   ltc_ecc_sig_opts sig_opts = {
+                                .prng = &yarrow_prng,
+                                .wprng = find_prng ("yarrow"),
+                                .recid = &recid
+   };
 
    /* XXX-FIXME: TFM does not support sqrtmod_prime */
    if (strcmp(ltc_mp.name, "TomsFastMath") == 0) return CRYPT_NOP;
@@ -1973,18 +2011,23 @@ static int s_ecc_test_recovery(void)
    DO(ecc_set_key(eth_pubkey, sizeof(eth_pubkey), PK_PUBLIC, &pubkey));
 
    DO(ecc_set_curve(dp, &reckey));
-   DO(ecc_recover_key(eth_sig, sizeof(eth_sig)-1, eth_hash, sizeof(eth_hash), 0, LTC_ECCSIG_RFC7518, &reckey));
+   recid = 0;
+   sig_opts.type = LTC_ECCSIG_RFC7518;
+   DO(ecc_recover_key(eth_sig, sizeof(eth_sig)-1, eth_hash, sizeof(eth_hash), &sig_opts, &reckey));
    DO(ecc_key_cmp(PK_PUBLIC, &pubkey, &reckey));
    ecc_free(&reckey);
 
    DO(ecc_set_curve(dp, &reckey));
-   DO(ecc_recover_key(eth_sig, sizeof(eth_sig), eth_hash, sizeof(eth_hash), -1, LTC_ECCSIG_ETH27, &reckey));
+   recid = -1;
+   sig_opts.type = LTC_ECCSIG_ETH27;
+   DO(ecc_recover_key(eth_sig, sizeof(eth_sig), eth_hash, sizeof(eth_hash), &sig_opts, &reckey));
    DO(ecc_key_cmp(PK_PUBLIC, &pubkey, &reckey));
    ecc_free(&reckey);
 
    ecc_free(&pubkey);
 #endif
 
+   sig_opts.type = LTC_ECCSIG_RFC7518;
    for (i = 0; i < (int)LTC_ARRAY_SIZE(curvenames); i++) {
       DO(ecc_find_curve(curvenames[i], &dp));
 
@@ -2013,16 +2056,16 @@ static int s_ecc_test_recovery(void)
       /* test signature */
       len = sizeof(buf);
       recid = 0;
-      DO(ecc_sign_hash_rfc7518_ex(data16, 16, buf, &len, &yarrow_prng, find_prng ("yarrow"), &recid, &privkey));
+      DO(ecc_sign_hash_v2(data16, 16, buf, &len, &sig_opts, &privkey));
 
       /* test verification */
       stat = 0;
-      DO(ecc_verify_hash_rfc7518(buf, len, data16, 16, &stat, &pubkey));
+      DO(ecc_verify_hash_v2(buf, len, data16, 16, &sig_opts, &stat, &pubkey));
       if (stat != 1) return CRYPT_FAIL_TESTVECTOR;
 
       /* test recovery */
       DO(ecc_set_curve(dp, &reckey));
-      stat = ecc_recover_key(buf, len, data16, 16, recid, LTC_ECCSIG_RFC7518, &reckey);
+      stat = ecc_recover_key(buf, len, data16, 16, &sig_opts, &reckey);
       if (stat != CRYPT_OK) return CRYPT_FAIL_TESTVECTOR;
       DO(ecc_key_cmp(PK_PUBLIC, &pubkey, &reckey));
 

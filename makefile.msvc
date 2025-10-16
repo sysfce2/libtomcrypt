@@ -169,9 +169,10 @@ src/pk/asn1/oid/pk_get.obj src/pk/asn1/oid/pk_oid_cmp.obj src/pk/asn1/oid/pk_oid
 src/pk/asn1/pkcs8/pkcs8_decode_flexi.obj src/pk/asn1/pkcs8/pkcs8_get.obj \
 src/pk/asn1/x509/x509_decode_public_key_from_certificate.obj src/pk/asn1/x509/x509_decode_spki.obj \
 src/pk/asn1/x509/x509_decode_subject_public_key_info.obj \
-src/pk/asn1/x509/x509_encode_subject_public_key_info.obj src/pk/dh/dh.obj src/pk/dh/dh_check_pubkey.obj \
-src/pk/dh/dh_export.obj src/pk/dh/dh_export_key.obj src/pk/dh/dh_free.obj src/pk/dh/dh_generate_key.obj \
-src/pk/dh/dh_import.obj src/pk/dh/dh_import_pkcs8.obj src/pk/dh/dh_set.obj src/pk/dh/dh_set_pg_dhparam.obj \
+src/pk/asn1/x509/x509_encode_subject_public_key_info.obj src/pk/asn1/x509/x509_get_pka.obj \
+src/pk/asn1/x509/x509_import_spki.obj src/pk/dh/dh.obj src/pk/dh/dh_check_pubkey.obj src/pk/dh/dh_export.obj \
+src/pk/dh/dh_export_key.obj src/pk/dh/dh_free.obj src/pk/dh/dh_generate_key.obj src/pk/dh/dh_import.obj \
+src/pk/dh/dh_import_pkcs8.obj src/pk/dh/dh_set.obj src/pk/dh/dh_set_pg_dhparam.obj \
 src/pk/dh/dh_shared_secret.obj src/pk/dsa/dsa_decrypt_key.obj src/pk/dsa/dsa_encrypt_key.obj \
 src/pk/dsa/dsa_export.obj src/pk/dsa/dsa_free.obj src/pk/dsa/dsa_generate_key.obj \
 src/pk/dsa/dsa_generate_pqg.obj src/pk/dsa/dsa_import.obj src/pk/dsa/dsa_import_pkcs8.obj \

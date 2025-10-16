@@ -1388,6 +1388,10 @@
 				>
 			</File>
 			<File
+				RelativePath="src\misc\deprecated.c"
+				>
+			</File>
+			<File
 				RelativePath="src\misc\error_to_string.c"
 				>
 			</File>
@@ -2531,6 +2535,10 @@
 					>
 				</File>
 				<File
+					RelativePath="src\pk\ecc\ecc_sign_hash_x962.c"
+					>
+				</File>
+				<File
 					RelativePath="src\pk\ecc\ecc_sizes.c"
 					>
 				</File>
@@ -2556,6 +2564,10 @@
 				</File>
 				<File
 					RelativePath="src\pk\ecc\ecc_verify_hash_rfc7518.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\ecc\ecc_verify_hash_x962.c"
 					>
 				</File>
 				<File

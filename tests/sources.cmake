@@ -5,6 +5,7 @@ base64_test.c
 bcrypt_test.c
 cipher_hash_test.c
 common.c
+deprecated_test.c
 der_test.c
 dh_test.c
 dsa_test.c

@@ -29,7 +29,7 @@ const struct ltc_cipher_descriptor aesni_desc =
 #define temp_update(t, k) _mm_insert_epi32(t, k, 3)
 #define temp_invert(k) _mm_aesimc_si128(*((__m128i*)(k)))
 
-
+#define rcon aesni_rcon
 static const ulong32 rcon[] = {
     0x01UL, 0x02UL, 0x04UL, 0x08UL, 0x10UL, 0x20UL, 0x40UL, 0x80UL, 0x1BUL, 0x36UL
 };
@@ -369,6 +369,8 @@ int aesni_keysize(int *keysize)
    *keysize = 32;
    return CRYPT_OK;
 }
+
+#undef rcon
 
 #endif
 

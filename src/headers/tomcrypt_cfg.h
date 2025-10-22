@@ -246,6 +246,8 @@ typedef unsigned long ltc_mp_digit;
    #undef LTC_FAST
    #define LTC_NO_AES_NI
    #define LTC_NO_BSWAP
+   #define LTC_NO_CLZL
+   #define LTC_NO_CTZL
    #define LTC_NO_ROLC
    #define LTC_NO_ROTATE
 #endif
@@ -296,11 +298,11 @@ typedef unsigned long ltc_mp_digit;
    #define LTC_HAVE_ROTATE_BUILTIN
 #endif
 
-#if __has_builtin(__builtin_clzl)
+#if !defined(LTC_NO_CLZL) && __has_builtin(__builtin_clzl)
    #define LTC_HAVE_CLZL_BUILTIN
 #endif
 
-#if __has_builtin(__builtin_ctzl)
+#if !defined(LTC_NO_CTZL) && __has_builtin(__builtin_ctzl)
    #define LTC_HAVE_CTZL_BUILTIN
 #endif
 

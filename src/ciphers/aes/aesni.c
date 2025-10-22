@@ -147,7 +147,6 @@ int aesni_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_
    for (i = 1; i < skey->rijndael.Nr; i++) {
       rrk -= 4;
       rk += 4;
-      temp = temp_invert(rk);
       *((__m128i*) rk) = temp_invert(rrk);
    }
 

@@ -244,6 +244,7 @@ typedef unsigned long ltc_mp_digit;
    #undef ENDIAN_32BITWORD
    #undef ENDIAN_64BITWORD
    #undef LTC_FAST
+   #define LTC_NO_AES_NI
    #define LTC_NO_BSWAP
    #define LTC_NO_ROLC
    #define LTC_NO_ROTATE
@@ -301,6 +302,10 @@ typedef unsigned long ltc_mp_digit;
 
 #if __has_builtin(__builtin_ctzl)
    #define LTC_HAVE_CTZL_BUILTIN
+#endif
+
+#if !defined(LTC_NO_AES_NI) && (defined(__x86_64__) || defined(_M_X64))
+#define LTC_AES_NI
 #endif
 
 #if defined(__GNUC__)

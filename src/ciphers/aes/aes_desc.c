@@ -83,13 +83,17 @@ static LTC_INLINE int s_aesni_is_supported(void)
 
    return is_supported;
 }
+#endif
 
 #ifndef ENCRYPT_ONLY
 int aesni_is_supported(void)
 {
+#ifdef LTC_AES_NI
    return s_aesni_is_supported();
-}
+#else
+   return 0;
 #endif
+}
 #endif
 
  /**

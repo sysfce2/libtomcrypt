@@ -10,7 +10,7 @@ int store_test(void)
   ulong32 L, L1;
   ulong64 LL, LL1;
 #ifdef LTC_FAST
-  unsigned long x, z;
+  unsigned long x, z, zz;
 #endif
 
   for (y = 0; y < 4; y++) {
@@ -51,22 +51,22 @@ int store_test(void)
 #ifdef LTC_FAST
   y = 16;
 
-  for (z = 0; z < y; z++) {
+  for (z = 0, zz = 2*y - 1; z < y; z++, zz-=2) {
      /* fill y bytes with random */
      ENSURE(yarrow_read(buf+z,   y, &yarrow_prng) == y);
-     ENSURE(yarrow_read(buf+z+y, y, &yarrow_prng) == y);
+     ENSURE(yarrow_read(buf+z+y+zz, y, &yarrow_prng) == y);
 
      /* now XOR it byte for byte */
      for (x = 0; x < y; x++) {
-         buf[2*y+z+x] = buf[z+x] ^ buf[z+y+x];
+         buf[4*y+z+x] = buf[z+x] ^ buf[z+y+x+zz];
      }
 
      /* now XOR it word for word */
      for (x = 0; x < y; x += sizeof(LTC_FAST_TYPE)) {
-        *(LTC_FAST_TYPE_PTR_CAST(&buf[3*y+z+x])) = *(LTC_FAST_TYPE_PTR_CAST(&buf[z+x])) ^ *(LTC_FAST_TYPE_PTR_CAST(&buf[z+y+x]));
+        *(LTC_FAST_TYPE_PTR_CAST(&buf[5*y+z+x])) = *(LTC_FAST_TYPE_PTR_CAST(&buf[z+x])) ^ *(LTC_FAST_TYPE_PTR_CAST(&buf[z+y+x+zz]));
      }
 
-     if (memcmp(&buf[2*y+z], &buf[3*y+z], y)) {
+     if (memcmp(&buf[4*y+z], &buf[5*y+z], y)) {
         fprintf(stderr, "\nLTC_FAST failed at offset %lu\n", z);
         return 1;
      }

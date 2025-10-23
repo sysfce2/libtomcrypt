@@ -10369,17 +10369,6 @@ Since the function is given the entire RSA key (for private keys only) CRT is po
 
 \mysection{Deprecated API functions}
 
-\subsection{After v1.18.0}
-
-\index{init\_LTM()} \index{init\_TFM()} \index{init\_GMP()}
-\begin{verbatim}
-void init_LTM(void);
-void init_TFM(void);
-void init_GMP(void);
-\end{verbatim}
-
-These three MPI init functions have been introduced in version 1.18.0 and have been deprecated in the same version in favor of \code{crypt\_mp\_init()}, c.f. Ch. \ref{mp-init}.
-
 \clearpage
 \addcontentsline{toc}{chapter}{Index}
 \printindex

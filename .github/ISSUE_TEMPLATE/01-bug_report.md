@@ -1,3 +1,12 @@
+---
+name: Bug report
+about: Create a bug report
+title: ''
+labels: bug
+assignees: ''
+
+---
+
 <!--
 
 Do you want to ask a question? Are you looking for support? The Mailing list is the best place for getting support: https://groups.google.com/forum/#!forum/libtom
@@ -22,7 +31,7 @@ This is a very generic template, remove items that do not apply. For completed i
 
 ### Version
 
-You can get this information from the define `SCRYPT` in `src/include/tomcrypt.h` or your local git repository by running `git describe --always --tags --dirty`. 
+You can get this information from the define `SCRYPT` in `src/include/tomcrypt.h` or your local git repository by running `git describe --always --tags --dirty`.
 Also, please include the compiler, the compiler version, the architecture and (if applicable) the MPI provider, the OS and what version of the OS you're experiencing the issue.
 
 ### Additional Information

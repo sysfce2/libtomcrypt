@@ -29,7 +29,7 @@ docs crypt.pdf: crypt.tex
 	rm -f crypt.pdf $(LEFTOVERS)
 	cp crypt.tex crypt.bak
 	touch -r crypt.tex crypt.bak
-	(printf "%s" "\def\fixedpdfdate{"; date +'D:%Y%m%d%H%M%S%:z' -d @$$(stat --format=%Y crypt.tex) | sed "s/:\([0-9][0-9]\)$$/'\1'}/g") > crypt-deterministic.tex
+	(printf "%s" "\def\fixedpdfdate{"; date +'D:%Y%m%d%H%M%S%:z' -u -d @$${SOURCE_DATE_EPOCH:-$$(stat --format=%Y crypt.tex)} | sed "s/:\([0-9][0-9]\)$$/'\1'}/g") > crypt-deterministic.tex
 	printf "%s\n" "\pdfinfo{" >> crypt-deterministic.tex
 	printf "%s\n" "  /CreationDate (\fixedpdfdate)" >> crypt-deterministic.tex
 	printf "%s\n}\n" "  /ModDate (\fixedpdfdate)" >> crypt-deterministic.tex

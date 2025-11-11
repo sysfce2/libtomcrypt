@@ -431,7 +431,7 @@ static int s_rsa_import_x509(const void *in, unsigned long inlen, void *key)
    return rsa_import_x509(in, inlen, key);
 }
 
-#if defined(LTC_MD2) && defined(LTC_MD5) && defined(LTC_RC2)
+#if defined(LTC_TEST_READDIR)
 static int password_get(void **p, unsigned long *l, void *u)
 {
    LTC_UNUSED_PARAM(u);
@@ -476,8 +476,9 @@ int rsa_test(void)
 #ifdef LTC_TEST_READDIR
    DO(test_process_dir("tests/rsa", &key, s_rsa_import_x509, NULL, (dir_cleanup_cb)rsa_free, "rsa_test"));
 #if defined(LTC_MD2) && defined(LTC_MD5) && defined(LTC_RC2)
-   DO(test_process_dir("tests/rsa-pkcs8", &key, s_rsa_import_pkcs8, NULL, (dir_cleanup_cb)rsa_free, "rsa_pkcs8_test"));
+   DO(test_process_dir("tests/rsa-pkcs8/old", &key, s_rsa_import_pkcs8, NULL, (dir_cleanup_cb)rsa_free, "rsa_pkcs8_test"));
 #endif
+   DO(test_process_dir("tests/rsa-pkcs8", &key, s_rsa_import_pkcs8, NULL, (dir_cleanup_cb)rsa_free, "rsa_pkcs8_test"));
 #endif
 
    DO(s_rsa_cryptx_issue_69());

@@ -148,6 +148,12 @@ ifneq ($(GIT_VERSION),)
 LTC_CFLAGS += -DGIT_VERSION=\"$(GIT_VERSION)\"
 endif
 
+ifndef LTC_DEBUG
+ifeq ($(findstring -DARGTYPE,$(CFLAGS)),)
+LTC_CFLAGS += -DARGTYPE=4
+endif
+endif
+
 LTC_CFLAGS := $(LTC_CFLAGS) $(CFLAGS)
 
 ifneq ($(findstring -DLTC_PTHREAD,$(LTC_CFLAGS)),)
@@ -174,7 +180,7 @@ TEST=test
 USEFUL_DEMOS   = hashsum
 
 # Demos that are usable but only rarely make sense to be installed
-USEABLE_DEMOS  = aesgcm constants crypt openssh-privkey openssl-enc pem-info sizes timing
+USEABLE_DEMOS  = aesgcm constants crypt der_print_flexi latex-tables openssh-privkey openssl-enc sizes timing
 
 # Demos that are used for testing or measuring
 TEST_DEMOS     = small tv_gen

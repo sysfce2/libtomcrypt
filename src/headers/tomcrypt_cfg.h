@@ -244,7 +244,10 @@ typedef unsigned long ltc_mp_digit;
    #undef ENDIAN_32BITWORD
    #undef ENDIAN_64BITWORD
    #undef LTC_FAST
+   #define LTC_NO_AES_NI
    #define LTC_NO_BSWAP
+   #define LTC_NO_CLZL
+   #define LTC_NO_CTZL
    #define LTC_NO_ROLC
    #define LTC_NO_ROTATE
 #endif
@@ -295,12 +298,16 @@ typedef unsigned long ltc_mp_digit;
    #define LTC_HAVE_ROTATE_BUILTIN
 #endif
 
-#if __has_builtin(__builtin_clzl)
+#if !defined(LTC_NO_CLZL) && __has_builtin(__builtin_clzl)
    #define LTC_HAVE_CLZL_BUILTIN
 #endif
 
-#if __has_builtin(__builtin_ctzl)
+#if !defined(LTC_NO_CTZL) && __has_builtin(__builtin_ctzl)
    #define LTC_HAVE_CTZL_BUILTIN
+#endif
+
+#if !defined(LTC_NO_AES_NI) && (defined(__x86_64__) || defined(_M_X64))
+#define LTC_AES_NI
 #endif
 
 #if defined(__GNUC__)
@@ -329,20 +336,29 @@ typedef unsigned long ltc_mp_digit;
 #   define LTC_NULL_TERMINATED
 #endif
 
+#ifndef LTC_DEPRECATED
 #if defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 405)
 #  define LTC_DEPRECATED(s) __attribute__((deprecated("replaced by " #s)))
-#  define PRIVATE_LTC_DEPRECATED_PRAGMA(s) _Pragma(#s)
-#  define LTC_DEPRECATED_PRAGMA(s) PRIVATE_LTC_DEPRECATED_PRAGMA(GCC warning s)
 #elif defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 301)
 #  define LTC_DEPRECATED(s) __attribute__((deprecated))
-#  define LTC_DEPRECATED_PRAGMA(s)
 #elif defined(_MSC_VER) && _MSC_VER >= 1500
    /* supported since Visual Studio 2008 */
 #  define LTC_DEPRECATED(s) __declspec(deprecated("replaced by " #s))
-#  define LTC_DEPRECATED_PRAGMA(s) __pragma(message(s))
 #else
 #  define LTC_DEPRECATED(s)
+#endif
+#endif
+
+#ifndef LTC_DEPRECATED_PRAGMA
+#if defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 405)
+#  define PRIVATE_LTC_DEPRECATED_PRAGMA(s) _Pragma(#s)
+#  define LTC_DEPRECATED_PRAGMA(s) PRIVATE_LTC_DEPRECATED_PRAGMA(GCC warning s)
+#elif defined(_MSC_VER) && _MSC_VER >= 1500
+   /* supported since Visual Studio 2008 */
+#  define LTC_DEPRECATED_PRAGMA(s) __pragma(message(s))
+#else
 #  define LTC_DEPRECATED_PRAGMA(s)
+#endif
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)

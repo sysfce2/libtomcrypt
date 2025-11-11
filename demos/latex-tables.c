@@ -74,11 +74,24 @@ static void LTC_NORETURN die(int status)
 {
    FILE* o = status == EXIT_SUCCESS ? stdout : stderr;
    fprintf(o,
-         "Usage: pem-info [<-h>]\n\n"
-         "Generate LaTeX tables from the supported PEM resp. SSH ciphers.\n\n"
+         "Usage: latex-tables [<-h>]\n\n"
+         "Generate LaTeX tables from some library internal data.\n\n"
          "\t-h\tThe help you're looking at.\n"
    );
    exit(status);
+}
+
+static int s_to_lower(const char *in, char *out, unsigned long *outlen)
+{
+   unsigned long n;
+   for (n = 0; n < *outlen && in[n]; ++n) {
+      out[n] = tolower(in[n]);
+   }
+   if (n == *outlen)
+      return CRYPT_BUFFER_OVERFLOW;
+   out[n] = '\0';
+   *outlen = n;
+   return CRYPT_OK;
 }
 
 int main(int argc, char **argv)
@@ -108,6 +121,50 @@ int main(int argc, char **argv)
                                nbuf, s_map_cipher(ssh_ciphers[n].algo),
                                ssh_ciphers[n].keylen * 8,
                                                        s_map_mode(ssh_ciphers[n].mode));
+   }
+
+   printf("\nECC curves:\n\n");
+   for (n = 0; ltc_ecc_curves[n].OID != NULL; ++n) {
+      const char * const *names;
+      char lower[32] = {0}, buf[64] = {0};
+      unsigned long m, bufl = 0, lowerl;
+      int err = ecc_get_curve_names(ltc_ecc_curves[n].OID, &names);
+      if (err != CRYPT_OK) {
+         printf("\\error: OID %s not found (%s)\n", ltc_ecc_curves[n].OID, error_to_string(err));
+         return EXIT_FAILURE;
+      }
+      for (m = 1; names[m]; ++m) {
+         const char *name = names[m];
+         if (memcmp(name, "P-", 2) == 0 || memcmp(name, "ECC-", 4) == 0) {
+            /* Use the original name */
+         } else {
+            lowerl = sizeof(lower);
+            if ((err = s_to_lower(name, lower, &lowerl)) != CRYPT_OK) {
+               printf("\\error: %s could not be converted to lowercase (%s)\n", name, error_to_string(err));
+               return EXIT_FAILURE;
+            }
+            name = lower;
+         }
+         if (m == 1) {
+            err = snprintf(buf + bufl, sizeof(buf) - bufl, "%s", name);
+         } else {
+            err = snprintf(buf + bufl, sizeof(buf) - bufl, ", %s", name);
+         }
+         if (err == -1 || (unsigned)err > sizeof(buf) - bufl) {
+            printf("\\error: snprintf returned %d at %s\n", err, name);
+            return EXIT_FAILURE;
+         }
+         bufl += err;
+      }
+      lower[0] = '{';
+      lowerl = sizeof(lower) - 2;
+      if ((err = s_to_lower(names[0], &lower[1], &lowerl)) != CRYPT_OK) {
+         printf("\\error: %s could not be converted to lowercase (%s)\n", names[0], error_to_string(err));
+         return EXIT_FAILURE;
+      }
+      lower[lowerl + 1] = '}';
+      lower[lowerl + 2] = '\0';
+      printf("\\hline \\texttt%-17s & %-36s & %-21s \\\\\n", lower, buf, ltc_ecc_curves[n].OID);
    }
 
    return 0;

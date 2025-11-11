@@ -20,25 +20,18 @@ build_script:
       if "Visual Studio 2015"=="%APPVEYOR_BUILD_WORKER_IMAGE%" call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
       cd..
       git clone https://github.com/libtom/libtommath.git --branch=master
+      cp libtomcrypt\.ci\cmake.bat libtommath\cmake.bat
       cd libtommath
-      mkdir build
-      cd build
-      cmake -G "Ninja" ..
-      ninja
-      cd..
+      cmake.bat
       nmake -f makefile.msvc
       cd..
       cd libtomcrypt
-      mkdir build
-      cd build
-      cmake -G "Ninja" ..
-      ninja
-      cd..
+      .ci\cmake.bat
       nmake -f makefile.msvc all
       cp test.exe test-stock.exe
       cp timing.exe timing-stock.exe
       nmake -f makefile.msvc clean
-      nmake -f makefile.msvc all CFLAGS="/Ox /DUSE_LTM /DLTM_DESC /DLTC_AES_NI /I../libtommath"
+      nmake -f makefile.msvc all CFLAGS="/Ox /DUSE_LTM /DLTM_DESC /DLTC_NO_AES_NI /I../libtommath"
 test_script:
 - cmd: >-
     test-stock.exe

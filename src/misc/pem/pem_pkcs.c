@@ -41,120 +41,50 @@ static int s_decrypt_pem(unsigned char *asn1_cert, unsigned long *asn1_len, cons
    return err;
 }
 
-static int s_get_pka(ltc_asn1_list *pub, enum ltc_pka_id *pka)
-{
-   der_flexi_check flexi_should[4];
-   ltc_asn1_list *seqid, *id;
-   enum ltc_oid_id oid_id;
-   int err;
-   unsigned long n = 0;
-   LTC_SET_DER_FLEXI_CHECK(flexi_should, n++, LTC_ASN1_SEQUENCE, &seqid);
-   LTC_SET_DER_FLEXI_CHECK(flexi_should, n++, LTC_ASN1_BIT_STRING, NULL);
-   LTC_SET_DER_FLEXI_CHECK(flexi_should, n, LTC_ASN1_EOL, NULL);
-   if ((err = der_flexi_sequence_cmp(pub, flexi_should)) != CRYPT_OK) {
-      return err;
-   }
-   n = 0;
-   LTC_SET_DER_FLEXI_CHECK(flexi_should, n++, LTC_ASN1_OBJECT_IDENTIFIER, &id);
-   LTC_SET_DER_FLEXI_CHECK(flexi_should, n, LTC_ASN1_EOL, NULL);
-   err = der_flexi_sequence_cmp(seqid, flexi_should);
-   if (err != CRYPT_OK && err != CRYPT_INPUT_TOO_LONG) {
-      return err;
-   }
-   if ((err = pk_get_oid_from_asn1(id, &oid_id)) != CRYPT_OK) {
-      return err;
-   }
-   return pk_get_pka_id(oid_id, pka);
-}
+typedef int (*pkcs8_import_fn)(ltc_asn1_list *, ltc_asn1_list *, void*);
 
-typedef int (*import_fn)(const unsigned char *, unsigned long, void*);
-
-static const import_fn s_import_x509_fns[LTC_PKA_NUM] = {
+static const struct {
+   enum ltc_pka_id id;
+   pkcs8_import_fn fn;
+} s_import_pkcs8_map[LTC_OID_NUM] = {
+#ifdef LTC_MDH
+                                                [LTC_OID_DH] = { LTC_PKA_DH, (pkcs8_import_fn)dh_import_pkcs8_asn1 },
+#endif
+#ifdef LTC_MDSA
+                                                [LTC_OID_DSA] = { LTC_PKA_DSA, (pkcs8_import_fn)dsa_import_pkcs8_asn1 },
+#endif
 #ifdef LTC_MRSA
-                                                [LTC_PKA_RSA] = (import_fn)rsa_import_x509,
+                                                [LTC_OID_RSA] = { LTC_PKA_RSA, (pkcs8_import_fn)rsa_import_pkcs8_asn1 },
 #endif
 #ifdef LTC_MECC
-                                                [LTC_PKA_EC] = (import_fn)ecc_import_x509,
+                                                [LTC_OID_EC] = { LTC_PKA_EC, (pkcs8_import_fn)ecc_import_pkcs8_asn1 },
 #endif
 #ifdef LTC_CURVE25519
-                                                [LTC_PKA_X25519] = (import_fn)x25519_import_x509,
-                                                [LTC_PKA_ED25519] = (import_fn)ed25519_import_x509,
+                                                [LTC_OID_X25519] =  { LTC_PKA_X25519, (pkcs8_import_fn)x25519_import_pkcs8_asn1 },
+                                                [LTC_OID_ED25519] = { LTC_PKA_ED25519, (pkcs8_import_fn)ed25519_import_pkcs8_asn1 },
 #endif
 };
-
-static int s_import_x509(unsigned char *asn1_cert, unsigned long asn1_len, ltc_pka_key *k)
-{
-   enum ltc_pka_id pka = LTC_PKA_UNDEF;
-   ltc_asn1_list *d, *spki;
-   int err;
-   if ((err = x509_decode_spki(asn1_cert, asn1_len, &d, &spki)) != CRYPT_OK) {
-      return err;
-   }
-   err = s_get_pka(spki, &pka);
-   der_free_sequence_flexi(d);
-   if (err != CRYPT_OK) {
-      return err;
-   }
-   if (pka < 0
-         || pka > LTC_ARRAY_SIZE(s_import_x509_fns)
-         || s_import_x509_fns[pka] == NULL) {
-      return CRYPT_PK_INVALID_TYPE;
-   }
-   if ((err = s_import_x509_fns[pka](asn1_cert, asn1_len, &k->u)) == CRYPT_OK) {
-      k->id = pka;
-   }
-   return err;
-}
 
 static int s_import_pkcs8(unsigned char *asn1_cert, unsigned long asn1_len, ltc_pka_key *k, const password_ctx *pw_ctx)
 {
    int err;
-   enum ltc_oid_id pka;
+   enum ltc_oid_id oid_id;
    ltc_asn1_list *alg_id, *priv_key;
    ltc_asn1_list *p8_asn1 = NULL;
    if ((err = pkcs8_decode_flexi(asn1_cert, asn1_len, pw_ctx, &p8_asn1)) != CRYPT_OK) {
       goto cleanup;
    }
-   if ((err = pkcs8_get_children(p8_asn1, &pka, &alg_id, &priv_key)) != CRYPT_OK) {
+   if ((err = pkcs8_get_children(p8_asn1, &oid_id, &alg_id, &priv_key)) != CRYPT_OK) {
       goto cleanup;
    }
-   switch (pka) {
-#ifdef LTC_MDH
-      case LTC_OID_DH:
-         err = dh_import_pkcs8_asn1(alg_id, priv_key, &k->u.dh);
-         k->id = LTC_PKA_DH;
-         break;
-#endif
-#ifdef LTC_MDSA
-      case LTC_OID_DSA:
-         err = dsa_import_pkcs8_asn1(alg_id, priv_key, &k->u.dsa);
-         k->id = LTC_PKA_DSA;
-         break;
-#endif
-#ifdef LTC_MRSA
-      case LTC_OID_RSA:
-         err = rsa_import_pkcs8_asn1(alg_id, priv_key, &k->u.rsa);
-         k->id = LTC_PKA_RSA;
-         break;
-#endif
-#ifdef LTC_MECC
-      case LTC_OID_EC:
-         err = ecc_import_pkcs8_asn1(alg_id, priv_key, &k->u.ecc);
-         k->id = LTC_PKA_EC;
-         break;
-#endif
-#ifdef LTC_CURVE25519
-      case LTC_OID_X25519:
-         err = x25519_import_pkcs8_asn1(alg_id, priv_key, &k->u.x25519);
-         k->id = LTC_PKA_X25519;
-         break;
-      case LTC_OID_ED25519:
-         err = ed25519_import_pkcs8_asn1(alg_id, priv_key, &k->u.ed25519);
-         k->id = LTC_PKA_ED25519;
-         break;
-#endif
-      default:
-         err = CRYPT_PK_INVALID_TYPE;
+   if (oid_id < 0
+         || oid_id > LTC_ARRAY_SIZE(s_import_pkcs8_map)
+         || s_import_pkcs8_map[oid_id].fn == NULL) {
+      err = CRYPT_PK_INVALID_TYPE;
+      goto cleanup;
+   }
+   if ((err = s_import_pkcs8_map[oid_id].fn(alg_id, priv_key, &k->u)) == CRYPT_OK) {
+      k->id = s_import_pkcs8_map[oid_id].id;
    }
 
 cleanup:
@@ -171,10 +101,12 @@ static int s_extract_pka(unsigned char *asn1_cert, unsigned long asn1_len, enum 
    if ((err = der_decode_sequence_flexi(asn1_cert, &asn1_len, &pub)) != CRYPT_OK) {
       return err;
    }
-   err = s_get_pka(pub, pka);
+   err = x509_get_pka(pub, pka);
    der_sequence_free(pub);
    return err;
 }
+
+typedef int (*import_fn)(const unsigned char *, unsigned long, void*);
 
 static const import_fn s_import_openssl_fns[LTC_PKA_NUM] = {
 #ifdef LTC_MRSA
@@ -195,21 +127,16 @@ static const import_fn s_import_openssl_fns[LTC_PKA_NUM] = {
 static int s_decode(struct get_char *g, ltc_pka_key *k, const password_ctx *pw_ctx)
 {
    unsigned char *asn1_cert = NULL;
-   unsigned long w, asn1_len, n;
+   unsigned long w = 0, asn1_len, n;
    int err = CRYPT_ERROR;
    struct pem_headers hdr = { 0 };
    struct password pw = { 0 };
    enum ltc_pka_id pka;
    XMEMSET(k, 0, sizeof(*k));
-   w = LTC_PEM_READ_BUFSIZE * 2;
-retry:
-   asn1_cert = XREALLOC(asn1_cert, w);
    for (n = 0; n < pem_std_headers_num; ++n) {
       hdr.id = &pem_std_headers[n];
-      err = pem_read(asn1_cert, &w, &hdr, g);
-      if (err == CRYPT_BUFFER_OVERFLOW) {
-         goto retry;
-      } else if (err == CRYPT_OK) {
+      err = pem_read((void**)&asn1_cert, &w, &hdr, g);
+      if (err == CRYPT_OK) {
          break;
       } else if (err != CRYPT_UNKNOWN_PEM) {
          goto cleanup;
@@ -224,7 +151,7 @@ retry:
       err = s_import_pkcs8(asn1_cert, asn1_len, k, pw_ctx);
       goto cleanup;
    } else if (hdr.id->flags == pf_x509) {
-      err = s_import_x509(asn1_cert, asn1_len, k);
+      err = x509_import_spki(asn1_cert, asn1_len, k, NULL);
       goto cleanup;
    } else if ((hdr.id->flags & pf_public) && hdr.id->pka == LTC_PKA_UNDEF) {
       if ((err = s_extract_pka(asn1_cert, asn1_len, &pka)) != CRYPT_OK) {
@@ -272,7 +199,7 @@ int pem_decode_pkcs_filehandle(FILE *f, ltc_pka_key *k, const password_ctx *pw_c
    LTC_ARGCHK(f != NULL);
    LTC_ARGCHK(k != NULL);
    {
-      struct get_char g = { .get = pem_get_char_from_file, .data.f = f };
+      struct get_char g = pem_get_char_init_filehandle(f);
       return s_decode(&g, k, pw_ctx);
    }
 }
@@ -284,7 +211,7 @@ int pem_decode_pkcs(const void *buf, unsigned long len, ltc_pka_key *k, const pa
    LTC_ARGCHK(len != 0);
    LTC_ARGCHK(k != NULL);
    {
-      struct get_char g = { .get = pem_get_char_from_buf, SET_BUFP(.data.buf, buf, len) };
+      struct get_char g = pem_get_char_init(buf, len);
       return s_decode(&g, k, pw_ctx);
    }
 }

@@ -352,19 +352,40 @@ struct bufp {
 };
 
 #define SET_BUFP(n, d, l) n.start = (char*)d, n.work = (char*)d, n.end = (char*)d + l + 1
+#define UPDATE_BUFP(n, d, w, l) n.start = (char*)d, n.work = (char*)d + w, n.end = (char*)d + l + 1
+
+struct get_char;
+struct get_char_api {
+   int (*get)(struct get_char*);
+};
 
 struct get_char {
-   int (*get)(struct get_char*);
+   struct get_char_api api;
    union {
 #ifndef LTC_NO_FILE
-      FILE *f;
+      struct {
+         FILE *f;
+      } f;
 #endif /* LTC_NO_FILE */
       struct bufp buf;
    } data;
    struct str unget_buf;
    char unget_buf_[LTC_PEM_DECODE_BUFSZ];
    int prev_get;
+   unsigned long total_read;
 };
+
+#define pem_get_char_init(b, l)   { \
+   .api = get_char_buffer_api, \
+   SET_BUFP(.data.buf, (b), (l)), \
+   .total_read = 0, \
+}
+
+#define pem_get_char_init_filehandle(fi)    { \
+   .api = get_char_filehandle_api, \
+   .data.f.f = (fi), \
+   .total_read = 0, \
+}
 #endif
 
 /* others */
@@ -387,10 +408,10 @@ int pem_decrypt(unsigned char *data, unsigned long *datalen,
                 const struct blockcipher_info *info,
                 enum padding_type padding);
 #ifndef LTC_NO_FILE
-int pem_get_char_from_file(struct get_char *g);
+extern const struct get_char_api get_char_filehandle_api;
 #endif /* LTC_NO_FILE */
-int pem_get_char_from_buf(struct get_char *g);
-int pem_read(void *asn1_cert, unsigned long *asn1_len, struct pem_headers *hdr, struct get_char *g);
+extern const struct get_char_api get_char_buffer_api;
+int pem_read(void **dest, unsigned long *len, struct pem_headers *hdr, struct get_char *g);
 #endif
 
 /* tomcrypt_pk.h */
@@ -651,17 +672,29 @@ int der_printable_value_decode(int v);
 
 unsigned long der_utf8_charsize(const wchar_t c);
 
-typedef struct {
+typedef int (*der_flexi_handler)(const ltc_asn1_list*, void*);
+
+typedef struct der_flexi_check {
    ltc_asn1_type t;
+   int optional;
    ltc_asn1_list **pp;
+   der_flexi_handler handler;
+   void *userdata;
 } der_flexi_check;
 
-#define LTC_SET_DER_FLEXI_CHECK(list, index, Type, P)    \
-   do {                                         \
-      int LTC_SDFC_temp##__LINE__ = (index);   \
-      list[LTC_SDFC_temp##__LINE__].t = Type;  \
-      list[LTC_SDFC_temp##__LINE__].pp = P;    \
+#define LTC_PRIV_SET_DER_FLEXI_CHECK(list, index, Type, P, Opt, Hndl, Udata)    \
+   do {                                                                 \
+      int LTC_SDFC_temp##__LINE__ = (index);                            \
+      list[LTC_SDFC_temp##__LINE__].t = Type;                           \
+      list[LTC_SDFC_temp##__LINE__].pp = P;                             \
+      list[LTC_SDFC_temp##__LINE__].optional = Opt;                     \
+      list[LTC_SDFC_temp##__LINE__].handler = (der_flexi_handler)Hndl;  \
+      list[LTC_SDFC_temp##__LINE__].userdata = Udata;                   \
    } while (0)
+#define LTC_SET_DER_FLEXI_CHECK(list, index, Type, P) LTC_PRIV_SET_DER_FLEXI_CHECK(list, index, Type, P, 0, NULL, NULL)
+#define LTC_SET_DER_FLEXI_CHECK_OPT(list, index, Type, P) LTC_PRIV_SET_DER_FLEXI_CHECK(list, index, Type, P, 1, NULL, NULL)
+#define LTC_SET_DER_FLEXI_HANDLER(list, index, Type, Hndl, Udata) LTC_PRIV_SET_DER_FLEXI_CHECK(list, index, Type, NULL, 0, Hndl, Udata)
+#define LTC_SET_DER_FLEXI_HANDLER_OPT(list, index, Type, Hndl, Udata) LTC_PRIV_SET_DER_FLEXI_CHECK(list, index, Type, NULL, 1, Hndl, Udata)
 
 
 extern const ltc_asn1_type  der_asn1_tag_to_type_map[];
@@ -696,6 +729,9 @@ int x509_encode_subject_public_key_info(unsigned char *out, unsigned long *outle
 int x509_decode_subject_public_key_info(const unsigned char *in, unsigned long inlen,
         enum ltc_oid_id algorithm, void *public_key, unsigned long *public_key_len,
         ltc_asn1_type parameters_type, ltc_asn1_list* parameters, unsigned long *parameters_len);
+
+int x509_get_pka(ltc_asn1_list *pub, enum ltc_pka_id *pka);
+int x509_import_spki(const unsigned char *asn1_cert, unsigned long asn1_len, ltc_pka_key *k, ltc_asn1_list **root);
 
 int pk_oid_cmp_with_asn1(const char *o1, const ltc_asn1_list *o2);
 

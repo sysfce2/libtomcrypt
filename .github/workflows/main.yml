@@ -52,6 +52,7 @@ jobs:
           - { BUILDNAME: 'NO_FAST',                 BUILDOPTIONS: '-DLTC_NO_FAST',                                                        BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'NO_FAST+SMALL+NO_TABLES', BUILDOPTIONS: '-DLTC_NO_FAST -DLTC_SMALL_CODE -DLTC_NO_TABLES',                       BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'NO_ASM',                  BUILDOPTIONS: '-DLTC_NO_ASM',                                                         BUILDSCRIPT: '.ci/run.sh' }
+          - { BUILDNAME: 'NO_DEPRECATED_APIS',      BUILDOPTIONS: '-DLTC_NO_DEPRECATED_APIS',                                             BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'NO_TIMING_RESISTANCE',    BUILDOPTIONS: '-DLTC_NO_ECC_TIMING_RESISTANT -DLTC_NO_RSA_BLINDING',                  BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'FORTUNA_CUSTOM_OPTIONS',  BUILDOPTIONS: '-DLTC_FORTUNA_USE_ENCRYPT_ONLY -DLTC_FORTUNA_RESEED_RATELIMIT_STATIC', BUILDSCRIPT: '.ci/run.sh' }
           - { BUILDNAME: 'PTHREAD',                 BUILDOPTIONS: '-DLTC_PTHREAD',                                                        BUILDSCRIPT: '.ci/run.sh' }

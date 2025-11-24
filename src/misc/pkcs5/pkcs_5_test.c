@@ -175,7 +175,7 @@ int pkcs_5_test (void)
 #endif
             ++failed;
         }
-        else if (compare_testvector(DK, dkLen, cases_5_2[i].DK, cases_5_2[i].dkLen, "PKCS#5_2", i)) {
+        else if (ltc_compare_testvector(DK, dkLen, cases_5_2[i].DK, cases_5_2[i].dkLen, "PKCS#5_2", i)) {
             ++failed;
         }
     }
@@ -193,7 +193,7 @@ int pkcs_5_test (void)
 #endif
             ++failed;
         }
-        else if (compare_testvector(DK, dkLen, cases_5_1[i].DK, cases_5_1[i].dkLen, "PKCS#5_1", i)) {
+        else if (ltc_compare_testvector(DK, dkLen, cases_5_1[i].DK, cases_5_1[i].dkLen, "PKCS#5_1", i)) {
             ++failed;
         }
     }
@@ -211,7 +211,7 @@ int pkcs_5_test (void)
 #endif
             ++failed;
         }
-        else if (compare_testvector(DK, dkLen, cases_5_1o[i].DK, cases_5_1o[i].dkLen, "PKCS#5_1o", i)) {
+        else if (ltc_compare_testvector(DK, dkLen, cases_5_1o[i].DK, cases_5_1o[i].dkLen, "PKCS#5_1o", i)) {
             ++failed;
         }
     }

@@ -260,7 +260,7 @@ int xts_test(void)
                }
             }
 
-            if (compare_testvector(OUT, tests[i].PTLEN, tests[i].CTX, tests[i].PTLEN, "XTS encrypt", i)) {
+            if (ltc_compare_testvector(OUT, tests[i].PTLEN, tests[i].CTX, tests[i].PTLEN, "XTS encrypt", i)) {
                xts_done(&xts);
                return CRYPT_FAIL_TESTVECTOR;
             }
@@ -285,7 +285,7 @@ int xts_test(void)
                }
             }
 
-            if (compare_testvector(OUT, tests[i].PTLEN, tests[i].PTX, tests[i].PTLEN, "XTS decrypt", i)) {
+            if (ltc_compare_testvector(OUT, tests[i].PTLEN, tests[i].PTX, tests[i].PTLEN, "XTS decrypt", i)) {
                xts_done(&xts);
                return CRYPT_FAIL_TESTVECTOR;
             }

@@ -103,7 +103,7 @@ int xcbc_test(void)
      if ((err = xcbc_memory(idx, tests[x].K, 16, tests[x].M, tests[x].msglen, T, &taglen)) != CRYPT_OK) {
         return err;
      }
-     if (compare_testvector(T, taglen, tests[x].T, 16, "XCBC", x)) {
+     if (ltc_compare_testvector(T, taglen, tests[x].T, 16, "XCBC", x)) {
         return CRYPT_FAIL_TESTVECTOR;
      }
   }

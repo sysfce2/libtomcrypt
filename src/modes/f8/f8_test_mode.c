@@ -53,7 +53,7 @@ int f8_test_mode(void)
    f8_done(&f8);
 
    /* compare */
-   if (compare_testvector(buf, sizeof(ct), ct, sizeof(ct), "f8", 0)) {
+   if (ltc_compare_testvector(buf, sizeof(ct), ct, sizeof(ct), "f8", 0)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 

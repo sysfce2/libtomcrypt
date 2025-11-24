@@ -145,15 +145,15 @@ int base64_test(void)
 
    out[10] = 0;
    DO(base64_decode(out, l1, tmp, &l2));
-   DO(compare_testvector(tmp, l2, in, l2, "insane base64 decoding (NUL)", 0));
+   COMPARE_TESTVECTOR(tmp, l2, in, l2, "insane base64 decoding (NUL)", 0);
    DO(base64_sane_decode(out, l1, tmp, &l2) == CRYPT_INVALID_PACKET ? CRYPT_OK : CRYPT_INVALID_PACKET);
    DO(base64_strict_decode(out, l1, tmp, &l2) == CRYPT_INVALID_PACKET ? CRYPT_OK : CRYPT_INVALID_PACKET);
 
    out[10] = 9; /* tab */
    DO(base64_decode(out, l1, tmp, &l2));
-   DO(compare_testvector(tmp, l2, in, l2, "insane base64 decoding (TAB)", 0));
+   COMPARE_TESTVECTOR(tmp, l2, in, l2, "insane base64 decoding (TAB)", 0);
    DO(base64_sane_decode(out, l1, tmp, &l2));
-   DO(compare_testvector(tmp, l2, in, l2, "relaxed base64 decoding (TAB)", 0));
+   COMPARE_TESTVECTOR(tmp, l2, in, l2, "relaxed base64 decoding (TAB)", 0);
    DO(base64_strict_decode(out, l1, tmp, &l2) == CRYPT_INVALID_PACKET ? CRYPT_OK : CRYPT_INVALID_PACKET);
 
    memset(in, 'A', sizeof(in));
@@ -161,16 +161,16 @@ int base64_test(void)
    SHOULD_FAIL(base64_encode_pem(in, 51, out, &l1, 0));
    l1++;
    DO(base64_encode_pem(in, 51, out, &l1, 0));
-   DO(compare_testvector(out, l1, As_lf, strlen(As_lf), "PEM output with \\n", 0));
+   COMPARE_TESTVECTOR(out, l1, As_lf, strlen(As_lf), "PEM output with \\n", 0);
    l1 = strlen(As_crlf) + 1;
    DO(base64_encode_pem(in, 51, out, &l1, BASE64_PEM_CRLF));
-   DO(compare_testvector(out, l1, As_crlf, strlen(As_crlf), "PEM output with \\r\\n", 0));
+   COMPARE_TESTVECTOR(out, l1, As_crlf, strlen(As_crlf), "PEM output with \\r\\n", 0);
    l1 = strlen(As_ssh_lf) + 1;
    DO(base64_encode_pem(in, 57, out, &l1, BASE64_PEM_SSH));
-   DO(compare_testvector(out, l1, As_ssh_lf, strlen(As_ssh_lf), "PEM SSH-style output with \\n", 0));
+   COMPARE_TESTVECTOR(out, l1, As_ssh_lf, strlen(As_ssh_lf), "PEM SSH-style output with \\n", 0);
    l1 = strlen(As_ssh_crlf) + 1;
    DO(base64_encode_pem(in, 57, out, &l1, BASE64_PEM_SSH | BASE64_PEM_CRLF));
-   DO(compare_testvector(out, l1, As_ssh_crlf, strlen(As_ssh_crlf), "PEM SSH-style output with \\r\\n", 0));
+   COMPARE_TESTVECTOR(out, l1, As_ssh_crlf, strlen(As_ssh_crlf), "PEM SSH-style output with \\r\\n", 0);
 #endif
 
    return 0;

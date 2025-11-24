@@ -101,9 +101,7 @@ int prng_test(void)
    }
    DO(fortuna_done(&nprng));
 
-   if (compare_testvector(buf + 64, 32, buf + 32, 32, "fortuna_add_entropy() vs. fortuna_add_random_event()", 0) != 0) {
-      err = CRYPT_FAIL_TESTVECTOR;
-   }
+   COMPARE_TESTVECTOR(buf + 64, 32, buf + 32, 32, "fortuna_add_entropy() vs. fortuna_add_random_event()", 0);
 #endif
    return err;
 }

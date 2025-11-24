@@ -59,7 +59,7 @@ int ctr_test(void)
         return err;
      }
      ctr_done(&ctr);
-     if (compare_testvector(buf, tests[x].msglen, tests[x].ct, tests[x].msglen, "CTR", x)) {
+     if (ltc_compare_testvector(buf, tests[x].msglen, tests[x].ct, tests[x].msglen, "CTR", x)) {
         return CRYPT_FAIL_TESTVECTOR;
      }
   }

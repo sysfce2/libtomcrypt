@@ -27,7 +27,6 @@ static const struct {
 
 int modes_test(void)
 {
-   int ret = CRYPT_NOP;
 #ifdef LTC_CBC_MODE
    symmetric_CBC cbc;
 #endif
@@ -50,57 +49,47 @@ int modes_test(void)
    ENSURE(yarrow_read(iv,  16, &yarrow_prng) == 16);
 
    /* get idx of AES handy */
-   cipher_idx = find_cipher("aes");
-   if (cipher_idx == -1) {
-      fprintf(stderr, "test requires AES");
-      return 1;
-   }
+   ENSURE((cipher_idx = find_cipher("aes")) != -1);
 #endif
 
 #ifdef LTC_F8_MODE
-   DO(ret = f8_test_mode());
+   DO(f8_test_mode());
 #endif
 
 #ifdef LTC_LRW_MODE
-   DO(ret = lrw_test());
+   DO(lrw_test());
 #endif
 
 #ifdef LTC_CBC_MODE
    /* test CBC mode */
    /* encode the block */
-   DO(ret = cbc_start(cipher_idx, iv, key, 16, 0, &cbc));
+   DO(cbc_start(cipher_idx, iv, key, 16, 0, &cbc));
    l = sizeof(iv2);
-   DO(ret = cbc_getiv(iv2, &l, &cbc));
-   if (l != 16 || memcmp(iv2, iv, 16)) {
-      fprintf(stderr, "cbc_getiv failed");
-      return 1;
-   }
-   DO(ret = cbc_encrypt(pt, ct, 64, &cbc));
+   DO(cbc_getiv(iv2, &l, &cbc));
+   COMPARE_TESTVECTOR(iv2, l, iv, 16, "cbc_getiv", 0);
+   DO(cbc_encrypt(pt, ct, 64, &cbc));
 
    /* decode the block */
-   DO(ret = cbc_setiv(iv2, l, &cbc));
+   DO(cbc_setiv(iv2, l, &cbc));
    zeromem(tmp, sizeof(tmp));
-   DO(ret = cbc_decrypt(ct, tmp, 64, &cbc));
-   if (memcmp(tmp, pt, 64) != 0) {
-      fprintf(stderr, "CBC failed");
-      return 1;
-   }
+   DO(cbc_decrypt(ct, tmp, 64, &cbc));
+   COMPARE_TESTVECTOR(pt, 64, tmp, 64, "CBC", 0);
 #endif
 
 #ifdef LTC_CFB_MODE
    /* test CFB mode */
    /* encode the block */
-   DO(ret = cfb_start(cipher_idx, iv, key, 16, 0, &cfb));
+   DO(cfb_start(cipher_idx, iv, key, 16, 0, &cfb));
    l = sizeof(iv2);
-   DO(ret = cfb_getiv(iv2, &l, &cfb));
+   DO(cfb_getiv(iv2, &l, &cfb));
    /* note we don't memcmp iv2/iv since cfb_start processes the IV for the first block */
    ENSURE(l == 16);
-   DO(ret = cfb_encrypt(pt, ct, 64, &cfb));
+   DO(cfb_encrypt(pt, ct, 64, &cfb));
 
    /* decode the block */
-   DO(ret = cfb_setiv(iv, l, &cfb));
+   DO(cfb_setiv(iv, l, &cfb));
    zeromem(tmp, sizeof(tmp));
-   DO(ret = cfb_decrypt(ct, tmp, 64, &cfb));
+   DO(cfb_decrypt(ct, tmp, 64, &cfb));
    COMPARE_TESTVECTOR(tmp, 64, pt, 64, "cfb128-enc-dec", 0);
    cfb_done(&cfb);
    XMEMSET(&cfb, 0, sizeof(cfb));
@@ -118,10 +107,10 @@ int modes_test(void)
       l = sizeof(iv2);
       DO(cfb_getiv(iv2, &l, &cfb));
       ENSURE(l == 16);
-      DO(ret = cfb_encrypt(pt, tmp, 2, &cfb));
+      DO(cfb_encrypt(pt, tmp, 2, &cfb));
       COMPARE_TESTVECTOR(tmp, 2, ct, 2, "cfb-enc", n);
       DO(cfb_setiv(iv2, l, &cfb));
-      DO(ret = cfb_decrypt(tmp, tmp2, 2, &cfb));
+      DO(cfb_decrypt(tmp, tmp2, 2, &cfb));
       COMPARE_TESTVECTOR(tmp2, 2, pt, 2, "cfb-dec", n);
    }
 #endif
@@ -129,25 +118,25 @@ int modes_test(void)
 #ifdef LTC_OFB_MODE
    /* test OFB mode */
    /* encode the block */
-   DO(ret = ofb_start(cipher_idx, iv, key, 16, 0, &ofb));
+   DO(ofb_start(cipher_idx, iv, key, 16, 0, &ofb));
    l = sizeof(iv2);
    DO(ofb_getiv(iv2, &l, &ofb));
-   DO(do_compare_testvector(iv2, l, iv, 16, "ofb_getiv", 0));
-   DO(ret = ofb_encrypt(pt, ct, 64, &ofb));
+   COMPARE_TESTVECTOR(iv2, l, iv, 16, "ofb_getiv", 0);
+   DO(ofb_encrypt(pt, ct, 64, &ofb));
 
    /* decode the block */
-   DO(ret = ofb_setiv(iv2, l, &ofb));
+   DO(ofb_setiv(iv2, l, &ofb));
    zeromem(tmp, sizeof(tmp));
-   DO(ret = ofb_decrypt(ct, tmp, 64, &ofb));
-   DO(do_compare_testvector(tmp, 64, pt, 64, "OFB", 0));
+   DO(ofb_decrypt(ct, tmp, 64, &ofb));
+   COMPARE_TESTVECTOR(tmp, 64, pt, 64, "OFB", 0);
 #endif
 
 #if defined(LTC_CTR_MODE) && defined(LTC_RIJNDAEL)
-   DO(ret = ctr_test());
+   DO(ctr_test());
 #endif
 
 #ifdef LTC_XTS_MODE
-   DO(ret = xts_test());
+   DO(xts_test());
 #endif
 
    return 0;

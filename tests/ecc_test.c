@@ -1886,39 +1886,39 @@ static int s_ecc_import_export(void) {
    /* export - openssl compatible DER format */
    outlen = sizeof(out);
    DO(ecc_export_openssl(out, &outlen, PK_PRIVATE, &pri));
-   if (compare_testvector(out, outlen, ltc_ecc_long_pri_test_key, sizeof(ltc_ecc_long_pri_test_key),   "e-ltc_ecc_long_pri_test_key",   0)) return CRYPT_ERROR;
+   COMPARE_TESTVECTOR(out, outlen, ltc_ecc_long_pri_test_key, sizeof(ltc_ecc_long_pri_test_key),   "e-ltc_ecc_long_pri_test_key",   0);
    outlen = sizeof(out);
    DO(ecc_export_openssl(out, &outlen, PK_PRIVATE|PK_COMPRESSED, &pri));
-   if (compare_testvector(out, outlen, long_pric, sizeof(long_pric),  "e-long_pric",  0)) return CRYPT_ERROR;
+   COMPARE_TESTVECTOR(out, outlen, long_pric, sizeof(long_pric),  "e-long_pric",  0);
    outlen = sizeof(out);
    DO(ecc_export_openssl(out, &outlen, PK_PUBLIC, &pub));
-   if (compare_testvector(out, outlen, long_pub, sizeof(long_pub),   "e-long_pub",   0)) return CRYPT_ERROR;
+   COMPARE_TESTVECTOR(out, outlen, long_pub, sizeof(long_pub),   "e-long_pub",   0);
    outlen = sizeof(out);
    DO(ecc_export_openssl(out, &outlen, PK_PUBLIC|PK_COMPRESSED, &pub));
-   if (compare_testvector(out, outlen, long_pubc, sizeof(long_pubc),  "e-long_pubc",  0)) return CRYPT_ERROR;
+   COMPARE_TESTVECTOR(out, outlen, long_pubc, sizeof(long_pubc),  "e-long_pubc",  0);
    outlen = sizeof(out);
    DO(ecc_export_openssl(out, &outlen, PK_PRIVATE|PK_CURVEOID, &pri));
-   if (compare_testvector(out, outlen, short_pri, sizeof(short_pri),  "e-short_pri",  0)) return CRYPT_ERROR;
+   COMPARE_TESTVECTOR(out, outlen, short_pri, sizeof(short_pri),  "e-short_pri",  0);
    outlen = sizeof(out);
    DO(ecc_export_openssl(out, &outlen, PK_PRIVATE|PK_CURVEOID|PK_COMPRESSED, &pri));
-   if (compare_testvector(out, outlen, short_pric, sizeof(short_pric), "e-short_pric", 0)) return CRYPT_ERROR;
+   COMPARE_TESTVECTOR(out, outlen, short_pric, sizeof(short_pric), "e-short_pric", 0);
    outlen = sizeof(out);
    DO(ecc_export_openssl(out, &outlen, PK_PUBLIC|PK_CURVEOID,  &pub));
-   if (compare_testvector(out, outlen, short_pub, sizeof(short_pub),  "e-short_pub",  0)) return CRYPT_ERROR;
+   COMPARE_TESTVECTOR(out, outlen, short_pub, sizeof(short_pub),  "e-short_pub",  0);
    outlen = sizeof(out);
    DO(ecc_export_openssl(out, &outlen, PK_PUBLIC|PK_CURVEOID|PK_COMPRESSED, &pub));
-   if (compare_testvector(out, outlen, short_pubc, sizeof(short_pubc), "e-short_pubc", 0)) return CRYPT_ERROR;
+   COMPARE_TESTVECTOR(out, outlen, short_pubc, sizeof(short_pubc), "e-short_pubc", 0);
 
    /* export - raw keys */
    outlen = sizeof(out);
    DO(ecc_get_key(out, &outlen, PK_PRIVATE, &pri));
-   if (compare_testvector(out, outlen, raw_pri, sizeof(raw_pri),    "e-raw_pri",    0)) return CRYPT_ERROR;
+   COMPARE_TESTVECTOR(out, outlen, raw_pri, sizeof(raw_pri),    "e-raw_pri",    0);
    outlen = sizeof(out);
    DO(ecc_get_key(out, &outlen, PK_PUBLIC, &pub));
-   if (compare_testvector(out, outlen, raw_pub, sizeof(raw_pub),    "e-raw_pub",    0)) return CRYPT_ERROR;
+   COMPARE_TESTVECTOR(out, outlen, raw_pub, sizeof(raw_pub),    "e-raw_pub",    0);
    outlen = sizeof(out);
    DO(ecc_get_key(out, &outlen, PK_PUBLIC|PK_COMPRESSED, &pub));
-   if (compare_testvector(out, outlen, raw_pubc, sizeof(raw_pubc),   "e-raw_pubc",   0)) return CRYPT_ERROR;
+   COMPARE_TESTVECTOR(out, outlen, raw_pubc, sizeof(raw_pubc),   "e-raw_pubc",   0);
 
    ecc_free(&pri);
    ecc_free(&pub);

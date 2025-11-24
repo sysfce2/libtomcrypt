@@ -320,8 +320,8 @@ int aesni_test(void)
 
     aesni_ecb_encrypt(tests[i].pt, tmp[0], &key);
     aesni_ecb_decrypt(tmp[0], tmp[1], &key);
-    if (compare_testvector(tmp[0], 16, tests[i].ct, 16, "AES-NI Encrypt", i) ||
-          compare_testvector(tmp[1], 16, tests[i].pt, 16, "AES-NI Decrypt", i)) {
+    if (ltc_compare_testvector(tmp[0], 16, tests[i].ct, 16, "AES-NI Encrypt", i) ||
+          ltc_compare_testvector(tmp[1], 16, tests[i].pt, 16, "AES-NI Decrypt", i)) {
         return CRYPT_FAIL_TESTVECTOR;
     }
 

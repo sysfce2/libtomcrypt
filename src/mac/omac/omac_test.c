@@ -82,7 +82,7 @@ int omac_test(void)
           return err;
        }
 
-       if (compare_testvector(out, len, tests[x].tag, sizeof(tests[x].tag), "OMAC", x) != 0) {
+       if (ltc_compare_testvector(out, len, tests[x].tag, sizeof(tests[x].tag), "OMAC", x) != 0) {
           return CRYPT_FAIL_TESTVECTOR;
        }
     }

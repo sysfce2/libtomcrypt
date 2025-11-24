@@ -265,7 +265,7 @@ int hkdf_test(void)
             return err;
         }
 
-        if(compare_testvector(OKM, cases[i].OKM_l, cases[i].OKM, (size_t)cases[i].OKM_l, "HKDF", cases[i].num)) {
+        if(ltc_compare_testvector(OKM, cases[i].OKM_l, cases[i].OKM, (size_t)cases[i].OKM_l, "HKDF", cases[i].num)) {
             failed++;
         }
     }

@@ -132,14 +132,14 @@ int modes_test(void)
    DO(ret = ofb_start(cipher_idx, iv, key, 16, 0, &ofb));
    l = sizeof(iv2);
    DO(ofb_getiv(iv2, &l, &ofb));
-   DO(do_compare_testvector(iv2, l, iv, 16, "ofb_getiv", 0));
+   COMPARE_TESTVECTOR(iv2, l, iv, 16, "ofb_getiv", 0);
    DO(ret = ofb_encrypt(pt, ct, 64, &ofb));
 
    /* decode the block */
    DO(ret = ofb_setiv(iv2, l, &ofb));
    zeromem(tmp, sizeof(tmp));
    DO(ret = ofb_decrypt(ct, tmp, 64, &ofb));
-   DO(do_compare_testvector(tmp, 64, pt, 64, "OFB", 0));
+   COMPARE_TESTVECTOR(tmp, 64, pt, 64, "OFB", 0);
 #endif
 
 #if defined(LTC_CTR_MODE) && defined(LTC_RIJNDAEL)

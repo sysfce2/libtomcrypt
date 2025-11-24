@@ -36,7 +36,7 @@ int sha3_224_test(void)
    /* SHA3-224 on an empty buffer */
    sha3_224_init(&c);
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_224_empty, sizeof(sha3_224_empty), "SHA3-224", 0)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_224_empty, sizeof(sha3_224_empty), "SHA3-224", 0)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -45,7 +45,7 @@ int sha3_224_test(void)
    sha3_process(&c, buf, sizeof(buf) / 2);
    sha3_process(&c, buf + sizeof(buf) / 2, sizeof(buf) / 2);
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_224_0xa3_200_times, sizeof(sha3_224_0xa3_200_times), "SHA3-224", 1)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_224_0xa3_200_times, sizeof(sha3_224_0xa3_200_times), "SHA3-224", 1)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -56,7 +56,7 @@ int sha3_224_test(void)
        sha3_process(&c, &c1, 1);
    }
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_224_0xa3_200_times, sizeof(sha3_224_0xa3_200_times), "SHA3-224", 2)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_224_0xa3_200_times, sizeof(sha3_224_0xa3_200_times), "SHA3-224", 2)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -92,7 +92,7 @@ int sha3_256_test(void)
    /* SHA3-256 on an empty buffer */
    sha3_256_init(&c);
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_256_empty, sizeof(sha3_256_empty), "SHA3-256", 0)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_256_empty, sizeof(sha3_256_empty), "SHA3-256", 0)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -100,7 +100,7 @@ int sha3_256_test(void)
    sha3_256_init(&c);
    sha3_process(&c, buf, sizeof(buf));
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_256_0xa3_200_times, sizeof(sha3_256_0xa3_200_times), "SHA3-256", 1)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_256_0xa3_200_times, sizeof(sha3_256_0xa3_200_times), "SHA3-256", 1)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -109,7 +109,7 @@ int sha3_256_test(void)
    sha3_process(&c, buf, sizeof(buf) / 2);
    sha3_process(&c, buf + sizeof(buf) / 2, sizeof(buf) / 2);
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_256_0xa3_200_times, sizeof(sha3_256_0xa3_200_times), "SHA3-256", 2)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_256_0xa3_200_times, sizeof(sha3_256_0xa3_200_times), "SHA3-256", 2)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -120,7 +120,7 @@ int sha3_256_test(void)
        sha3_process(&c, &c1, 1);
    }
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_256_0xa3_200_times, sizeof(sha3_256_0xa3_200_times), "SHA3-256", 3)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_256_0xa3_200_times, sizeof(sha3_256_0xa3_200_times), "SHA3-256", 3)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -146,7 +146,7 @@ int sha3_256_test(void)
            "\x76\x3d\x52\xdb\x98\xd9\x49\xd3"
            "\xb0\xfe\xd6\xa8\x05\x2f\xbb", 1080 / 8);
    sha3_done(&c, hash);
-   if(compare_testvector(hash, sizeof(hash),
+   if(ltc_compare_testvector(hash, sizeof(hash),
            "\xa1\x9e\xee\x92\xbb\x20\x97\xb6"
            "\x4e\x82\x3d\x59\x77\x98\xaa\x18"
            "\xbe\x9b\x7c\x73\x6b\x80\x59\xab"
@@ -183,7 +183,7 @@ int sha3_384_test(void)
    sha3_384_init(&c);
    sha3_process(&c, buf, sizeof(buf));
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_384_0xa3_200_times, sizeof(sha3_384_0xa3_200_times), "SHA3-384", 0)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_384_0xa3_200_times, sizeof(sha3_384_0xa3_200_times), "SHA3-384", 0)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -192,7 +192,7 @@ int sha3_384_test(void)
    sha3_process(&c, buf, sizeof(buf) / 2);
    sha3_process(&c, buf + sizeof(buf) / 2, sizeof(buf) / 2);
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_384_0xa3_200_times, sizeof(sha3_384_0xa3_200_times), "SHA3-384", 1)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_384_0xa3_200_times, sizeof(sha3_384_0xa3_200_times), "SHA3-384", 1)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -203,7 +203,7 @@ int sha3_384_test(void)
        sha3_process(&c, &c1, 1);
    }
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_384_0xa3_200_times, sizeof(sha3_384_0xa3_200_times), "SHA3-384", 2)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_384_0xa3_200_times, sizeof(sha3_384_0xa3_200_times), "SHA3-384", 2)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -238,7 +238,7 @@ int sha3_512_test(void)
    sha3_512_init(&c);
    sha3_process(&c, buf, sizeof(buf));
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_512_0xa3_200_times, sizeof(sha3_512_0xa3_200_times), "SHA3-512", 0)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_512_0xa3_200_times, sizeof(sha3_512_0xa3_200_times), "SHA3-512", 0)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -247,7 +247,7 @@ int sha3_512_test(void)
    sha3_process(&c, buf, sizeof(buf) / 2);
    sha3_process(&c, buf + sizeof(buf) / 2, sizeof(buf) / 2);
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_512_0xa3_200_times, sizeof(sha3_512_0xa3_200_times), "SHA3-512", 1)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_512_0xa3_200_times, sizeof(sha3_512_0xa3_200_times), "SHA3-512", 1)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -258,7 +258,7 @@ int sha3_512_test(void)
        sha3_process(&c, &c1, 1);
    }
    sha3_done(&c, hash);
-   if (compare_testvector(hash, sizeof(hash), sha3_512_0xa3_200_times, sizeof(sha3_512_0xa3_200_times), "SHA3-512", 2)) {
+   if (ltc_compare_testvector(hash, sizeof(hash), sha3_512_0xa3_200_times, sizeof(sha3_512_0xa3_200_times), "SHA3-512", 2)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -307,14 +307,14 @@ int sha3_shake_test(void)
    /* SHAKE256 on an empty buffer */
    sha3_shake_init(&c, 256);
    for (i = 0; i < 16; i++) sha3_shake_done(&c, hash, 32); /* get 512 bytes, keep in hash the last 32 */
-   if (compare_testvector(hash, sizeof(shake256_empty), shake256_empty, sizeof(shake256_empty), "SHAKE256", 0)) {
+   if (ltc_compare_testvector(hash, sizeof(shake256_empty), shake256_empty, sizeof(shake256_empty), "SHAKE256", 0)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
    /* SHAKE256 via sha3_shake_memory [FIPS 202] */
    len = 512;
    sha3_shake_memory(256, buf, sizeof(buf), hash, &len);
-   if (compare_testvector(hash + 480, sizeof(shake256_0xa3_200_times), shake256_0xa3_200_times, sizeof(shake256_0xa3_200_times), "SHAKE256", 1)) {
+   if (ltc_compare_testvector(hash + 480, sizeof(shake256_0xa3_200_times), shake256_0xa3_200_times, sizeof(shake256_0xa3_200_times), "SHAKE256", 1)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -322,7 +322,7 @@ int sha3_shake_test(void)
    sha3_shake_init(&c, 256);
    sha3_shake_process(&c, buf, sizeof(buf));
    for (i = 0; i < 16; i++) sha3_shake_done(&c, hash, 32); /* get 512 bytes, keep in hash the last 32 */
-   if (compare_testvector(hash, sizeof(shake256_0xa3_200_times), shake256_0xa3_200_times, sizeof(shake256_0xa3_200_times), "SHAKE256", 2)) {
+   if (ltc_compare_testvector(hash, sizeof(shake256_0xa3_200_times), shake256_0xa3_200_times, sizeof(shake256_0xa3_200_times), "SHAKE256", 2)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -331,7 +331,7 @@ int sha3_shake_test(void)
    sha3_shake_process(&c, buf, sizeof(buf) / 2);
    sha3_shake_process(&c, buf + sizeof(buf) / 2, sizeof(buf) / 2);
    for (i = 0; i < 16; i++) sha3_shake_done(&c, hash, 32); /* get 512 bytes, keep in hash the last 32 */
-   if (compare_testvector(hash, sizeof(shake256_0xa3_200_times), shake256_0xa3_200_times, sizeof(shake256_0xa3_200_times), "SHAKE256", 3)) {
+   if (ltc_compare_testvector(hash, sizeof(shake256_0xa3_200_times), shake256_0xa3_200_times, sizeof(shake256_0xa3_200_times), "SHAKE256", 3)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -340,21 +340,21 @@ int sha3_shake_test(void)
    sha3_shake_init(&c, 256);
    while (i--) sha3_shake_process(&c, &c1, 1);
    for (i = 0; i < 16; i++) sha3_shake_done(&c, hash, 32); /* get 512 bytes, keep in hash the last 32 */
-   if (compare_testvector(hash, sizeof(shake256_0xa3_200_times), shake256_0xa3_200_times, sizeof(shake256_0xa3_200_times), "SHAKE256", 4)) {
+   if (ltc_compare_testvector(hash, sizeof(shake256_0xa3_200_times), shake256_0xa3_200_times, sizeof(shake256_0xa3_200_times), "SHAKE256", 4)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
    /* SHAKE128 on an empty buffer */
    sha3_shake_init(&c, 128);
    for (i = 0; i < 16; i++) sha3_shake_done(&c, hash, 32); /* get 512 bytes, keep in hash the last 32 */
-   if (compare_testvector(hash, sizeof(shake128_empty), shake128_empty, sizeof(shake128_empty), "SHAKE128", 0)) {
+   if (ltc_compare_testvector(hash, sizeof(shake128_empty), shake128_empty, sizeof(shake128_empty), "SHAKE128", 0)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
    /* SHAKE128 via sha3_shake_memory [FIPS 202] */
    len = 512;
    sha3_shake_memory(128, buf, sizeof(buf), hash, &len);
-   if (compare_testvector(hash + 480, sizeof(shake128_0xa3_200_times), shake128_0xa3_200_times, sizeof(shake128_0xa3_200_times), "SHAKE128", 1)) {
+   if (ltc_compare_testvector(hash + 480, sizeof(shake128_0xa3_200_times), shake128_0xa3_200_times, sizeof(shake128_0xa3_200_times), "SHAKE128", 1)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -362,7 +362,7 @@ int sha3_shake_test(void)
    sha3_shake_init(&c, 128);
    sha3_shake_process(&c, buf, sizeof(buf));
    for (i = 0; i < 16; i++) sha3_shake_done(&c, hash, 32); /* get 512 bytes, keep in hash the last 32 */
-   if (compare_testvector(hash, sizeof(shake128_0xa3_200_times), shake128_0xa3_200_times, sizeof(shake128_0xa3_200_times), "SHAKE128", 2)) {
+   if (ltc_compare_testvector(hash, sizeof(shake128_0xa3_200_times), shake128_0xa3_200_times, sizeof(shake128_0xa3_200_times), "SHAKE128", 2)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -371,7 +371,7 @@ int sha3_shake_test(void)
    sha3_shake_process(&c, buf, sizeof(buf) / 2);
    sha3_shake_process(&c, buf + sizeof(buf) / 2, sizeof(buf) / 2);
    for (i = 0; i < 16; i++) sha3_shake_done(&c, hash, 32); /* get 512 bytes, keep in hash the last 32 */
-   if (compare_testvector(hash, sizeof(shake128_0xa3_200_times), shake128_0xa3_200_times, sizeof(shake128_0xa3_200_times), "SHAKE128", 3)) {
+   if (ltc_compare_testvector(hash, sizeof(shake128_0xa3_200_times), shake128_0xa3_200_times, sizeof(shake128_0xa3_200_times), "SHAKE128", 3)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -380,7 +380,7 @@ int sha3_shake_test(void)
    sha3_shake_init(&c, 128);
    while (i--) sha3_shake_process(&c, &c1, 1);
    for (i = 0; i < 16; i++) sha3_shake_done(&c, hash, 32); /* get 512 bytes, keep in hash the last 32 */
-   if (compare_testvector(hash, sizeof(shake128_0xa3_200_times), shake128_0xa3_200_times, sizeof(shake128_0xa3_200_times), "SHAKE128", 4)) {
+   if (ltc_compare_testvector(hash, sizeof(shake128_0xa3_200_times), shake128_0xa3_200_times, sizeof(shake128_0xa3_200_times), "SHAKE128", 4)) {
       return CRYPT_FAIL_TESTVECTOR;
    }
 
@@ -403,7 +403,7 @@ int keccak_224_test(void)
    keccak_224_init(&c);
    keccak_process(&c, (unsigned char*) "\xcc", 1);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 28,
+   if(ltc_compare_testvector(hash, 28,
                          "\xa9\xca\xb5\x9e\xb4\x0a\x10\xb2"
                          "\x46\x29\x0f\x2d\x60\x86\xe3\x2e"
                          "\x36\x89\xfa\xf1\xd2\x6b\x47\x0c"
@@ -415,7 +415,7 @@ int keccak_224_test(void)
    keccak_224_init(&c);
    keccak_process(&c, (unsigned char*)"\x41\xfb", 2);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 28,
+   if(ltc_compare_testvector(hash, 28,
                          "\x61\x5b\xa3\x67\xaf\xdc\x35\xaa"
                          "\xc3\x97\xbc\x7e\xb5\xd5\x8d\x10"
                          "\x6a\x73\x4b\x24\x98\x6d\x5d\x97"
@@ -429,7 +429,7 @@ int keccak_224_test(void)
                     "\x52\xa6\x08\xab\x21\xcc\xdd\x8a"
                     "\x44\x57\xa5\x7e\xde\x78\x21\x76", 16);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 28,
+   if(ltc_compare_testvector(hash, 28,
                          "\x56\x79\xcd\x50\x9c\x51\x20\xaf"
                          "\x54\x79\x5c\xf4\x77\x14\x96\x41"
                          "\xcf\x27\xb2\xeb\xb6\xa5\xf9\x03"
@@ -454,7 +454,7 @@ int keccak_224_test(void)
                     "\x4a\x3f\x9d\x9e\x53\xe7\xe0\x84"
                     "\x6d\xcb\xb4\xce", 100);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 28,
+   if(ltc_compare_testvector(hash, 28,
                          "\x62\xb1\x0f\x1b\x62\x36\xeb\xc2"
                          "\xda\x72\x95\x77\x42\xa8\xd4\xe4"
                          "\x8e\x21\x3b\x5f\x89\x34\x60\x4b"
@@ -478,7 +478,7 @@ int keccak_256_test(void)
    keccak_256_init(&c);
    keccak_process(&c, (unsigned char*) "\xcc", 1);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 32,
+   if(ltc_compare_testvector(hash, 32,
                          "\xee\xad\x6d\xbf\xc7\x34\x0a\x56"
                          "\xca\xed\xc0\x44\x69\x6a\x16\x88"
                          "\x70\x54\x9a\x6a\x7f\x6f\x56\x96"
@@ -490,7 +490,7 @@ int keccak_256_test(void)
    keccak_256_init(&c);
    keccak_process(&c, (unsigned char*)"\x41\xfb", 2);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 32,
+   if(ltc_compare_testvector(hash, 32,
                          "\xa8\xea\xce\xda\x4d\x47\xb3\x28"
                          "\x1a\x79\x5a\xd9\xe1\xea\x21\x22"
                          "\xb4\x07\xba\xf9\xaa\xbc\xb9\xe1"
@@ -504,7 +504,7 @@ int keccak_256_test(void)
                     "\x52\xa6\x08\xab\x21\xcc\xdd\x8a"
                     "\x44\x57\xa5\x7e\xde\x78\x21\x76", 16);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 32,
+   if(ltc_compare_testvector(hash, 32,
                          "\x0e\x32\xde\xfa\x20\x71\xf0\xb5"
                          "\xac\x0e\x6a\x10\x8b\x84\x2e\xd0"
                          "\xf1\xd3\x24\x97\x12\xf5\x8e\xe0"
@@ -529,7 +529,7 @@ int keccak_256_test(void)
                     "\x4a\x3f\x9d\x9e\x53\xe7\xe0\x84"
                     "\x6d\xcb\xb4\xce", 100);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 32,
+   if(ltc_compare_testvector(hash, 32,
                          "\xce\x87\xa5\x17\x3b\xff\xd9\x23"
                          "\x99\x22\x16\x58\xf8\x01\xd4\x5c"
                          "\x29\x4d\x90\x06\xee\x9f\x3f\x9d"
@@ -553,7 +553,7 @@ int keccak_384_test(void)
    keccak_384_init(&c);
    keccak_process(&c, (unsigned char*) "\xcc", 1);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 48,
+   if(ltc_compare_testvector(hash, 48,
                          "\x1b\x84\xe6\x2a\x46\xe5\xa2\x01"
                          "\x86\x17\x54\xaf\x5d\xc9\x5c\x4a"
                          "\x1a\x69\xca\xf4\xa7\x96\xae\x40"
@@ -567,7 +567,7 @@ int keccak_384_test(void)
    keccak_384_init(&c);
    keccak_process(&c, (unsigned char*)"\x41\xfb", 2);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 48,
+   if(ltc_compare_testvector(hash, 48,
                          "\x49\x5c\xce\x27\x14\xcd\x72\xc8"
                          "\xc5\x3c\x33\x63\xd2\x2c\x58\xb5"
                          "\x59\x60\xfe\x26\xbe\x0b\xf3\xbb"
@@ -583,7 +583,7 @@ int keccak_384_test(void)
                     "\x52\xa6\x08\xab\x21\xcc\xdd\x8a"
                     "\x44\x57\xa5\x7e\xde\x78\x21\x76", 16);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 48,
+   if(ltc_compare_testvector(hash, 48,
                          "\x18\x42\x2a\xc1\xd3\xa1\xe5\x4b"
                          "\xad\x87\x68\x83\xd2\xd6\xdd\x65"
                          "\xf6\x5c\x1d\x5f\x33\xa7\x12\x5c"
@@ -610,7 +610,7 @@ int keccak_384_test(void)
                     "\x4a\x3f\x9d\x9e\x53\xe7\xe0\x84"
                     "\x6d\xcb\xb4\xce", 100);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 48,
+   if(ltc_compare_testvector(hash, 48,
                          "\x13\x51\x14\x50\x8d\xd6\x3e\x27"
                          "\x9e\x70\x9c\x26\xf7\x81\x7c\x04"
                          "\x82\x76\x6c\xde\x49\x13\x2e\x3e"
@@ -636,7 +636,7 @@ int keccak_512_test(void)
    keccak_512_init(&c);
    keccak_process(&c, (unsigned char*) "\xcc", 1);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 64,
+   if(ltc_compare_testvector(hash, 64,
                          "\x86\x30\xc1\x3c\xbd\x06\x6e\xa7"
                          "\x4b\xbe\x7f\xe4\x68\xfe\xc1\xde"
                          "\xe1\x0e\xdc\x12\x54\xfb\x4c\x1b"
@@ -652,7 +652,7 @@ int keccak_512_test(void)
    keccak_512_init(&c);
    keccak_process(&c, (unsigned char*)"\x41\xfb", 2);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 64,
+   if(ltc_compare_testvector(hash, 64,
                          "\x55\x1d\xa6\x23\x6f\x8b\x96\xfc"
                          "\xe9\xf9\x7f\x11\x90\xe9\x01\x32"
                          "\x4f\x0b\x45\xe0\x6d\xbb\xb5\xcd"
@@ -670,7 +670,7 @@ int keccak_512_test(void)
                     "\x52\xa6\x08\xab\x21\xcc\xdd\x8a"
                     "\x44\x57\xa5\x7e\xde\x78\x21\x76", 16);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 64,
+   if(ltc_compare_testvector(hash, 64,
                          "\x4b\x39\xd3\xda\x5b\xcd\xf4\xd9"
                          "\xb7\x69\x01\x59\x95\x64\x43\x11"
                          "\xc1\x4c\x43\x5b\xf7\x2b\x10\x09"
@@ -699,7 +699,7 @@ int keccak_512_test(void)
                     "\x4a\x3f\x9d\x9e\x53\xe7\xe0\x84"
                     "\x6d\xcb\xb4\xce", 100);
    keccak_done(&c, hash);
-   if(compare_testvector(hash, 64,
+   if(ltc_compare_testvector(hash, 64,
                          "\x52\x7d\x28\xe3\x41\xe6\xb1\x4f"
                          "\x46\x84\xad\xb4\xb8\x24\xc4\x96"
                          "\xc6\x48\x2e\x51\x14\x95\x65\xd3"

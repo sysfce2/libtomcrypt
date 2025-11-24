@@ -79,4 +79,10 @@ int ecc_verify_hash_rfc7518(const unsigned char *sig,  unsigned long siglen,
 }
 #endif /* LTC_MECC */
 
+int compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which)
+{
+   return ltc_compare_testvector(is, is_len, should, should_len, what, which);
+}
+
+
 #endif /* LTC_NO_DEPRECATED_APIS */

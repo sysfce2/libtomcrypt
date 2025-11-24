@@ -130,7 +130,7 @@ int pmac_test(void)
            return err;
         }
 
-        if (compare_testvector(outtag, len, tests[x].tag, sizeof(tests[x].tag), "PMAC", x)) {
+        if (ltc_compare_testvector(outtag, len, tests[x].tag, sizeof(tests[x].tag), "PMAC", x)) {
            return CRYPT_FAIL_TESTVECTOR;
         }
     }

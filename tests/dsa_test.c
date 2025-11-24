@@ -187,8 +187,8 @@ static int s_dsa_compat_test(void)
                  &key));
   len = sizeof(buf);
   DO(dsa_export(buf, &len, PK_PRIVATE | PK_STD, &key));
-  DO(do_compare_testvector(buf, len, ltc_dsa_private_test_key, sizeof(ltc_dsa_private_test_key),
-                         "DSA private export from dsa_set_pqg() & dsa_set_key()\n", __LINE__));
+  COMPARE_TESTVECTOR(buf, len, ltc_dsa_private_test_key, sizeof(ltc_dsa_private_test_key),
+                         "DSA private export from dsa_set_pqg() & dsa_set_key()\n", __LINE__);
   dsa_free(&key);
 
   /* try import public key from raw hexadecimal numbers */
@@ -201,8 +201,8 @@ static int s_dsa_compat_test(void)
                  &key));
   len = sizeof(buf);
   DO(dsa_export(buf, &len, PK_PUBLIC | PK_STD, &key));
-  DO(do_compare_testvector(buf, len, openssl_pub_dsa, sizeof(openssl_pub_dsa),
-                         "DSA public export from dsa_set_pqg() & dsa_set_key()\n", __LINE__));
+  COMPARE_TESTVECTOR(buf, len, openssl_pub_dsa, sizeof(openssl_pub_dsa),
+                         "DSA public export from dsa_set_pqg() & dsa_set_key()\n", __LINE__);
   dsa_free(&key);
 
   /* try import dsaparam */
@@ -223,8 +223,8 @@ static int s_dsa_compat_test(void)
                  &key));
   len = sizeof(buf);
   DO(dsa_export(buf, &len, PK_PUBLIC | PK_STD, &key));
-  DO(do_compare_testvector(buf, len, openssl_pub_dsa, sizeof(openssl_pub_dsa),
-                         "DSA public export from dsa_set_pqg_dsaparam()\n", __LINE__));
+  COMPARE_TESTVECTOR(buf, len, openssl_pub_dsa, sizeof(openssl_pub_dsa),
+                         "DSA public export from dsa_set_pqg_dsaparam()\n", __LINE__);
   dsa_free(&key);
 
   /* try import dsaparam - our private key */
@@ -234,8 +234,8 @@ static int s_dsa_compat_test(void)
                  &key));
   len = sizeof(buf);
   DO(dsa_export(buf, &len, PK_PRIVATE | PK_STD, &key));
-  DO(do_compare_testvector(buf, len, ltc_dsa_private_test_key, sizeof(ltc_dsa_private_test_key),
-                         "DSA private export from dsa_set_pqg_dsaparam()\n", __LINE__));
+  COMPARE_TESTVECTOR(buf, len, ltc_dsa_private_test_key, sizeof(ltc_dsa_private_test_key),
+                         "DSA private export from dsa_set_pqg_dsaparam()\n", __LINE__);
   dsa_free(&key);
 
   return CRYPT_OK;

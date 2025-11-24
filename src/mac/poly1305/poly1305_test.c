@@ -33,12 +33,12 @@ int poly1305_test(void)
    if ((err = poly1305_process(&st, (unsigned char*)m + 14, 1)) != CRYPT_OK)         return err;
    if ((err = poly1305_process(&st, (unsigned char*)m + 15, mlen - 15)) != CRYPT_OK) return err;
    if ((err = poly1305_done(&st, out, &len)) != CRYPT_OK)                            return err;
-   if (compare_testvector(out, len, tag, sizeof(tag), "POLY1305-TV1", 1) != 0)       return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(out, len, tag, sizeof(tag), "POLY1305-TV1", 1) != 0)       return CRYPT_FAIL_TESTVECTOR;
    /* process in one go */
    if ((err = poly1305_init(&st, k, 32)) != CRYPT_OK)                                return err;
    if ((err = poly1305_process(&st, (unsigned char*)m, mlen)) != CRYPT_OK)           return err;
    if ((err = poly1305_done(&st, out, &len)) != CRYPT_OK)                            return err;
-   if (compare_testvector(out, len, tag, sizeof(tag), "POLY1305-TV2", 1) != 0)       return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(out, len, tag, sizeof(tag), "POLY1305-TV2", 1) != 0)       return CRYPT_FAIL_TESTVECTOR;
    return CRYPT_OK;
 #endif
 }

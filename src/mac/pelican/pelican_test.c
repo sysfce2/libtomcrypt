@@ -91,7 +91,7 @@ int pelican_test(void)
           return err;
        }
 
-       if (compare_testvector(out, 16, tests[x].T, 16, "PELICAN", x)) {
+       if (ltc_compare_testvector(out, 16, tests[x].T, 16, "PELICAN", x)) {
            return CRYPT_FAIL_TESTVECTOR;
        }
    }

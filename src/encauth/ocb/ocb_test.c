@@ -174,8 +174,8 @@ int ocb_test(void)
            return err;
         }
 
-        if (compare_testvector(outtag, len, tests[x].tag, sizeof(tests[x].tag), "OCB Tag", x) ||
-              compare_testvector(outct, tests[x].ptlen, tests[x].ct, tests[x].ptlen, "OCB CT", x)) {
+        if (ltc_compare_testvector(outtag, len, tests[x].tag, sizeof(tests[x].tag), "OCB Tag", x) ||
+              ltc_compare_testvector(outct, tests[x].ptlen, tests[x].ct, tests[x].ptlen, "OCB CT", x)) {
            return CRYPT_FAIL_TESTVECTOR;
         }
 
@@ -183,7 +183,7 @@ int ocb_test(void)
              outct, tests[x].tag, len, &res)) != CRYPT_OK) {
            return err;
         }
-        if ((res != 1) || compare_testvector(outct, tests[x].ptlen, tests[x].pt, tests[x].ptlen, "OCB", x)) {
+        if ((res != 1) || ltc_compare_testvector(outct, tests[x].ptlen, tests[x].pt, tests[x].ptlen, "OCB", x)) {
 #ifdef LTC_TEST_DBG
            printf("\n\nOCB: Failure-decrypt - res = %d\n", res);
 #endif

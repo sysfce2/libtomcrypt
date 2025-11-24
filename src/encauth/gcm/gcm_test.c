@@ -336,7 +336,7 @@ int gcm_test(void)
    if ((err = gcm_add_iv(&gcm, tests[0].IV, tests[0].IVlen)) != CRYPT_OK)    return err;
    /* intentionally skip gcm_add_aad + gcm_process */
    if ((err = gcm_done(&gcm, T[0], &y)) != CRYPT_OK)                         return err;
-   if (compare_testvector(T[0], y, tests[0].T, 16, "GCM Encrypt Tag-special", 0))      return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(T[0], y, tests[0].T, 16, "GCM Encrypt Tag-special", 0))      return CRYPT_FAIL_TESTVECTOR;
 
    for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
        y = sizeof(T[0]);
@@ -348,11 +348,11 @@ int gcm_test(void)
           return err;
        }
 
-       if (compare_testvector(out[0], tests[x].ptlen, tests[x].C, tests[x].ptlen, "GCM CT", x)) {
+       if (ltc_compare_testvector(out[0], tests[x].ptlen, tests[x].C, tests[x].ptlen, "GCM CT", x)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
 
-       if (compare_testvector(T[0], y, tests[x].T, 16, "GCM Encrypt Tag", x)) {
+       if (ltc_compare_testvector(T[0], y, tests[x].T, 16, "GCM Encrypt Tag", x)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
 
@@ -366,7 +366,7 @@ int gcm_test(void)
           return err;
        }
 
-       if (compare_testvector(out[1], tests[x].ptlen, tests[x].P, tests[x].ptlen, "GCM PT", x)) {
+       if (ltc_compare_testvector(out[1], tests[x].ptlen, tests[x].P, tests[x].ptlen, "GCM PT", x)) {
           return CRYPT_FAIL_TESTVECTOR;
        }
    }

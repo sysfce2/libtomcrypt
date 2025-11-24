@@ -393,6 +393,17 @@ struct get_char {
 void copy_or_zeromem(const unsigned char* src, unsigned char* dest, unsigned long len, int coz);
 void password_free(struct password *pw, const struct password_ctx *ctx);
 
+int ltc_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
+int ltc_do_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
+
+#define LTC_COMPARE_TESTVECTOR(i, il, s, sl, wa, wi)                                   \
+   do {                                                                                \
+      int LTC_TMPVAR(ret) = do_compare_testvector((i), (il), (s), (sl), (wa), (wi));   \
+      if (LTC_TMPVAR(ret) != CRYPT_OK) {                                               \
+         return LTC_TMPVAR(ret);                                                       \
+      }                                                                                \
+   } while(0)
+
 #if defined(LTC_PBES)
 int pbes_decrypt(const pbes_arg  *arg, unsigned char *dec_data, unsigned long *dec_size);
 

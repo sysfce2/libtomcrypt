@@ -220,8 +220,8 @@ int ocb3_test(void)
            return err;
         }
 
-        if (compare_testvector(outtag, len, tests[x].tag, sizeof(tests[x].tag), "OCB3 Tag", x) ||
-              compare_testvector(outct, tests[x].ptlen, tests[x].ct, tests[x].ptlen, "OCB3 CT", x)) {
+        if (ltc_compare_testvector(outtag, len, tests[x].tag, sizeof(tests[x].tag), "OCB3 Tag", x) ||
+              ltc_compare_testvector(outct, tests[x].ptlen, tests[x].ct, tests[x].ptlen, "OCB3 CT", x)) {
            return CRYPT_FAIL_TESTVECTOR;
         }
 
@@ -233,7 +233,7 @@ int ocb3_test(void)
                                              tests[x].ptlen != 0 ? outct : NULL, tests[x].tag, len, &res)) != CRYPT_OK) {
            return err;
         }
-        if ((res != 1) || compare_testvector(outct, tests[x].ptlen, tests[x].pt, tests[x].ptlen, "OCB3", x)) {
+        if ((res != 1) || ltc_compare_testvector(outct, tests[x].ptlen, tests[x].pt, tests[x].ptlen, "OCB3", x)) {
 #ifdef LTC_TEST_DBG
            printf("\n\nOCB3: Failure-decrypt - res = %d\n", res);
 #endif
@@ -253,8 +253,8 @@ int ocb3_test(void)
        return err;
     }
 
-    if (compare_testvector(outtag, len, T, sizeof(T), "OCB3 Tag", x) ||
-          compare_testvector(outct, sizeof(P), C, sizeof(C), "OCB3 CT", x)) {
+    if (ltc_compare_testvector(outtag, len, T, sizeof(T), "OCB3 Tag", x) ||
+          ltc_compare_testvector(outct, sizeof(P), C, sizeof(C), "OCB3 CT", x)) {
        return CRYPT_FAIL_TESTVECTOR;
     }
 
@@ -266,7 +266,7 @@ int ocb3_test(void)
                                           outct, T, sizeof(T), &res)) != CRYPT_OK) {
        return err;
     }
-    if ((res != 1) || compare_testvector(outct, sizeof(C), P, sizeof(P), "OCB3", x)) {
+    if ((res != 1) || ltc_compare_testvector(outct, sizeof(C), P, sizeof(P), "OCB3", x)) {
 #ifdef LTC_TEST_DBG
        printf("\n\nOCB3: Failure-decrypt - res = %d\n", res);
 #endif
@@ -281,16 +281,16 @@ int ocb3_test(void)
     if ((err = ocb3_encrypt_last(&ocb, P+32, sizeof(P)-32, outct+32)) != CRYPT_OK) return err;
     len = sizeof(outtag); /* intentionally more than 12 */
     if ((err = ocb3_done(&ocb, outtag, &len)) != CRYPT_OK)                         return err;
-    if (compare_testvector(outct, sizeof(P), C, sizeof(C), "OCB3 CT", x))          return CRYPT_FAIL_TESTVECTOR;
-    if (compare_testvector(outtag, len, T, sizeof(T), "OCB3 Tag.enc", x))          return CRYPT_FAIL_TESTVECTOR;
+    if (ltc_compare_testvector(outct, sizeof(P), C, sizeof(C), "OCB3 CT", x))          return CRYPT_FAIL_TESTVECTOR;
+    if (ltc_compare_testvector(outtag, len, T, sizeof(T), "OCB3 Tag.enc", x))          return CRYPT_FAIL_TESTVECTOR;
     if ((err = ocb3_init(&ocb, idx, K, sizeof(K), N, sizeof(N), 12)) != CRYPT_OK)  return err;
     if ((err = ocb3_add_aad(&ocb, A, sizeof(A))) != CRYPT_OK)                      return err;
     if ((err = ocb3_decrypt(&ocb, C, 32, outct)) != CRYPT_OK)                      return err;
     if ((err = ocb3_decrypt_last(&ocb, C+32, sizeof(C)-32, outct+32)) != CRYPT_OK) return err;
     len = sizeof(outtag); /* intentionally more than 12 */
     if ((err = ocb3_done(&ocb, outtag, &len)) != CRYPT_OK)                         return err;
-    if (compare_testvector(outct, sizeof(C), P, sizeof(P), "OCB3 PT", x))          return CRYPT_FAIL_TESTVECTOR;
-    if (compare_testvector(outtag, len, T, sizeof(T), "OCB3 Tag.dec", x))          return CRYPT_FAIL_TESTVECTOR;
+    if (ltc_compare_testvector(outct, sizeof(C), P, sizeof(P), "OCB3 PT", x))          return CRYPT_FAIL_TESTVECTOR;
+    if (ltc_compare_testvector(outtag, len, T, sizeof(T), "OCB3 Tag.dec", x))          return CRYPT_FAIL_TESTVECTOR;
 
     return CRYPT_OK;
 #endif /* LTC_TEST */

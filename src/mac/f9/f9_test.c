@@ -53,7 +53,7 @@ int f9_test(void)
      if ((err = f9_memory(idx, tests[x].K, 16, tests[x].M, tests[x].msglen, T, &taglen)) != CRYPT_OK) {
         return err;
      }
-     if (compare_testvector(T, taglen, tests[x].T, 4, "F9", x)) {
+     if (ltc_compare_testvector(T, taglen, tests[x].T, 4, "F9", x)) {
         return CRYPT_FAIL_TESTVECTOR;
      }
   }

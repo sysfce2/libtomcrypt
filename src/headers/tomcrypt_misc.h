@@ -201,4 +201,5 @@ int ssh_encode_sequence_multi(unsigned char *out, unsigned long *outlen, ...) LT
 int ssh_decode_sequence_multi(const unsigned char *in, unsigned long *inlen, ...) LTC_NULL_TERMINATED;
 #endif /* LTC_SSH */
 
+LTC_DEPRECATED(nothing. API will be internal)
 int compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);

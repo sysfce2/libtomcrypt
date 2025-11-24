@@ -51,9 +51,7 @@ static int s_rfc_7748_5_2_test(void)
 
    for (n = 0; n < LTC_ARRAY_SIZE(rfc_7748_5_2); ++n) {
       tweetnacl_crypto_scalarmult(out, rfc_7748_5_2[n].scalar, rfc_7748_5_2[n].u_in);
-      if (compare_testvector(out, sizeof(out), rfc_7748_5_2[n].u_out, sizeof(rfc_7748_5_2[n].u_out), "x25519 RFC 7748 Ch. 5.2", n) != 0) {
-         return CRYPT_FAIL_TESTVECTOR;
-      }
+      COMPARE_TESTVECTOR(out, sizeof(out), rfc_7748_5_2[n].u_out, sizeof(rfc_7748_5_2[n].u_out), "x25519 RFC 7748 Ch. 5.2", n);
    }
    return CRYPT_OK;
 }
@@ -101,12 +99,12 @@ static int s_rfc_7748_6_test(void)
    DO(x25519_import_raw(bob_public, sizeof(bob_public), PK_PUBLIC, &bob_pub));
 
    DO(x25519_shared_secret(&alice_priv, &bob_pub, buf, &buflen));
-   DO(compare_testvector(buf, buflen, shared_secret, sizeof(shared_secret), "x25519 - RFC 7748 Ch. 6", 0));
+   COMPARE_TESTVECTOR(buf, buflen, shared_secret, sizeof(shared_secret), "x25519 - RFC 7748 Ch. 6", 0);
 
    XMEMSET(buf, 0, sizeof(buf));
 
    DO(x25519_shared_secret(&bob_priv, &alice_pub, buf, &buflen));
-   DO(compare_testvector(buf, buflen, shared_secret, sizeof(shared_secret), "x25519 - RFC 7748 Ch. 6", 1));
+   COMPARE_TESTVECTOR(buf, buflen, shared_secret, sizeof(shared_secret), "x25519 - RFC 7748 Ch. 6", 1);
 
    return CRYPT_OK;
 }

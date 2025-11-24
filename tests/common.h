@@ -38,7 +38,7 @@ int ecc_key_cmp(const int should_type, const ecc_key *should, const ecc_key *is)
 #define ENSUREX(x, str) do { run_cmd(((x)) ? CRYPT_OK : CRYPT_FAIL_TESTVECTOR, __LINE__, __FILE__, #x, (str)); } while (0)
 #endif
 
-#define COMPARE_TESTVECTOR(i, il, s, sl, wa, wi) do { DO(do_compare_testvector((i), (il), (s), (sl), (wa), (wi))); } while(0)
+#define COMPARE_TESTVECTOR(i, il, s, sl, wa, wi) do { DO(ltc_do_compare_testvector((i), (il), (s), (sl), (wa), (wi))); } while(0)
 
 #if !((defined(_WIN32) || defined(_WIN32_WCE)) && !defined(__GNUC__)) && !defined(LTC_NO_FILE)
 #define LTC_TEST_READDIR
@@ -53,7 +53,5 @@ int test_process_dir(const char *path, void *ctx, dir_iter_cb iter, dir_fiter_cb
 void run_cmd(int res, int line, const char *file, const char *cmd, const char *algorithm);
 
 void print_hex(const char* what, const void* v, const unsigned long l);
-
-int do_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
 
 #endif /* DEMOS_COMMON_H_ */

@@ -47,8 +47,8 @@ int chacha20poly1305_test(void)
    len = sizeof(emac);
    if ((err = chacha20poly1305_done(&st1, emac, &len)) != CRYPT_OK) return err;
 
-   if (compare_testvector(ct, mlen, enc, sizeof(enc), "ENC-CT", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
-   if (compare_testvector(emac, len, tag, sizeof(tag), "ENC-TAG", 2) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(ct, mlen, enc, sizeof(enc), "ENC-CT", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(emac, len, tag, sizeof(tag), "ENC-TAG", 2) != 0) return CRYPT_FAIL_TESTVECTOR;
 
    /* decrypt IV 96bit */
    if ((err = chacha20poly1305_init(&st2, k, sizeof(k))) != CRYPT_OK) return err;
@@ -59,22 +59,22 @@ int chacha20poly1305_test(void)
    len = sizeof(dmac);
    if ((err = chacha20poly1305_done(&st2, dmac, &len)) != CRYPT_OK) return err;
 
-   if (compare_testvector(pt, mlen, m, mlen, "DEC-PT", 3) != 0) return CRYPT_FAIL_TESTVECTOR;
-   if (compare_testvector(dmac, len, tag, sizeof(tag), "DEC-TAG", 4) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(pt, mlen, m, mlen, "DEC-PT", 3) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(dmac, len, tag, sizeof(tag), "DEC-TAG", 4) != 0) return CRYPT_FAIL_TESTVECTOR;
 
    /* chacha20poly1305_memory - encrypt */
    len = sizeof(emac);
    if ((err = chacha20poly1305_memory(k, sizeof(k), i12, sizeof(i12), aad, sizeof(aad), (unsigned char *)m,
                                       mlen, ct, emac, &len, CHACHA20POLY1305_ENCRYPT)) != CRYPT_OK) return err;
-   if (compare_testvector(ct, mlen, enc, sizeof(enc), "ENC-CT2", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
-   if (compare_testvector(emac, len, tag, sizeof(tag), "ENC-TAG2", 2) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(ct, mlen, enc, sizeof(enc), "ENC-CT2", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(emac, len, tag, sizeof(tag), "ENC-TAG2", 2) != 0) return CRYPT_FAIL_TESTVECTOR;
 
    /* chacha20poly1305_memory - decrypt */
    len = sizeof(dmac);
    XMEMCPY(dmac, tag, sizeof(tag));
    if ((err = chacha20poly1305_memory(k, sizeof(k), i12, sizeof(i12), aad, sizeof(aad),
                                       ct, mlen, pt, dmac, &len, CHACHA20POLY1305_DECRYPT)) != CRYPT_OK) return err;
-   if (compare_testvector(pt, mlen, m, mlen, "DEC-PT2", 3) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(pt, mlen, m, mlen, "DEC-PT2", 3) != 0) return CRYPT_FAIL_TESTVECTOR;
 
    /* encrypt - rfc7905 */
    if ((err = chacha20poly1305_init(&st1, k, sizeof(k))) != CRYPT_OK) return err;
@@ -84,8 +84,8 @@ int chacha20poly1305_test(void)
    len = sizeof(emac);
    if ((err = chacha20poly1305_done(&st1, emac, &len)) != CRYPT_OK) return err;
 
-   if (compare_testvector(ct, 16, rfc7905_enc, 16, "ENC-CT3", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
-   if (compare_testvector(emac, len, rfc7905_tag, 16, "ENC-TAG3", 2) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(ct, 16, rfc7905_enc, 16, "ENC-CT3", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(emac, len, rfc7905_tag, 16, "ENC-TAG3", 2) != 0) return CRYPT_FAIL_TESTVECTOR;
 
    /* decrypt - rfc7905 */
    if ((err = chacha20poly1305_init(&st1, k, sizeof(k))) != CRYPT_OK) return err;
@@ -95,8 +95,8 @@ int chacha20poly1305_test(void)
    len = sizeof(dmac);
    if ((err = chacha20poly1305_done(&st1, dmac, &len)) != CRYPT_OK) return err;
 
-   if (compare_testvector(pt, 16, rfc7905_pt, 16, "DEC-CT3", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
-   if (compare_testvector(dmac, len, rfc7905_tag, 16, "DEC-TAG3", 2) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(pt, 16, rfc7905_pt, 16, "DEC-CT3", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(dmac, len, rfc7905_tag, 16, "DEC-TAG3", 2) != 0) return CRYPT_FAIL_TESTVECTOR;
 
    /* encrypt IV 64bit */
    if ((err = chacha20poly1305_init(&st1, k, sizeof(k))) != CRYPT_OK) return err;
@@ -114,8 +114,8 @@ int chacha20poly1305_test(void)
    len = sizeof(dmac);
    if ((err = chacha20poly1305_done(&st2, dmac, &len)) != CRYPT_OK) return err;
 
-   if (compare_testvector(pt, mlen, m, mlen, "DEC-PT4", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
-   if (compare_testvector(dmac, len, emac, len, "DEC-TAG4", 2) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(pt, mlen, m, mlen, "DEC-PT4", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
+   if (ltc_compare_testvector(dmac, len, emac, len, "DEC-TAG4", 2) != 0) return CRYPT_FAIL_TESTVECTOR;
 
    /* wycheproof failing test - https://github.com/libtom/libtomcrypt/pull/451 */
    {
@@ -135,7 +135,7 @@ int chacha20poly1305_test(void)
       err = chacha20poly1305_memory(key, sizeof(key), iv, sizeof(iv), waad, sizeof(waad),
                                     wpt, 0, wct, wtag, &taglen, CHACHA20POLY1305_ENCRYPT);
       if (err != CRYPT_OK) return CRYPT_FAIL_TESTVECTOR;
-      if (compare_testvector(wtag, taglen, valid_tag, sizeof(valid_tag), "WYCH", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
+      if (ltc_compare_testvector(wtag, taglen, valid_tag, sizeof(valid_tag), "WYCH", 1) != 0) return CRYPT_FAIL_TESTVECTOR;
 
       /* VALID tag */
       taglen = sizeof(valid_tag);

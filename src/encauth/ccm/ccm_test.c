@@ -168,10 +168,10 @@ int ccm_test(void)
             }
          }
 
-         if (compare_testvector(buf, tests[x].ptlen, tests[x].ct, tests[x].ptlen, "CCM encrypt data", x)) {
+         if (ltc_compare_testvector(buf, tests[x].ptlen, tests[x].ct, tests[x].ptlen, "CCM encrypt data", x)) {
             return CRYPT_FAIL_TESTVECTOR;
          }
-         if (compare_testvector(tag, taglen, tests[x].tag, tests[x].taglen, "CCM encrypt tag", x)) {
+         if (ltc_compare_testvector(tag, taglen, tests[x].tag, tests[x].taglen, "CCM encrypt tag", x)) {
             return CRYPT_FAIL_TESTVECTOR;
          }
 
@@ -207,7 +207,7 @@ int ccm_test(void)
          }
 
 
-         if (compare_testvector(buf2, tests[x].ptlen, tests[x].pt, tests[x].ptlen, "CCM decrypt data", x)) {
+         if (ltc_compare_testvector(buf2, tests[x].ptlen, tests[x].pt, tests[x].ptlen, "CCM decrypt data", x)) {
             return CRYPT_FAIL_TESTVECTOR;
          }
          if (y == 0) {
@@ -225,11 +225,11 @@ int ccm_test(void)
                            tag3, &taglen, 1   ) != CRYPT_ERROR) {
                return CRYPT_FAIL_TESTVECTOR;
             }
-            if (compare_testvector(buf2, tests[x].ptlen, zero, tests[x].ptlen, "CCM decrypt wrong tag", x)) {
+            if (ltc_compare_testvector(buf2, tests[x].ptlen, zero, tests[x].ptlen, "CCM decrypt wrong tag", x)) {
                return CRYPT_FAIL_TESTVECTOR;
             }
          } else {
-            if (compare_testvector(tag2, taglen, tests[x].tag, tests[x].taglen, "CCM decrypt tag", x)) {
+            if (ltc_compare_testvector(tag2, taglen, tests[x].tag, tests[x].taglen, "CCM decrypt tag", x)) {
                return CRYPT_FAIL_TESTVECTOR;
             }
          }

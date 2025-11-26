@@ -3075,9 +3075,26 @@ int main(void)
 }
 \end{verbatim}
 
-\mysection{SHA3 SHAKE}
+\mysection{Extendable Output Functions (XOF)}
+Some algorithms provide a special XOF (Extendable Output Functions) mode which allow to generate message digests of an arbitrary length.
+
+The library supports the following XOFs.
+
+\subsection{SHA3 SHAKE}
 The SHA3 class of algorithms provides a special XOF (Extendable Output Functions) mode, called SHAKE.
 SHAKE operates in 2 security configurations, 128bit or 256bit, and allows to generate message digests of an arbitrary length.
+
+The API functions are as follows.
+
+\begin{small}
+\begin{verbatim}
+int sha3_shake_init(hash_state *md, int num);
+int sha3_shake_process(hash_state * md, const unsigned char *in, unsigned long inlen);
+int sha3_shake_done(hash_state *md, unsigned char *out, unsigned long outlen);
+\end{verbatim}
+\end{small}
+
+The process function \code{sha3\_shake\_process()} is implemented as a macro which calls \code{sha3\_process()}.
 
 For further information see \url{https://en.wikipedia.org/wiki/SHA-3}
 
@@ -3109,6 +3126,22 @@ int main(void)
 }
 \end{verbatim}
 \end{small}
+
+\subsection{TurboSHAKE}
+Another variation of SHA3 SHAKE is TurboSHAKE, which has been specified in \href{https://datatracker.ietf.org/doc/rfc9861/}{\texttt{RFC 9861}}.
+
+The API works equivalent to the one of SHA3 SHAKE, where the APIs only have a different name.
+
+\begin{small}
+\begin{verbatim}
+int turbo_shake_init(hash_state *md, int num);
+int turbo_shake_process(hash_state *md, const unsigned char *in, unsigned long inlen);
+int turbo_shake_done(hash_state *md, unsigned char *out, unsigned long outlen);
+\end{verbatim}
+\end{small}
+
+The init function \code{turbo\_shake\_init()} is implemented as a macro which calls \code{sha3\_shake\_init()}.
+
 
 \mysection{Extended Tiger API}
 

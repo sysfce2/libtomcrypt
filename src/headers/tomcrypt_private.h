@@ -396,12 +396,12 @@ void password_free(struct password *pw, const struct password_ctx *ctx);
 int ltc_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
 int ltc_do_compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
 
-#define LTC_COMPARE_TESTVECTOR(i, il, s, sl, wa, wi)                                   \
-   do {                                                                                \
-      int LTC_TMPVAR(ret) = do_compare_testvector((i), (il), (s), (sl), (wa), (wi));   \
-      if (LTC_TMPVAR(ret) != CRYPT_OK) {                                               \
-         return LTC_TMPVAR(ret);                                                       \
-      }                                                                                \
+#define LTC_COMPARE_TESTVECTOR(i, il, s, sl, wa, wi)                                      \
+   do {                                                                                   \
+      int LTC_TMPVAR(ret) = ltc_do_compare_testvector((i), (il), (s), (sl), (wa), (wi));  \
+      if (LTC_TMPVAR(ret) != CRYPT_OK) {                                                  \
+         return LTC_TMPVAR(ret);                                                          \
+      }                                                                                   \
    } while(0)
 
 #if defined(LTC_PBES)

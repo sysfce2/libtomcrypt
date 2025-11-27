@@ -353,19 +353,19 @@ int keccak_done(hash_state *md, unsigned char *out)
 #endif
 
 #ifdef LTC_SHA3
-static LTC_INLINE int s_sha3_shake_done(hash_state *md, unsigned char *out, unsigned long outlen, process_fn proc_f)
+static LTC_INLINE int s_sha3_shake_done(hash_state *md, unsigned char *out, unsigned long outlen, unsigned char domain, process_fn proc_f)
 {
    /* IMPORTANT NOTE: sha3_shake_done can be called many times */
    unsigned long idx;
    unsigned i;
 
    if (outlen == 0) return CRYPT_OK; /* nothing to do */
-   LTC_ARGCHK(md  != NULL);
+   LTC_ARGCHK(md != NULL);
    LTC_ARGCHK(out != NULL);
 
    if (!md->sha3.xof_flag) {
       /* shake_xof operation must be done only once */
-      md->sha3.s[md->sha3.word_index] ^= (md->sha3.saved ^ (CONST64(0x1F) << (md->sha3.byte_index * 8)));
+      md->sha3.s[md->sha3.word_index] ^= (md->sha3.saved ^ (((ulong64)(domain)) << (md->sha3.byte_index * 8)));
       md->sha3.s[SHA3_KECCAK_SPONGE_WORDS - md->sha3.capacity_words - 1] ^= CONST64(0x8000000000000000);
       proc_f(md->sha3.s);
       /* store sha3.s[] as little-endian bytes into sha3.sb */
@@ -392,13 +392,13 @@ static LTC_INLINE int s_sha3_shake_done(hash_state *md, unsigned char *out, unsi
 
 int sha3_shake_done(hash_state *md, unsigned char *out, unsigned long outlen)
 {
-   return s_sha3_shake_done(md, out, outlen, s_keccakf);
+   return s_sha3_shake_done(md, out, outlen, 0x1f, s_keccakf);
 }
 
 #if defined LTC_TURBO_SHAKE
 int turbo_shake_done(hash_state *md, unsigned char *out, unsigned long outlen)
 {
-   return s_sha3_shake_done(md, out, outlen, s_keccak_turbo_f);
+   return s_sha3_shake_done(md, out, outlen, 0x1f, s_keccak_turbo_f);
 }
 #endif
 

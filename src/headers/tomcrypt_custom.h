@@ -259,6 +259,7 @@
 #define LTC_SHA3
 #define LTC_KECCAK
 #define LTC_TURBO_SHAKE
+#define LTC_KANGAROO_TWELVE
 #define LTC_SHA512
 #define LTC_SHA512_256
 #define LTC_SHA512_224
@@ -711,6 +712,10 @@
 
 #if defined(LTC_TURBO_SHAKE) && !defined(LTC_SHA3)
    #error LTC_TURBO_SHAKE requires LTC_SHA3
+#endif
+
+#if defined(LTC_KANGAROO_TWELVE) && !defined(LTC_TURBO_SHAKE)
+   #error LTC_KANGAROO_TWELVE requires LTC_TURBO_SHAKE
 #endif
 
 #if defined(LTC_NO_MATH) && (defined(LTM_DESC) || defined(TFM_DESC) || defined(GMP_DESC))

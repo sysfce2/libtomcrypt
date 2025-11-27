@@ -63,6 +63,9 @@ int cipher_hash_test(void)
 #ifdef LTC_TURBO_SHAKE
    DO(turbo_shake_test());
 #endif
+#ifdef LTC_KANGAROO_TWELVE
+   DO(kangaroo_twelve_test());
+#endif
 
    return 0;
 }

@@ -709,6 +709,10 @@
    #error LTC_SPRNG requires LTC_RNG_GET_BYTES
 #endif
 
+#if defined(LTC_TURBO_SHAKE) && !defined(LTC_SHA3)
+   #error LTC_TURBO_SHAKE requires LTC_SHA3
+#endif
+
 #if defined(LTC_NO_MATH) && (defined(LTM_DESC) || defined(TFM_DESC) || defined(GMP_DESC))
    #error LTC_NO_MATH defined, but also a math descriptor
 #endif

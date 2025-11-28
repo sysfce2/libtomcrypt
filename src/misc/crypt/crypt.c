@@ -160,6 +160,9 @@ const char *crypt_build_settings =
 #if defined(LTC_TURBO_SHAKE)
    "   TurboSHAKE\n"
 #endif
+#if defined(LTC_KANGAROO_TWELVE)
+   "   KangarooTwelve\n"
+#endif
 #if defined(LTC_KECCAK)
    "   KECCAK\n"
 #endif

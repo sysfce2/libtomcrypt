@@ -39,7 +39,7 @@ static int ss_sha1_compress(hash_state *md, const unsigned char *buf)
 static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
 #endif
 {
-    ulong32 a,b,c,d,e,W[80],i;
+    ulong32 a,b,c,d,e,W[16],i;
 #ifdef LTC_SMALL_CODE
     ulong32 t;
 #endif
@@ -48,6 +48,7 @@ static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
     for (i = 0; i < 16; i++) {
         LOAD32H(W[i], buf + (4*i));
     }
+    #define Wi(i) W[(i) % 16] = ROL(W[((i) - 3) % 16] ^ W[((i) - 8) % 16] ^ W[((i) - 14) % 16] ^ W[((i) - 16) % 16], 1);
 
     /* copy state */
     a = md->sha1.state[0];
@@ -56,71 +57,74 @@ static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
     d = md->sha1.state[3];
     e = md->sha1.state[4];
 
-    /* expand it */
-    for (i = 16; i < 80; i++) {
-        W[i] = ROL(W[i-3] ^ W[i-8] ^ W[i-14] ^ W[i-16], 1);
-    }
-
     /* compress */
     /* round one */
-    #define FF0(a,b,c,d,e,i) e = (ROLc(a, 5) + F0(b,c,d) + e + W[i] + 0x5a827999UL); b = ROLc(b, 30);
-    #define FF1(a,b,c,d,e,i) e = (ROLc(a, 5) + F1(b,c,d) + e + W[i] + 0x6ed9eba1UL); b = ROLc(b, 30);
-    #define FF2(a,b,c,d,e,i) e = (ROLc(a, 5) + F2(b,c,d) + e + W[i] + 0x8f1bbcdcUL); b = ROLc(b, 30);
-    #define FF3(a,b,c,d,e,i) e = (ROLc(a, 5) + F3(b,c,d) + e + W[i] + 0xca62c1d6UL); b = ROLc(b, 30);
+    #define FF0(a,b,c,d,e,i) e = (ROLc(a, 5) + F0(b,c,d) + e + W[(i) % 16] + 0x5a827999UL); b = ROLc(b, 30);
+    #define FF1(a,b,c,d,e,i) e = (ROLc(a, 5) + F1(b,c,d) + e + W[(i) % 16] + 0x6ed9eba1UL); b = ROLc(b, 30);
+    #define FF2(a,b,c,d,e,i) e = (ROLc(a, 5) + F2(b,c,d) + e + W[(i) % 16] + 0x8f1bbcdcUL); b = ROLc(b, 30);
+    #define FF3(a,b,c,d,e,i) e = (ROLc(a, 5) + F3(b,c,d) + e + W[(i) % 16] + 0xca62c1d6UL); b = ROLc(b, 30);
 
 #ifdef LTC_SMALL_CODE
 
-    for (i = 0; i < 20; ) {
+    for (i = 0; i < 16; ) {
        FF0(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+    }
+    for (; i < 20; ) {
+       Wi(i); FF0(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
     for (; i < 40; ) {
-       FF1(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+       Wi(i); FF1(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
     for (; i < 60; ) {
-       FF2(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+       Wi(i); FF2(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
     for (; i < 80; ) {
-       FF3(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
+       Wi(i); FF3(a,b,c,d,e,i++); t = e; e = d; d = c; c = b; b = a; a = t;
     }
 
 #else
 
-    for (i = 0; i < 20; ) {
+    for (i = 0; i < 15; ) {
        FF0(a,b,c,d,e,i++);
        FF0(e,a,b,c,d,i++);
        FF0(d,e,a,b,c,i++);
        FF0(c,d,e,a,b,i++);
        FF0(b,c,d,e,a,i++);
     }
+    FF0(a,b,c,d,e,i++);
+    Wi(i); FF0(e,a,b,c,d,i++);
+    Wi(i); FF0(d,e,a,b,c,i++);
+    Wi(i); FF0(c,d,e,a,b,i++);
+    Wi(i); FF0(b,c,d,e,a,i++);
 
     /* round two */
     for (; i < 40; )  {
-       FF1(a,b,c,d,e,i++);
-       FF1(e,a,b,c,d,i++);
-       FF1(d,e,a,b,c,i++);
-       FF1(c,d,e,a,b,i++);
-       FF1(b,c,d,e,a,i++);
+       Wi(i); FF1(a,b,c,d,e,i++);
+       Wi(i); FF1(e,a,b,c,d,i++);
+       Wi(i); FF1(d,e,a,b,c,i++);
+       Wi(i); FF1(c,d,e,a,b,i++);
+       Wi(i); FF1(b,c,d,e,a,i++);
     }
 
     /* round three */
     for (; i < 60; )  {
-       FF2(a,b,c,d,e,i++);
-       FF2(e,a,b,c,d,i++);
-       FF2(d,e,a,b,c,i++);
-       FF2(c,d,e,a,b,i++);
-       FF2(b,c,d,e,a,i++);
+       Wi(i); FF2(a,b,c,d,e,i++);
+       Wi(i); FF2(e,a,b,c,d,i++);
+       Wi(i); FF2(d,e,a,b,c,i++);
+       Wi(i); FF2(c,d,e,a,b,i++);
+       Wi(i); FF2(b,c,d,e,a,i++);
     }
 
     /* round four */
     for (; i < 80; )  {
-       FF3(a,b,c,d,e,i++);
-       FF3(e,a,b,c,d,i++);
-       FF3(d,e,a,b,c,i++);
-       FF3(c,d,e,a,b,i++);
-       FF3(b,c,d,e,a,i++);
+       Wi(i); FF3(a,b,c,d,e,i++);
+       Wi(i); FF3(e,a,b,c,d,i++);
+       Wi(i); FF3(d,e,a,b,c,i++);
+       Wi(i); FF3(c,d,e,a,b,i++);
+       Wi(i); FF3(b,c,d,e,a,i++);
     }
 #endif
 
@@ -128,6 +132,7 @@ static int  s_sha1_compress(hash_state *md, const unsigned char *buf)
     #undef FF1
     #undef FF2
     #undef FF3
+    #undef Wi
 
     /* store */
     md->sha1.state[0] = md->sha1.state[0] + a;

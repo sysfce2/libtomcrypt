@@ -88,7 +88,7 @@ static int ss_sha512_compress(hash_state * md, const unsigned char *buf)
 static int  s_sha512_compress(hash_state * md, const unsigned char *buf)
 #endif
 {
-    ulong64 S[8], W[80], t0, t1;
+    ulong64 S[8], W[16], t0, t1;
     int i;
 
     /* copy state into S */
@@ -100,16 +100,25 @@ static int  s_sha512_compress(hash_state * md, const unsigned char *buf)
     for (i = 0; i < 16; i++) {
         LOAD64H(W[i], buf + (8*i));
     }
-
-    /* fill W[16..79] */
-    for (i = 16; i < 80; i++) {
-        W[i] = Gamma1(W[i - 2]) + W[i - 7] + Gamma0(W[i - 15]) + W[i - 16];
-    }
+    #define Wi(i) W[(i) % 16] = Gamma1(W[((i) - 2) % 16]) + W[((i) - 7) % 16] + Gamma0(W[((i) - 15) % 16]) + W[((i) - 16) % 16];
 
     /* Compress */
 #ifdef LTC_SMALL_CODE
-    for (i = 0; i < 80; i++) {
-        t0 = S[7] + Sigma1(S[4]) + Ch(S[4], S[5], S[6]) + K[i] + W[i];
+    for (i = 0; i < 16; i++) {
+        t0 = S[7] + Sigma1(S[4]) + Ch(S[4], S[5], S[6]) + K[i] + W[i % 16];
+        t1 = Sigma0(S[0]) + Maj(S[0], S[1], S[2]);
+        S[7] = S[6];
+        S[6] = S[5];
+        S[5] = S[4];
+        S[4] = S[3] + t0;
+        S[3] = S[2];
+        S[2] = S[1];
+        S[1] = S[0];
+        S[0] = t0 + t1;
+    }
+    for (; i < 80; i++) {
+        Wi(i);
+        t0 = S[7] + Sigma1(S[4]) + Ch(S[4], S[5], S[6]) + K[i] + W[i % 16];
         t1 = Sigma0(S[0]) + Maj(S[0], S[1], S[2]);
         S[7] = S[6];
         S[6] = S[5];
@@ -121,13 +130,13 @@ static int  s_sha512_compress(hash_state * md, const unsigned char *buf)
         S[0] = t0 + t1;
     }
 #else
-#define RND(a,b,c,d,e,f,g,h,i)                    \
-     t0 = h + Sigma1(e) + Ch(e, f, g) + K[i] + W[i];   \
-     t1 = Sigma0(a) + Maj(a, b, c);                  \
-     d += t0;                                        \
+#define RND(a,b,c,d,e,f,g,h,i)                              \
+     t0 = h + Sigma1(e) + Ch(e, f, g) + K[i] + W[(i) % 16]; \
+     t1 = Sigma0(a) + Maj(a, b, c);                         \
+     d += t0;                                               \
      h  = t0 + t1;
 
-    for (i = 0; i < 80; i += 8) {
+    for (i = 0; i < 16; i += 8) {
         RND(S[0],S[1],S[2],S[3],S[4],S[5],S[6],S[7],i+0);
         RND(S[7],S[0],S[1],S[2],S[3],S[4],S[5],S[6],i+1);
         RND(S[6],S[7],S[0],S[1],S[2],S[3],S[4],S[5],i+2);
@@ -137,7 +146,18 @@ static int  s_sha512_compress(hash_state * md, const unsigned char *buf)
         RND(S[2],S[3],S[4],S[5],S[6],S[7],S[0],S[1],i+6);
         RND(S[1],S[2],S[3],S[4],S[5],S[6],S[7],S[0],i+7);
     }
+    for (; i < 80; i += 8) {
+        Wi(i+0); RND(S[0],S[1],S[2],S[3],S[4],S[5],S[6],S[7],i+0);
+        Wi(i+1); RND(S[7],S[0],S[1],S[2],S[3],S[4],S[5],S[6],i+1);
+        Wi(i+2); RND(S[6],S[7],S[0],S[1],S[2],S[3],S[4],S[5],i+2);
+        Wi(i+3); RND(S[5],S[6],S[7],S[0],S[1],S[2],S[3],S[4],i+3);
+        Wi(i+4); RND(S[4],S[5],S[6],S[7],S[0],S[1],S[2],S[3],i+4);
+        Wi(i+5); RND(S[3],S[4],S[5],S[6],S[7],S[0],S[1],S[2],i+5);
+        Wi(i+6); RND(S[2],S[3],S[4],S[5],S[6],S[7],S[0],S[1],i+6);
+        Wi(i+7); RND(S[1],S[2],S[3],S[4],S[5],S[6],S[7],S[0],i+7);
+    }
 #endif
+#undef Wi
 
 
     /* feedback */

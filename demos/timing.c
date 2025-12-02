@@ -14,6 +14,8 @@ static prng_state yarrow_prng;
 #define KTIMES  25
 #define TIMES   100000
 
+static const char *filter_arg;
+
 static struct list {
     int id;
     ulong64 spd1, spd2, avg;
@@ -56,7 +58,7 @@ static void tally_results(int type)
 }
 
 /* RDTSC from Scott Duplichan */
-static ulong64 rdtsc (void)
+static LTC_INLINE ulong64 rdtsc (void)
    {
    #if defined __GNUC__ && !defined(LTC_NO_ASM)
       #if defined(__i386__) || defined(__x86_64__)
@@ -111,12 +113,12 @@ static ulong64 rdtsc (void)
 
 static ulong64 timer, skew = 0;
 
-static void t_start(void)
+static LTC_INLINE void t_start(void)
 {
    timer = rdtsc();
 }
 
-static ulong64 t_read(void)
+static LTC_INLINE ulong64 t_read(void)
 {
    return rdtsc() - timer;
 }
@@ -470,20 +472,27 @@ static void time_cipher_lrw(void) { fprintf(stderr, "NO LRW\n"); }
 
 static void time_hash(void)
 {
-  unsigned long x, y1, len;
+  unsigned long x, y1, len = 1024;
   ulong64 t1, t2, c1, c2;
   hash_state md;
   int    (*func)(hash_state *, const unsigned char *, unsigned long), err;
-  unsigned char pt[MAXBLOCKSIZE] = { 0 };
-
+  unsigned char *pt = XMALLOC(len);
+  if (pt == NULL) {
+     fprintf(stderr, "\n\nout of heap yo\n\n");
+     exit(EXIT_FAILURE);
+  }
 
   fprintf(stderr, "\n\nHASH Time Trials for:\n");
   no_results = 0;
   for (x = 0; hash_descriptor[x].name != NULL; x++) {
 
+     if (filter_arg && strstr(hash_descriptor[x].name, filter_arg) == NULL)
+        continue;
+
     /* sanity check on hash */
     if ((err = hash_descriptor[x].test()) != CRYPT_OK) {
        fprintf(stderr, "\n\nERROR: Hash %s failed self-test %s\n", hash_descriptor[x].name, error_to_string(err));
+       XFREE(pt);
        exit(EXIT_FAILURE);
     }
 
@@ -493,7 +502,6 @@ static void time_hash(void)
 #define DO2   DO1 DO1
 
     func = hash_descriptor[x].process;
-    len  = hash_descriptor[x].blocksize;
 
     c1 = c2 = (ulong64)-1;
     for (y1 = 0; y1 < TIMES; y1++) {
@@ -515,6 +523,7 @@ static void time_hash(void)
 #undef DO1
    }
    tally_results(2);
+   XFREE(pt);
 }
 
 /*#warning you need an mp_rand!!!*/
@@ -1368,12 +1377,15 @@ static void LTC_NORETURN die(int status)
 {
    FILE* o = status == EXIT_SUCCESS ? stdout : stderr;
    fprintf(o,
-         "Usage: timing [<-h|-l|alg>] [mpi]\n\n"
+         "Usage: timing [<-h|-l|alg>] [mpi] [filter]\n\n"
          "Run timing tests of all built-in algorithms, or only the one given in <alg>.\n\n"
-         "\talg\tThe algorithm to test. Use the '-l' option to check for valid values.\n"
+         "\talg\tThe algorithms to test. Use the '-l' option to check for valid values.\n"
          "\tmpi\tThe MPI provider to use.\n"
+         "\tfilter\tFilter within the algorithm class (currently only for 'hash'es).\n"
          "\t-l\tList all built-in algorithms that can be timed.\n"
-         "\t-h\tThe help you're looking at.\n"
+         "\t-h\tThe help you're looking at.\n\n"
+         "Examples:\n"
+         "\ttiming hash sha\t\tWill run the timing demo for all hashes containing 'sha' in their name\n"
    );
    exit(status);
 }
@@ -1440,6 +1452,9 @@ register_all_prngs();
 
    if (crypt_mp_init(mpi_provider) != CRYPT_OK) {
       fprintf(stderr, "Init of MPI provider \"%s\" failed\n", mpi_provider ? mpi_provider : "(null)");
+      filter_arg = mpi_provider;
+   } else if (argc > 3){
+      filter_arg = argv[3];
    }
 
 if ((err = rng_make_prng(128, find_prng("yarrow"), &yarrow_prng, NULL)) != CRYPT_OK) {

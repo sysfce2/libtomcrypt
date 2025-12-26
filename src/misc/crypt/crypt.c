@@ -528,6 +528,9 @@ const char *crypt_build_settings =
 #if defined(LTC_SMALL_CODE)
     " LTC_SMALL_CODE "
 #endif
+#if defined(LTC_SMALL_STACK)
+    " LTC_SMALL_STACK "
+#endif
 #if defined(LTC_NO_FILE)
     " LTC_NO_FILE "
 #endif

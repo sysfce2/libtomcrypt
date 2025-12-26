@@ -4,7 +4,7 @@
 
 /**
   @file sha256.c
-  LTC_SHA256 by Tom St Denis
+  SHA256 by Tom St Denis
 */
 
 #ifdef LTC_SHA256
@@ -26,6 +26,15 @@ const struct ltc_hash_descriptor sha256_desc =
     &sha256_test,
     NULL
 };
+
+/* While implementing the SMALL STACK option in https://github.com/libtom/libtomcrypt/pull/709
+ * we came to the conclusion that SHA256 profits from the SMALL STACK option when the SMALL CODE
+ * option is disabled.
+ * So enable it either when it's enabled explicitly, or when SMALL CODE is disabled.
+ */
+#if !defined(LTC_SMALL_CODE) || defined(LTC_SMALL_STACK)
+#define LTC_SMALL_STACK_SHA256
+#endif
 
 #ifdef LTC_SMALL_CODE
 /* the K array */
@@ -63,7 +72,12 @@ static int ss_sha256_compress(hash_state * md, const unsigned char *buf)
 static int s_sha256_compress(hash_state * md, const unsigned char *buf)
 #endif
 {
-    ulong32 S[8], W[16], t0, t1;
+    ulong32 S[8], t0, t1;
+#ifdef LTC_SMALL_STACK_SHA256
+    ulong32 W[16];
+#else
+    ulong32 W[64];
+#endif
 #ifdef LTC_SMALL_CODE
     ulong32 t;
 #endif
@@ -78,16 +92,29 @@ static int s_sha256_compress(hash_state * md, const unsigned char *buf)
     for (i = 0; i < 16; i++) {
         LOAD32H(W[i], buf + (4*i));
     }
+
+#ifdef LTC_SMALL_STACK_SHA256
     #define Wi(i) W[(i) % 16] = Gamma1(W[((i) - 2) % 16]) + W[((i) - 7) % 16] + Gamma0(W[((i) - 15) % 16]) + W[((i) - 16) % 16]
+    #define Windex(i) ((i) % 16)
+#else
+    #define Wi(i) do { } while(0)
+    #define Windex(i) (i)
+
+    /* fill W[16..63] */
+    for (i = 16; i < 64; i++) {
+        W[i] = Gamma1(W[i - 2]) + W[i - 7] + Gamma0(W[i - 15]) + W[i - 16];
+    }
+#endif
 
     /* Compress */
 #ifdef LTC_SMALL_CODE
-#define RND(a,b,c,d,e,f,g,h,i)                              \
-     t0 = h + Sigma1(e) + Ch(e, f, g) + K[i] + W[(i) % 16]; \
-     t1 = Sigma0(a) + Maj(a, b, c);                         \
-     d += t0;                                               \
+#define RND(a,b,c,d,e,f,g,h,i)                               \
+     t0 = h + Sigma1(e) + Ch(e, f, g) + K[i] + W[Windex(i)]; \
+     t1 = Sigma0(a) + Maj(a, b, c);                          \
+     d += t0;                                                \
      h  = t0 + t1;
 
+#ifdef LTC_SMALL_STACK_SHA256
      for (i = 0; i < 16; ++i) {
          RND(S[0],S[1],S[2],S[3],S[4],S[5],S[6],S[7],i);
          t = S[7]; S[7] = S[6]; S[6] = S[5]; S[5] = S[4];
@@ -100,10 +127,17 @@ static int s_sha256_compress(hash_state * md, const unsigned char *buf)
          S[4] = S[3]; S[3] = S[2]; S[2] = S[1]; S[1] = S[0]; S[0] = t;
      }
 #else
-#define RND(a,b,c,d,e,f,g,h,i,ki)                         \
-     t0 = h + Sigma1(e) + Ch(e, f, g) + ki + W[(i) % 16]; \
-     t1 = Sigma0(a) + Maj(a, b, c);                       \
-     d += t0;                                             \
+     for (i = 0; i < 64; ++i) {
+         RND(S[0],S[1],S[2],S[3],S[4],S[5],S[6],S[7],i);
+         t = S[7]; S[7] = S[6]; S[6] = S[5]; S[5] = S[4];
+         S[4] = S[3]; S[3] = S[2]; S[2] = S[1]; S[1] = S[0]; S[0] = t;
+     }
+#endif /* LTC_SMALL_STACK_SHA256 */
+#else
+#define RND(a,b,c,d,e,f,g,h,i,ki)                          \
+     t0 = h + Sigma1(e) + Ch(e, f, g) + ki + W[Windex(i)]; \
+     t1 = Sigma0(a) + Maj(a, b, c);                        \
+     d += t0;                                              \
      h  = t0 + t1;
 
     RND(S[0],S[1],S[2],S[3],S[4],S[5],S[6],S[7],0,0x428a2f98);
@@ -173,6 +207,7 @@ static int s_sha256_compress(hash_state * md, const unsigned char *buf)
 #endif
 #undef RND
 #undef Wi
+#undef Windex
 
     /* feedback */
     for (i = 0; i < 8; i++) {

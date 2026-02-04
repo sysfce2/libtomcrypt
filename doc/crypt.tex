@@ -5591,16 +5591,6 @@ int ecc_set_curve_by_size(    int  keysize,
 
 The \textit{keysize} maps to the specific curve according to table \ref{fig:legacy-curve-names}.
 
-\subsection{Key Free}
-To free the memory allocated by one of \textit{ecc\_generate\_key()}, \textit{ecc\_make\_key()}, \textit{ecc\_make\_key\_ex()}, \textit{ecc\_import()},
-\textit{ecc\_import\_openssl()}, \textit{ecc\_import\_x509()}, \textit{ecc\_import\_pkcs8()}, \textit{ecc\_ansi\_x963\_import()},
-\textit{ecc\_ansi\_x963\_import\_ex()}, or \textit{ecc\_set\_key()} the following function is provided:
-
-\index{ecc\_free()}
-\begin{verbatim}
-void ecc_free(ecc_key *key);
-\end{verbatim}
-
 \subsection{Key Helper Functions}
 To get the curve OID as a NUL--terminated string the following function is provided:
 
@@ -5848,6 +5838,32 @@ int ecc_ansi_x963_import_ex(const unsigned char *in,
 \end{verbatim}
 This will import the key stored in the array pointed to by \textit{in} of length \textit{inlen} octets using the domain parameters pointed to by \textit{dp}.
 The imported key is stored in the ECC key pointed to by \textit{key}.  The function will free any allocated memory upon error.
+
+
+\mysection{Key Free}
+Any ECC API function which imports, generates, or finds (part of) a key with an argument of type
+\code{ecc\_key*} must upon success call the following function to free the memory allocated.
+
+\index{ecc\_free()}
+\begin{verbatim}
+void ecc_free(ecc_key *key);
+\end{verbatim}
+
+The following list of API functions must call \code{ecc\_free()} upon success:
+
+\code{ecc\_ansi\_x963\_import()},
+\code{ecc\_ansi\_x963\_import\_ex()},
+\code{ecc\_copy\_curve()},
+\code{ecc\_generate\_key()},
+\code{ecc\_import()},
+\code{ecc\_import\_ex()},
+\code{ecc\_import\_openssl()},
+\code{ecc\_import\_pkcs8()},
+\code{ecc\_import\_x509()},
+\code{ecc\_make\_key()},
+\code{ecc\_make\_key\_ex()},
+\code{ecc\_set\_curve()},
+\code{ecc\_set\_key()}.
 
 
 \mysection{Signatures (ECDSA)}

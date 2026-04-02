@@ -31,7 +31,6 @@ LTC_EXPORT void LTC_CALL XFREE(void *p);
 
 LTC_EXPORT void LTC_CALL XQSORT(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *));
 
-
 /* change the clock function too */
 LTC_EXPORT clock_t LTC_CALL XCLOCK(void);
 
@@ -250,6 +249,8 @@ typedef unsigned long ltc_mp_digit;
    #define LTC_NO_CTZL
    #define LTC_NO_ROLC
    #define LTC_NO_ROTATE
+   #define LTC_NO_GCM_PCLMUL
+   #define LTC_NO_GCM_PMULL
 #endif
 
 /* No LTC_FAST if: explicitly disabled OR non-gcc/non-clang compiler OR old gcc OR using -ansi -std=c99 */
@@ -365,6 +366,28 @@ typedef unsigned long ltc_mp_digit;
 #  define LTC_ATTRIBUTE(x) __attribute__(x)
 #else
 #  define LTC_ATTRIBUTE(x)
+#endif
+
+#if !defined(LTC_NO_GCM_PCLMUL) && (defined(__x86_64__) || defined(__i386__) || defined(_M_X64) || defined(_M_IX86))
+#define LTC_GCM_PCLMUL
+#undef LTC_GCM_TABLES
+#endif
+
+#if defined(__clang__) || defined(__GNUC__)
+#define LTC_GCM_PCLMUL_TARGET __attribute__((target("pclmul,ssse3")))
+#else
+#define LTC_GCM_PCLMUL_TARGET
+#endif
+
+#if !defined(LTC_NO_GCM_PMULL) && (defined(__aarch64__) || defined(_M_ARM64))
+#define LTC_GCM_PMULL
+#undef LTC_GCM_TABLES
+#endif
+
+#if defined(LTC_GCM_PMULL) && (defined(__clang__) || defined(__GNUC__))
+#define LTC_GCM_PMULL_TARGET __attribute__((target("+crypto")))
+#else
+#define LTC_GCM_PMULL_TARGET
 #endif
 
 #endif /* TOMCRYPT_CFG_H */

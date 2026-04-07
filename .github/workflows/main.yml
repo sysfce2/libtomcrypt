@@ -63,11 +63,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4.0.0
         with:
           timeout_minutes: 20
           max_attempts: 3
-          retry_on: error
           command: |
             sudo apt-get update -qq
             sudo apt-get install -y libgmp-dev valgrind libtool-bin clang-tools lcov ruby clang
@@ -117,11 +116,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4.0.0
         with:
-          timeout_minutes: 5
+          timeout_minutes: 20
           max_attempts: 3
-          retry_on: error
           command: |
             sudo apt-get update -qq
             sudo apt-get remove -y libtommath1
@@ -149,11 +147,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: install dependencies
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4.0.0
         with:
-          timeout_minutes: 5
+          timeout_minutes: 20
           max_attempts: 3
-          retry_on: error
           command: |
             sudo apt-get update -qq
             sudo apt-get remove -y libtommath1

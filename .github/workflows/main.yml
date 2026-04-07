@@ -139,6 +139,7 @@ jobs:
         os: [ ubuntu-22.04, ubuntu-24.04, ubuntu-22.04-arm, ubuntu-24.04-arm ]
         build_type: [ '', -DCMAKE_BUILD_TYPE=Debug, -DCMAKE_BUILD_TYPE=Release, -DCMAKE_BUILD_TYPE=RelWithDebInfo, -DCMAKE_BUILD_TYPE=MinSizeRel ]
         cc: [ clang, gcc ]
+        cflags: [ '', '-DLTC_CFLAGS="-DLTC_NO_ASM"']
         config:
           # Static library build
           - { CMAKEOPTIONS: '-DBUILD_SHARED_LIBS=Off' }
@@ -161,12 +162,12 @@ jobs:
         run: |
           mkdir build
           cd build
-          CC=${{ matrix.cc }} cmake ${{ matrix.config.CMAKEOPTIONS }} ${{ matrix.build_type }} ..
+          CC=${{ matrix.cc }} cmake ${{ matrix.config.CMAKEOPTIONS }} ${{ matrix.build_type }} ${{ matrix.cflags }} ..
           make -j$(nproc)
       - name: test
         run: |
           cd build
-          CC=${{ matrix.cc }} cmake ${{ matrix.config.CMAKEOPTIONS }} ${{ matrix.build_type }} -DBUILD_TESTING=On ..
+          CC=${{ matrix.cc }} cmake ${{ matrix.config.CMAKEOPTIONS }} ${{ matrix.build_type }} ${{ matrix.cflags }} -DBUILD_TESTING=On ..
           make -j$(nproc)
           ctest
       - name: error logs

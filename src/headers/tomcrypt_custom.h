@@ -146,6 +146,9 @@
 /* Use small code where possible */
 /* #define LTC_SMALL_CODE */
 
+/* Always use small stack sizes where possible */
+/* #define LTC_SMALL_STACK */
+
 /* clean the stack of functions which put private information on stack */
 /* #define LTC_CLEAN_STACK */
 

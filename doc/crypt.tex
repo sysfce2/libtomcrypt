@@ -9124,6 +9124,12 @@ of GCM output on both the AMD64 and Intel Pentium 4 platforms.  Requires GCC and
 When this is defined some of the code such as the Rijndael and SAFER+ ciphers are replaced with smaller code variants.
 These variants are slower but can save quite a bit of code space.
 
+\subsection{LTC\_SMALL\_STACK}
+When this is defined some of the code uses a variant which results in smaller stack sizes.
+Depending on the architecture and other configuration options the results of execution speeed can vary.
+Therefore we try to enable this automatically where it brings an advantage in speed.
+In case you always want smaller stack usage, no matter if it makes the execution slower, you should enable this.
+
 \subsection{LTC\_PTHREAD}
 When this is activated all of the descriptor table functions will use pthread locking to ensure thread safe updates to the tables.  Note that
 it doesn't prevent a thread that is passively using a table from being messed up by another thread that updates the table.

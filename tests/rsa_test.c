@@ -506,6 +506,7 @@ static int s_rsa_pss_test(void)
    DO(rsa_encrypt_key_v2(tv, 4, buf0, &buf0len, &rsa_oparams, &key));
    DO(rsa_encrypt_key_v2(tv, 4, buf0, &buf0len, &rsa_oparams, &key));
    key.params = rsa_oparams.params;
+   key.pss_oaep = 1;
    DO(rsa_encrypt_key_v2(tv, 4, buf0, &buf0len, &rsa_oparams, &key));
    /* If the key is a PSS key, we must do a PSS operation */
    rsa_oparams.padding = LTC_PKCS_1_V1_5;

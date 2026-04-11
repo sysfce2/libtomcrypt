@@ -64,11 +64,7 @@ int rand_prime(void *N, long len, prng_state *prng, int wprng);
 #ifdef LTC_MRSA
 
 typedef struct ltc_rsa_parameters {
-   /** PSS/OAEP or PKCS #1 v1.5 style
-    *  0 -> PKCS #1 v1.5, 1 -> PSS/OAEP */
-   int pss_oaep;
-   /** saltLength is only defined for PSS
-    * If saltLength == 0 -> OAEP, else -> PSS */
+   /** saltLength for PSS */
    unsigned long saltlen;
    /** lparam hash for OAEP
     *     resp.
@@ -97,7 +93,9 @@ typedef struct Rsa_key {
     void *dP;
     /** The d mod (q - 1) CRT param */
     void *dQ;
-    /** Further parameters of the RSA key */
+    /** Key is constrained to PSS/OAEP operations */
+    int pss_oaep;
+    /** PSS/OAEP parameters of the RSA key */
     ltc_rsa_parameters params;
 } rsa_key;
 
@@ -113,8 +111,6 @@ int rsa_exptmod(const unsigned char *in,   unsigned long inlen,
 void rsa_free(rsa_key *key);
 
 typedef struct ltc_rsa_op_parameters {
-   /* The RSA API will set the `pss_oaep` field for you,
-    * depending on the value of `padding`. */
    ltc_rsa_parameters params;
    /* The padding type */
    int padding;

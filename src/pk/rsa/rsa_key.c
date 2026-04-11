@@ -85,6 +85,7 @@ void rsa_shrink_key(rsa_key *key)
 int rsa_init(rsa_key *key)
 {
    LTC_ARGCHK(key != NULL);
+   key->pss_oaep = 0;
    XMEMSET(&key->params, 0, sizeof(key->params));
    return ltc_mp_init_multi(&key->e, &key->d, &key->N, &key->dQ, &key->dP, &key->qP, &key->p, &key->q, LTC_NULL);
 }
@@ -97,29 +98,27 @@ void rsa_free(rsa_key *key)
 {
    LTC_ARGCHKVD(key != NULL);
    ltc_mp_cleanup_multi(&key->q, &key->p, &key->qP, &key->dP, &key->dQ, &key->N, &key->d, &key->e, LTC_NULL);
+   key->pss_oaep = 0;
    XMEMSET(&key->params, 0, sizeof(key->params));
 }
 
 static LTC_INLINE int s_rsa_key_valid_rsa_params(ltc_rsa_op_checked *check)
 {
-   const ltc_rsa_parameters *key_params, *op_params;
+   const ltc_rsa_parameters *key_params;
    /* This is called from PKCS#1 de-/encoder code, so we can't check the key */
    if (check->key == NULL) {
       return CRYPT_OK;
    }
    key_params = &check->key->params;
-   op_params = &check->params->params;
-   /* The key is restricted to PSS, so check the op's params */
-   if (key_params->pss_oaep
-         && !rsa_params_equal(key_params, op_params)) {
-      return CRYPT_PK_TYPE_MISMATCH;
-   }
-   /* No PSS or OAEP, so we're fine. */
-   if (!key_params->pss_oaep
-         || !op_params->pss_oaep) {
+   /* Key has no PSS/OAEP constraints */
+   if (!check->key->pss_oaep) {
       return CRYPT_OK;
    }
-   /* Verify hash algs */
+   /* Key is constrained - operation must use matching PSS/OAEP params */
+   if (check->params->padding != LTC_PKCS_1_PSS
+         && check->params->padding != LTC_PKCS_1_OAEP) {
+      return CRYPT_PK_TYPE_MISMATCH;
+   }
    if (key_params->hash_alg == NULL
          || find_hash(key_params->hash_alg) != check->hash_alg) {
       return CRYPT_INVALID_HASH;
@@ -139,7 +138,7 @@ static LTC_INLINE int s_rsa_key_set_hash_algs(ltc_rsa_op_checked *check)
       return CRYPT_INVALID_HASH;
    }
    if (params->params.mgf1_hash_alg == NULL) {
-      if (!params->params.pss_oaep)
+      if (params->padding != LTC_PKCS_1_PSS && params->padding != LTC_PKCS_1_OAEP)
          return CRYPT_OK;
    } else if ((check->mgf1_hash_alg = find_hash(params->params.mgf1_hash_alg)) != -1) {
       return CRYPT_OK;
@@ -211,8 +210,6 @@ int rsa_key_valid_op(ltc_rsa_op op, ltc_rsa_op_checked *check)
       /* PKCS#1 ops don't need an RSA key */
       LTC_ARGCHK(check->key    != NULL);
    }
-   check->params->params.pss_oaep = check->params->padding == LTC_PKCS_1_OAEP
-         || check->params->padding == LTC_PKCS_1_PSS;
    if ((op & LTC_RSA_OP_SEND) == LTC_RSA_OP_SEND) {
       if ((err = s_rsa_check_prng(op, check->params)) != CRYPT_OK) {
          return err;
@@ -235,10 +232,6 @@ int rsa_key_valid_op(ltc_rsa_op op, ltc_rsa_op_checked *check)
 
 int rsa_params_equal(const ltc_rsa_parameters *a, const ltc_rsa_parameters *b)
 {
-   if (!a->pss_oaep)
-      return 0;
-   if (a->pss_oaep != b->pss_oaep)
-      return 0;
    if (a->saltlen != b->saltlen)
       return 0;
    if (!a->hash_alg || !b->hash_alg)

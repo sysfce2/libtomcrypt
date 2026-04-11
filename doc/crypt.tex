@@ -4568,30 +4568,26 @@ The following RSA Key Operations share \code{struct}s which hold the parameters 
 \begin{small}
 \begin{verbatim}
 typedef struct ltc_rsa_parameters {
-   /** PSS/OAEP or PKCS #1 v1.5 style
-    *  0 -> PKCS #1 v1.5, 1 -> PSS/OAEP */
-   int pss_oaep;
-   /** saltLength is only defined for PSS
-    * If saltLength == 0 -> OAEP, else -> PSS */
+   /** saltLength for PSS */
    unsigned long saltlen;
-   /** lparam hash for OAEP
-    *     resp.
-    *  signature hash for PSS
-    * and MGF hash algorithms */
-   const char *hash_alg, *mgf1_hash_alg;
+   /** Hash algorithm index for OAEP/PSS, -1 if unset */
+   int hash_idx;
+   /** MGF1 hash algorithm index, -1 if unset */
+   int mgf1_hash_idx;
 } ltc_rsa_parameters;
 \end{verbatim}
 \end{small}
 
 The \code{struct ltc\_rsa\_parameters} represents the RSA parameters as defined in \code{RSASSA-PSS-params}.
-This \code{struct} is used in two points, first when parsing an RSA key which contains those parameters in order to restrict the usage of the RSA key
-to the given set of parameters, c.f. TBD. Its second use is explained below and defines the parameters used for an RSA operation.
+This \code{struct} is used in two places: first, embedded in \code{rsa\_key} when parsing an RSA key which contains those parameters
+in order to restrict the usage of the RSA key to the given set of parameters (the \code{rsa\_key.pss\_oaep} flag indicates whether
+the key is constrained). Its second use is explained below and defines the parameters used for an RSA operation.
+The hash algorithms are identified by their descriptor index (as returned by \code{find\_hash()}).
 
 \index{ltc\_rsa\_op\_parameters}
 \begin{small}
 \begin{verbatim}
 typedef struct ltc_rsa_op_parameters {
-   /* pss_oaep flag is unused */
    ltc_rsa_parameters params;
    /* The padding type */
    int padding;
@@ -4646,7 +4642,7 @@ encryption function:
 \begin{verbatim}
 int rsa_encrypt_key_v2(const unsigned char   *in,     unsigned long  inlen,
                              unsigned char   *out,    unsigned long *outlen,
-                       ltc_rsa_op_parameters *opts,
+                       ltc_rsa_op_parameters *params,
                        const rsa_key         *key);
 \end{verbatim}
 
@@ -4688,15 +4684,15 @@ decryption function:
 \begin{verbatim}
 int rsa_decrypt_key_v2(const unsigned char   *in,     unsigned long  inlen,
                              unsigned char   *out,    unsigned long *outlen,
-                       ltc_rsa_op_parameters *opts,
+                       ltc_rsa_op_parameters *params,
                              int             *stat,
                        const rsa_key         *key);
 \end{verbatim}
 
-Similar to the extended encryption, the parameter \textit{opts.padding} indicates which version of the PKCS \#1 standard to use.
+Similar to the extended encryption, the parameter \textit{params.padding} indicates which version of the PKCS \#1 standard to use.
 It must be set to \code{LTC\_PKCS\_1\_V1\_5} to perform v1.5 decryption, or set to \code{LTC\_PKCS\_1\_OAEP} to perform v2.1 decryption.
 
-When performing v1.5 decryption, the \textit{opts.params.hash\_alg} and \textit{opts.u.crypt.lparam} parameters are totally ignored and can be set to \code{NULL} or zero (respectively).
+When performing v1.5 decryption, the \textit{params.params.hash\_idx} and \textit{params.u.crypt.lparam} parameters are totally ignored and can be set to \code{-1} or \code{NULL} (respectively).
 
 
 \mysection{RSA Signature Generation}
@@ -4735,22 +4731,22 @@ As of v1.15, the library supports both v1.5 and v2.1 signatures.  The extended s
 \begin{verbatim}
 int rsa_sign_hash_v2(const unsigned char   *hash,   unsigned long  hashlen,
                            unsigned char   *sig,    unsigned long *siglen,
-                     ltc_rsa_op_parameters *opts,
+                     ltc_rsa_op_parameters *params,
                      const rsa_key         *key);
 \end{verbatim}
 
 This will PKCS encode the message digest pointed to by \textit{in} of length \textit{inlen} octets.  Next, the PKCS encoded hash will be RSA
-\textit{signed} and the output stored in the buffer pointed to by \textit{out} of length \textit{outlen} octets.  The \textit{opts.padding} parameter
+\textit{signed} and the output stored in the buffer pointed to by \textit{out} of length \textit{outlen} octets.  The \textit{params.padding} parameter
 must be set to \code{LTC\_PKCS\_1\_V1\_5} to produce a v1.5 signature, otherwise, it must be set to \code{LTC\_PKCS\_1\_PSS} to produce a
 v2.1 signature.
 
 \index{LTC\_PKCS\_1\_V1\_5\_NA1}
 As of v1.18.0, the library also supports v1.5 signature generation without ASN.1 encoding the signature which can be indicated by passing
-\code{LTC\_PKCS\_1\_V1\_5\_NA1} as \textit{opts.padding} parameter. This option has been introduced to provide compatibilty to SSL3.0 implementations
+\code{LTC\_PKCS\_1\_V1\_5\_NA1} as \textit{params.padding} parameter. This option has been introduced to provide compatibilty to SSL3.0 implementations
 which implemented this.
 
-When generating a standard v1.5 signature the \textit{opts.prng}, and \textit{opts.wprng} parameters are ignored.
-When generating a v1.5 signature without ASN.1 decoding additionally the \textit{opts.params.hash\_alg} parameter is ignored.
+When generating a standard v1.5 signature the \textit{params.prng}, and \textit{params.wprng} parameters are ignored.
+When generating a v1.5 signature without ASN.1 decoding additionally the \textit{params.params.hash\_idx} parameter is ignored.
 
 \mysection{RSA Signature Verification}
 \index{rsa\_verify\_hash()}
@@ -4798,7 +4794,7 @@ As of v1.15, the library supports both v1.5 and v2.1 signature verification.  Th
 \begin{verbatim}
 int rsa_verify_hash_v2(const unsigned char   *sig,    unsigned long  siglen,
                        const unsigned char   *hash,   unsigned long  hashlen,
-                       ltc_rsa_op_parameters *opts,
+                       ltc_rsa_op_parameters *params,
                              int             *stat,
                        const rsa_key         *key);
 \end{verbatim}

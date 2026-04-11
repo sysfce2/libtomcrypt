@@ -223,13 +223,12 @@ int rsa_args_to_op_params(const unsigned char *lparam, unsigned long lparamlen,
                                .wprng = prng_idx,
                                .padding = padding,
                                .params.saltlen = saltlen,
+                               .params.hash_idx = -1,
+                               .params.mgf1_hash_idx = -1,
    };
    if ((err = hash_is_valid(hash_idx)) == CRYPT_OK) {
-      if (hash_descriptor[hash_idx].name == NULL) {
-         return CRYPT_INVALID_HASH;
-      }
-      p.params.hash_alg = hash_descriptor[hash_idx].name;
-      p.params.mgf1_hash_alg = p.params.hash_alg;
+      p.params.hash_idx = hash_idx;
+      p.params.mgf1_hash_idx = hash_idx;
       *params = p;
    } else if (padding == LTC_PKCS_1_V1_5 || padding == LTC_PKCS_1_V1_5_NA1) {
       /* PKCS#1 1.5 does not necessarily require a hash */

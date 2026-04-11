@@ -14,11 +14,13 @@ int pkcs_1_oaep_test(void)
   ltc_rsa_op_parameters rsa_params = {
                                       .wprng = register_prng(no_prng_desc),
                                       .prng = (void*)no_prng_desc,
-                                      .params.hash_alg = "sha1",
-                                      .params.mgf1_hash_alg = "sha1",
+                                      .params.hash_idx = -1,
+                                      .params.mgf1_hash_idx = -1,
                                       .padding = LTC_PKCS_1_OAEP
   };
   unsigned int i, j;
+  rsa_params.params.hash_idx = find_hash("sha1");
+  rsa_params.params.mgf1_hash_idx = rsa_params.params.hash_idx;
 
   if (ltc_mp.name == NULL) return CRYPT_NOP;
 

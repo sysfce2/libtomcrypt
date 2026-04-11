@@ -19,9 +19,11 @@ int pkcs_1_test(void)
    ltc_rsa_op_parameters rsa_params = {
                                        .wprng = find_prng("yarrow"),
                                        .prng = &yarrow_prng,
-                                       .params.hash_alg = "sha1",
-                                       .params.mgf1_hash_alg = "sha1",
+                                       .params.hash_idx = -1,
+                                       .params.mgf1_hash_idx = -1,
    };
+   rsa_params.params.hash_idx = find_hash("sha1");
+   rsa_params.params.mgf1_hash_idx = rsa_params.params.hash_idx;
 
    srand(LTC_TEST_RAND_SEED);
    /* do many tests */

@@ -119,12 +119,10 @@ static LTC_INLINE int s_rsa_key_valid_rsa_params(ltc_rsa_op_checked *check)
          && check->params->padding != LTC_PKCS_1_OAEP) {
       return CRYPT_PK_TYPE_MISMATCH;
    }
-   if (key_params->hash_alg == NULL
-         || find_hash(key_params->hash_alg) != check->hash_alg) {
+   if (key_params->hash_idx != check->hash_alg) {
       return CRYPT_INVALID_HASH;
    }
-   if (key_params->mgf1_hash_alg == NULL
-         || find_hash(key_params->mgf1_hash_alg) != check->mgf1_hash_alg) {
+   if (key_params->mgf1_hash_idx != check->mgf1_hash_alg) {
       return CRYPT_INVALID_HASH;
    }
    return CRYPT_OK;
@@ -133,14 +131,15 @@ static LTC_INLINE int s_rsa_key_valid_rsa_params(ltc_rsa_op_checked *check)
 static LTC_INLINE int s_rsa_key_set_hash_algs(ltc_rsa_op_checked *check)
 {
    ltc_rsa_op_parameters *params = check->params;
-   if (params->params.hash_alg == NULL
-         || (check->hash_alg = find_hash(params->params.hash_alg)) == -1) {
+   if (hash_is_valid(params->params.hash_idx) != CRYPT_OK) {
       return CRYPT_INVALID_HASH;
    }
-   if (params->params.mgf1_hash_alg == NULL) {
+   check->hash_alg = params->params.hash_idx;
+   if (params->params.mgf1_hash_idx == -1) {
       if (params->padding != LTC_PKCS_1_PSS && params->padding != LTC_PKCS_1_OAEP)
          return CRYPT_OK;
-   } else if ((check->mgf1_hash_alg = find_hash(params->params.mgf1_hash_alg)) != -1) {
+   } else if (hash_is_valid(params->params.mgf1_hash_idx) == CRYPT_OK) {
+      check->mgf1_hash_alg = params->params.mgf1_hash_idx;
       return CRYPT_OK;
    }
    return CRYPT_INVALID_HASH;
@@ -234,13 +233,9 @@ int rsa_params_equal(const ltc_rsa_parameters *a, const ltc_rsa_parameters *b)
 {
    if (a->saltlen != b->saltlen)
       return 0;
-   if (!a->hash_alg || !b->hash_alg)
+   if (a->hash_idx != b->hash_idx)
       return 0;
-   if (XSTRCMP(a->hash_alg, b->hash_alg))
-      return 0;
-   if (!a->mgf1_hash_alg || !b->mgf1_hash_alg)
-      return 0;
-   if (XSTRCMP(a->mgf1_hash_alg, b->mgf1_hash_alg))
+   if (a->mgf1_hash_idx != b->mgf1_hash_idx)
       return 0;
    return 1;
 }

@@ -66,11 +66,10 @@ int rand_prime(void *N, long len, prng_state *prng, int wprng);
 typedef struct ltc_rsa_parameters {
    /** saltLength for PSS */
    unsigned long saltlen;
-   /** lparam hash for OAEP
-    *     resp.
-    *  signature hash for PSS
-    * and MGF hash algorithms */
-   const char *hash_alg, *mgf1_hash_alg;
+   /** Hash algorithm index for OAEP/PSS, -1 if unset */
+   int hash_idx;
+   /** MGF1 hash algorithm index, -1 if unset */
+   int mgf1_hash_idx;
 } ltc_rsa_parameters;
 
 /** RSA key */
@@ -152,44 +151,44 @@ int rsa_verify_hash_v2(const unsigned char   *sig,    unsigned long  siglen,
                        const rsa_key         *key);
 
 /* These use PKCS #1 v2.0 padding */
-#define ltc_rsa_encrypt_key(in, inlen, out, outlen, lp, lplen, prng_, prng_idx, hash_idx, key) \
+#define ltc_rsa_encrypt_key(in, inlen, out, outlen, lp, lplen, prng_, prng_idx, hash_idx_, key) \
       rsa_encrypt_key_v2(in, inlen, out, outlen, \
                          &(ltc_rsa_op_parameters){ \
                            .u.crypt.lparam = lp, \
                            .u.crypt.lparamlen = lplen,\
                            .prng = prng_, \
                            .wprng = prng_idx, \
-                           .params.mgf1_hash_alg = hash_is_valid(hash_idx) == CRYPT_OK ? hash_descriptor[hash_idx].name : NULL, \
-                           .params.hash_alg = hash_is_valid(hash_idx) == CRYPT_OK ? hash_descriptor[hash_idx].name : NULL, \
+                           .params.mgf1_hash_idx = hash_idx_, \
+                           .params.hash_idx = hash_idx_, \
                            .padding = LTC_PKCS_1_OAEP, \
                          }, key)
 
-#define ltc_rsa_decrypt_key(in, inlen, out, outlen, lp, lplen, hash_idx, stat, key) \
+#define ltc_rsa_decrypt_key(in, inlen, out, outlen, lp, lplen, hash_idx_, stat, key) \
       rsa_decrypt_key_v2(in, inlen, out, outlen, \
                          &(ltc_rsa_op_parameters){ \
                            .u.crypt.lparam = lp, \
                            .u.crypt.lparamlen = lplen,\
-                           .params.mgf1_hash_alg = hash_is_valid(hash_idx) == CRYPT_OK ? hash_descriptor[hash_idx].name : NULL, \
-                           .params.hash_alg = hash_is_valid(hash_idx) == CRYPT_OK ? hash_descriptor[hash_idx].name : NULL, \
+                           .params.mgf1_hash_idx = hash_idx_, \
+                           .params.hash_idx = hash_idx_, \
                            .padding = LTC_PKCS_1_OAEP, \
                          }, stat, key)
 
-#define ltc_rsa_sign_hash(hash, hashlen, sig, siglen, prng_, prng_idx, hash_idx, saltlen_, key) \
+#define ltc_rsa_sign_hash(hash, hashlen, sig, siglen, prng_, prng_idx, hash_idx_, saltlen_, key) \
       rsa_sign_hash_v2(hash, hashlen, sig, siglen, \
                          &(ltc_rsa_op_parameters){ \
                            .prng = prng_, \
                            .wprng = prng_idx, \
-                           .params.mgf1_hash_alg = hash_is_valid(hash_idx) == CRYPT_OK ? hash_descriptor[hash_idx].name : NULL, \
-                           .params.hash_alg = hash_is_valid(hash_idx) == CRYPT_OK ? hash_descriptor[hash_idx].name : NULL, \
+                           .params.mgf1_hash_idx = hash_idx_, \
+                           .params.hash_idx = hash_idx_, \
                            .params.saltlen = saltlen_, \
                            .padding = LTC_PKCS_1_PSS, \
                          }, key)
 
-#define ltc_rsa_verify_hash(sig, siglen, hash, hashlen, hash_idx, saltlen_, stat, key) \
+#define ltc_rsa_verify_hash(sig, siglen, hash, hashlen, hash_idx_, saltlen_, stat, key) \
       rsa_verify_hash_v2(sig, siglen, hash, hashlen, \
                          &(ltc_rsa_op_parameters){ \
-                           .params.mgf1_hash_alg = hash_is_valid(hash_idx) == CRYPT_OK ? hash_descriptor[hash_idx].name : NULL, \
-                           .params.hash_alg = hash_is_valid(hash_idx) == CRYPT_OK ? hash_descriptor[hash_idx].name : NULL, \
+                           .params.mgf1_hash_idx = hash_idx_, \
+                           .params.hash_idx = hash_idx_, \
                            .params.saltlen = saltlen_, \
                            .padding = LTC_PKCS_1_PSS, \
                          }, stat, key)

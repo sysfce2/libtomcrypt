@@ -322,7 +322,10 @@ static int s_rsa_cryptx_issue_69(void)
    unsigned char buf0[512], buf1[512];
    unsigned long l0, l1;
    int stat;
-   ltc_rsa_op_parameters rsa_params = {0};
+   ltc_rsa_op_parameters rsa_params = {
+      .params.hash_idx = -1,
+      .params.mgf1_hash_idx = -1,
+   };
 
    l0 = sizeof(buf0);
    l1 = sizeof(buf1);
@@ -495,10 +498,11 @@ static int s_rsa_pss_test(void)
      .padding = LTC_PKCS_1_OAEP,
      .u.crypt.lparam = tv,
      .u.crypt.lparamlen = (unsigned long)4,
-     .params.hash_alg = "sha1",
-     .params.mgf1_hash_alg = "sha256",
      .params.saltlen = 7,
    };
+
+   rsa_oparams.params.hash_idx = find_hash("sha1");
+   rsa_oparams.params.mgf1_hash_idx = find_hash("sha256");
 
    DO(rsa_import(ltc_rsa_private_test_key, sizeof(ltc_rsa_private_test_key), &key));
 
@@ -536,9 +540,10 @@ int rsa_test(void)
       return 1;
    }
 
-   rsa_params.params.hash_alg = "sha1";
+   rsa_params.params.hash_idx = find_hash("sha1");
+   rsa_params.params.mgf1_hash_idx = rsa_params.params.hash_idx;
    rsa_params.wprng = find_prng("yarrow");
-   mgf_hash = find_hash(rsa_params.params.hash_alg);
+   mgf_hash = rsa_params.params.hash_idx;
    if (mgf_hash == -1 || rsa_params.wprng == -1) {
       fprintf(stderr, "rsa_test requires LTC_SHA1 and yarrow");
       return 1;
@@ -601,8 +606,8 @@ print_hex("q", tmp, len);
          if (2 * hash_descriptor[label_hash].hashsize > 126)
             continue;
          max_msgsize = 128 - (2 * hash_descriptor[label_hash].hashsize) - 2;
-         rsa_params.params.hash_alg = hash_descriptor[label_hash].name;
-         rsa_params.params.mgf1_hash_alg = hash_descriptor[mgf_hash].name;
+         rsa_params.params.hash_idx = label_hash;
+         rsa_params.params.mgf1_hash_idx = mgf_hash;
 
 #if defined(LTC_TEST_DBG) && LTC_TEST_DBG > 1
          fprintf(stderr, "Test MGF(%s), Labelhash(%s) with max_msgsize %lu\n", hash_descriptor[mgf_hash].name, hash_descriptor[label_hash].name, max_msgsize);
@@ -652,8 +657,8 @@ print_hex("q", tmp, len);
 
       }
    }
-   rsa_params.params.hash_alg = "sha1";
-   rsa_params.params.mgf1_hash_alg = "sha1";
+   rsa_params.params.hash_idx = find_hash("sha1");
+   rsa_params.params.mgf1_hash_idx = rsa_params.params.hash_idx;
 
 
    /* encrypt the key PKCS #1 v1.5 (payload from 1 to 117 bytes) */

@@ -84,7 +84,8 @@ static int s_rsa_decode_parameters(const rsa_pss_parameters_data *d, ltc_rsa_par
    int           err, idx;
 
    rsa_params->saltlen = 20;
-   rsa_params->hash_alg = rsa_params->mgf1_hash_alg = "sha1";
+   rsa_params->hash_idx = find_hash("sha1");
+   rsa_params->mgf1_hash_idx = rsa_params->hash_idx;
 
    for (n = 0; n < 4; ++n) {
       if (d->params[n].used == 0)
@@ -95,7 +96,7 @@ static int s_rsa_decode_parameters(const rsa_pss_parameters_data *d, ltc_rsa_par
             if (idx == -1) {
                return CRYPT_INVALID_HASH;
             }
-            rsa_params->hash_alg = hash_descriptor[idx].name;
+            rsa_params->hash_idx = idx;
             break;
          case 1:
             if ((err = pk_get_oid_from_asn1(&d->mgf[0], &oid_id)) != CRYPT_OK) {
@@ -108,7 +109,7 @@ static int s_rsa_decode_parameters(const rsa_pss_parameters_data *d, ltc_rsa_par
             if (idx == -1) {
                return CRYPT_INVALID_HASH;
             }
-            rsa_params->mgf1_hash_alg = hash_descriptor[idx].name;
+            rsa_params->mgf1_hash_idx = idx;
             break;
          case 2:
             rsa_params->saltlen = d->salt_length;

@@ -11,11 +11,12 @@
 int pkcs_1_emsa_test(void)
 {
   ltc_rsa_op_parameters rsa_params = {
-                                      .params.hash_alg = "sha1",
+                                      .params.hash_idx = -1,
                                       .padding = LTC_PKCS_1_V1_5
   };
   int hash_idx = find_hash("sha1");
   unsigned int i, j;
+  rsa_params.params.hash_idx = hash_idx;
 
   if (ltc_mp.name == NULL) return CRYPT_NOP;
 

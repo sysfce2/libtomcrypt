@@ -1,6 +1,5 @@
 /* LibTomCrypt, modular cryptographic library -- Tom St Denis */
 /* SPDX-License-Identifier: Unlicense */
-#define LTC_DEPRECATED(x)
 #include "tomcrypt_private.h"
 
 /**

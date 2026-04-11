@@ -444,7 +444,7 @@ int pk_oid_num_to_str(const unsigned long *oid, unsigned long oidlen, char *OID,
 
 int pk_oid_cmp_with_ulong(const char *o1, const unsigned long *o2, unsigned long o2size);
 
-/* ---- DH Routines ---- */
+/* ---- RSA Routines ---- */
 #ifdef LTC_MRSA
 /* Receiving side, i.e. Decrypt or Verify */
 #define LTC_RSA_OP_RECV  0x00u

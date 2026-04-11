@@ -130,23 +130,23 @@ typedef struct ltc_rsa_op_parameters {
 
 int rsa_encrypt_key_v2(const unsigned char   *in,     unsigned long  inlen,
                              unsigned char   *out,    unsigned long *outlen,
-                       ltc_rsa_op_parameters *opts,
+                       ltc_rsa_op_parameters *params,
                        const rsa_key         *key);
 
 int rsa_decrypt_key_v2(const unsigned char   *in,     unsigned long  inlen,
                              unsigned char   *out,    unsigned long *outlen,
-                       ltc_rsa_op_parameters *opts,
+                       ltc_rsa_op_parameters *params,
                              int             *stat,
                        const rsa_key         *key);
 
 int rsa_sign_hash_v2(const unsigned char   *hash,   unsigned long  hashlen,
                            unsigned char   *sig,    unsigned long *siglen,
-                     ltc_rsa_op_parameters *opts,
+                     ltc_rsa_op_parameters *params,
                      const rsa_key         *key);
 
 int rsa_verify_hash_v2(const unsigned char   *sig,    unsigned long  siglen,
                        const unsigned char   *hash,   unsigned long  hashlen,
-                       ltc_rsa_op_parameters *opts,
+                       ltc_rsa_op_parameters *params,
                              int             *stat,
                        const rsa_key         *key);
 

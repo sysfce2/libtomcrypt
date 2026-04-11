@@ -469,7 +469,7 @@ typedef enum ltc_rsa_op {
    LTC_PKCS1_VERIFY  = LTC_RSA_OP_PKCS1 | LTC_RSA_VERIFY,
 } ltc_rsa_op;
 
-typedef struct ltc_rsa_op_check {
+typedef struct ltc_rsa_op_checked {
    const rsa_key *key;
    ltc_rsa_op_parameters *params;
    int hash_alg, mgf1_hash_alg;

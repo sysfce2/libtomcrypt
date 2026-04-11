@@ -25,14 +25,14 @@ int rsa_sign_hash_v2(const unsigned char   *hash,   unsigned long  hashlen,
 {
    unsigned long modulus_bitlen, modulus_bytelen, x, y;
    int           err;
-   ltc_rsa_op_checked op_check = ltc_rsa_op_checked_init(key, params);
+   ltc_rsa_op_checked op_checked = ltc_rsa_op_checked_init(key, params);
 
    LTC_ARGCHK(hash     != NULL);
    LTC_ARGCHK(sig      != NULL);
    LTC_ARGCHK(siglen   != NULL);
    LTC_ARGCHK(key      != NULL);
 
-   if ((err = rsa_key_valid_op(LTC_RSA_SIGN, &op_check)) != CRYPT_OK) {
+   if ((err = rsa_key_valid_op(LTC_RSA_SIGN, &op_checked)) != CRYPT_OK) {
      return err;
    }
 
@@ -68,7 +68,7 @@ int rsa_sign_hash_v2(const unsigned char   *hash,   unsigned long  hashlen,
          hash    OCTET STRING
         }
      */
-      LTC_SET_ASN1(digestinfo, 0, LTC_ASN1_OBJECT_IDENTIFIER, hash_descriptor[op_check.hash_alg].OID, hash_descriptor[op_check.hash_alg].OIDlen);
+      LTC_SET_ASN1(digestinfo, 0, LTC_ASN1_OBJECT_IDENTIFIER, hash_descriptor[op_checked.hash_alg].OID, hash_descriptor[op_checked.hash_alg].OIDlen);
       LTC_SET_ASN1(digestinfo, 1, LTC_ASN1_NULL,              NULL,                          0);
       LTC_SET_ASN1(siginfo,    0, LTC_ASN1_SEQUENCE,          digestinfo,                    2);
       LTC_SET_ASN1(siginfo,    1, LTC_ASN1_OCTET_STRING,      hash,                            hashlen);

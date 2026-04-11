@@ -29,7 +29,7 @@ int rsa_verify_hash_v2(const unsigned char   *sig,    unsigned long  siglen,
   unsigned long modulus_bitlen, modulus_bytelen, x;
   int           err;
   unsigned char *tmpbuf;
-  ltc_rsa_op_checked op_check = ltc_rsa_op_checked_init(key, params);
+  ltc_rsa_op_checked op_checked = ltc_rsa_op_checked_init(key, params);
 
   LTC_ARGCHK(hash  != NULL);
   LTC_ARGCHK(sig   != NULL);
@@ -39,7 +39,7 @@ int rsa_verify_hash_v2(const unsigned char   *sig,    unsigned long  siglen,
   /* default to invalid */
   *stat = 0;
 
-  if ((err = rsa_key_valid_op(LTC_RSA_VERIFY, &op_check)) != CRYPT_OK) {
+  if ((err = rsa_key_valid_op(LTC_RSA_VERIFY, &op_checked)) != CRYPT_OK) {
     return err;
   }
 
@@ -131,8 +131,8 @@ int rsa_verify_hash_v2(const unsigned char   *sig,    unsigned long  siglen,
 
       /* test OID */
       if ((reallen == outlen) &&
-          (digestinfo[0].size == hash_descriptor[op_check.hash_alg].OIDlen) &&
-        (XMEMCMP(digestinfo[0].data, hash_descriptor[op_check.hash_alg].OID, sizeof(unsigned long) * hash_descriptor[op_check.hash_alg].OIDlen) == 0) &&
+          (digestinfo[0].size == hash_descriptor[op_checked.hash_alg].OIDlen) &&
+        (XMEMCMP(digestinfo[0].data, hash_descriptor[op_checked.hash_alg].OID, sizeof(unsigned long) * hash_descriptor[op_checked.hash_alg].OIDlen) == 0) &&
           (siginfo[1].size == hashlen) &&
         (XMEMCMP(siginfo[1].data, hash, hashlen) == 0)) {
          *stat = 1;

@@ -189,9 +189,12 @@ static LTC_INLINE int s_rsa_key_valid_crypt(ltc_rsa_op_checked *check)
    return s_rsa_key_valid_rsa_params(check);
 }
 
-static LTC_INLINE int s_rsa_check_prng(ltc_rsa_op_parameters *params)
+static LTC_INLINE int s_rsa_check_prng(ltc_rsa_op op, ltc_rsa_op_parameters *params)
 {
-   if (params->padding != LTC_PKCS_1_PSS)
+   /* Only PSS signing needs a PRNG, v1.5 signing is deterministic.
+    * All encryption needs a PRNG (OAEP seed, v1.5 EME random padding). */
+   if ((op & LTC_RSA_OP_SIGN) == LTC_RSA_OP_SIGN
+         && params->padding != LTC_PKCS_1_PSS)
       return CRYPT_OK;
    if (params->prng == NULL)
       return CRYPT_INVALID_PRNG;
@@ -211,7 +214,7 @@ int rsa_key_valid_op(ltc_rsa_op op, ltc_rsa_op_checked *check)
    check->params->params.pss_oaep = check->params->padding == LTC_PKCS_1_OAEP
          || check->params->padding == LTC_PKCS_1_PSS;
    if ((op & LTC_RSA_OP_SEND) == LTC_RSA_OP_SEND) {
-      if ((err = s_rsa_check_prng(check->params)) != CRYPT_OK) {
+      if ((err = s_rsa_check_prng(op, check->params)) != CRYPT_OK) {
          return err;
       }
    }

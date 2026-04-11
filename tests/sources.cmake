@@ -1,4 +1,5 @@
 set(SOURCES
+argon2_test.c
 base16_test.c
 base32_test.c
 base64_test.c

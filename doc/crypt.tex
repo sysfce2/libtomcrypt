@@ -7589,6 +7589,46 @@ The \textit{out} parameter shall be a pointer to a buffer of at least 32 octets,
 where \textit{outlen} contains the available buffer size on input and the written size after the invocation.
 
 
+\subsection{Argon2}
+\index{Argon2}
+\label{argon2}
+
+Argon2 is a memory-hard password hashing function defined in \href{https://datatracker.ietf.org/doc/html/rfc9106}{\texttt{RFC 9106}}.
+It is the winner of the 2015 \href{https://www.password-hashing.net/}{Password Hashing Competition} and is recommended for new applications that require password hashing or key derivation from passwords.
+
+Three variants are provided:
+
+\begin{description}
+\item[Argon2d] uses data-dependent memory access, which makes it faster but susceptible to side-channel attacks. Suitable for applications with no threats from side-channels.
+\item[Argon2i] uses data-independent memory access, which is preferred when side-channel resistance is needed.
+\item[Argon2id] is a hybrid that uses data-independent addressing for the first half of the first pass and data-dependent addressing for the remainder. This is the recommended variant for password hashing.
+\end{description}
+
+The implementation uses the BLAKE2b hash function internally.  To enable Argon2, define \texttt{LTC\_ARGON2} in \textit{tomcrypt\_custom.h} (it also requires \texttt{LTC\_BLAKE2B}).
+
+\index{argon2\_hash()}
+\begin{alltt}
+int argon2_hash(const unsigned char *pwd,  unsigned long pwdlen,
+                const unsigned char *salt, unsigned long saltlen,
+                const unsigned char *secret, unsigned long secretlen,
+                const unsigned char *ad, unsigned long adlen,
+                unsigned int t_cost, unsigned int m_cost,
+                unsigned int parallelism,
+                argon2_type type,
+                unsigned char *out, unsigned long outlen);
+\end{alltt}
+
+The \textit{pwd} parameter is the password of length \textit{pwdlen}.
+The \textit{salt} parameter is a random salt of length \textit{saltlen}; a minimum of 16 bytes is recommended.
+The \textit{secret} and \textit{ad} parameters are optional (may be \texttt{NULL} with a length of zero); they allow passing a secret key and associated data respectively.
+The \textit{t\_cost} parameter is the number of passes over the memory (minimum 1).
+The \textit{m\_cost} parameter is the memory usage in kibibytes (minimum $8 \times \textit{parallelism}$).
+The \textit{parallelism} parameter is the number of lanes (minimum 1); note that this implementation is single-threaded, so increasing this value changes the algorithm output but does not improve performance.
+The \textit{type} parameter selects the variant: \texttt{ARGON2\_D}, \texttt{ARGON2\_I}, or \texttt{ARGON2\_ID}.
+The output tag of length \textit{outlen} (minimum 4 bytes) is written to \textit{out}.
+The function returns \texttt{CRYPT\_OK} on success, \texttt{CRYPT\_MEM} if memory allocation fails, or \texttt{CRYPT\_INVALID\_ARG} if any parameter is out of range.
+
+
 \mysection{PKCS \#8}
 \index{PKCS \#8}
 \label{pkcs8}

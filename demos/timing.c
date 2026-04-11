@@ -736,8 +736,8 @@ static void time_rsa(void)
       .u.crypt.lparamlen = 8,
       .prng = &yarrow_prng,
       .wprng = find_prng("yarrow"),
-      .params.hash_alg = "sha1",
-      .params.mgf1_hash_alg = "sha1",
+      .params.hash_idx = find_hash("sha1"),
+      .params.mgf1_hash_idx = find_hash("sha1"),
       .params.saltlen = 8,
    };
 

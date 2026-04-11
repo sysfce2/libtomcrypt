@@ -31,6 +31,7 @@ pkcs_1_test.c
 prng_test.c
 rotate_test.c
 rsa_test.c
+scrypt_test.c
 ssh_test.c
 store_test.c
 test.c

@@ -71,6 +71,14 @@ int argon2_hash(const unsigned char *pwd,  unsigned long pwdlen,
                 unsigned char *out, unsigned long outlen);
 #endif /* LTC_ARGON2 */
 
+/* ---- scrypt password-based KDF (RFC 7914) ---- */
+#ifdef LTC_SCRYPT
+int scrypt_pbkdf(const unsigned char *password, unsigned long password_len,
+                 const unsigned char *salt,     unsigned long salt_len,
+                 unsigned long N, unsigned long r, unsigned long p,
+                 unsigned char *out, unsigned long outlen);
+#endif /* LTC_SCRYPT */
+
 #ifdef LTC_BCRYPT
 int bcrypt_pbkdf_openbsd(const          void *secret, unsigned long secret_len,
                          const unsigned char *salt,   unsigned long salt_len,

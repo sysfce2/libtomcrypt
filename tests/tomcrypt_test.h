@@ -44,6 +44,7 @@ int ed25519_test(void);
 int ssh_test(void);
 int argon2_test(void);
 int bcrypt_test(void);
+int scrypt_test(void);
 int no_null_termination_check_test(void);
 int pk_oid_test(void);
 int deprecated_test(void);

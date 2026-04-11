@@ -516,6 +516,8 @@
 
 #define LTC_ARGON2
 
+#define LTC_SCRYPT
+
 /* Keep LTC_NO_HKDF for compatibility reasons
  * superseeded by LTC_NO_MISC*/
 #ifndef LTC_NO_HKDF
@@ -685,6 +687,10 @@
 
 #if defined(LTC_ARGON2) && !defined(LTC_BLAKE2B)
    #error LTC_ARGON2 requires LTC_BLAKE2B
+#endif
+
+#if defined(LTC_SCRYPT) && (!defined(LTC_PKCS_5) || !defined(LTC_SHA256))
+   #error LTC_SCRYPT requires LTC_PKCS_5 and LTC_SHA256
 #endif
 
 #if defined(LTC_CHACHA20POLY1305_MODE) && (!defined(LTC_CHACHA) || !defined(LTC_POLY1305))

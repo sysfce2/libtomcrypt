@@ -1676,6 +1676,14 @@
 				</File>
 			</Filter>
 			<Filter
+				Name="scrypt"
+				>
+				<File
+					RelativePath="src\misc\scrypt\scrypt.c"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="ssh"
 				>
 				<File

@@ -127,7 +127,7 @@ static int s_rsa_decode_parameters(const rsa_pss_parameters_data *d, ltc_rsa_par
    return CRYPT_OK;
 }
 
-int rsa_decode_parameters(const ltc_asn1_list *parameters, ltc_rsa_parameters *rsa_params)
+int rsa_decode_parameters(const ltc_asn1_list *parameters, rsa_key *key)
 {
    int           err;
    rsa_pss_parameters_data d;
@@ -138,7 +138,11 @@ int rsa_decode_parameters(const ltc_asn1_list *parameters, ltc_rsa_parameters *r
       return err;
    }
 
-   return s_rsa_decode_parameters(&d, rsa_params);
+   if ((err = s_rsa_decode_parameters(&d, &key->params)) != CRYPT_OK) {
+      return err;
+   }
+   key->pss_oaep = 1;
+   return CRYPT_OK;
 }
 
 static LTC_INLINE int s_rsa_1_5_import_spki(const unsigned char *in, unsigned long inlen, rsa_key *key)

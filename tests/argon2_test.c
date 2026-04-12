@@ -48,35 +48,29 @@ int argon2_test(void)
 
    unsigned char tag[32];
 
-   /* Argon2d */
-   DO(argon2_hash(password, sizeof(password),
-                  salt, sizeof(salt),
-                  secret, sizeof(secret),
-                  ad, sizeof(ad),
-                  3, 32, 4,
-                  ARGON2_D,
-                  tag, sizeof(tag)));
-   COMPARE_TESTVECTOR(tag, sizeof(tag), expected_argon2d, sizeof(expected_argon2d), "Argon2d", 0);
+   const struct {
+      const char *name;
+      argon2_type type;
+      const unsigned char *expected;
+      unsigned long elen;
+   } argon_testcase[] = {
+                         { "Argon2d", ARGON2_D, expected_argon2d, sizeof(expected_argon2d) },
+                         { "Argon2i", ARGON2_I, expected_argon2i, sizeof(expected_argon2i) },
+                         { "Argon2id", ARGON2_ID, expected_argon2id, sizeof(expected_argon2id) },
+   };
 
-   /* Argon2i */
-   DO(argon2_hash(password, sizeof(password),
-                  salt, sizeof(salt),
-                  secret, sizeof(secret),
-                  ad, sizeof(ad),
-                  3, 32, 4,
-                  ARGON2_I,
-                  tag, sizeof(tag)));
-   COMPARE_TESTVECTOR(tag, sizeof(tag), expected_argon2i, sizeof(expected_argon2i), "Argon2i", 1);
+   size_t n;
 
-   /* Argon2id */
-   DO(argon2_hash(password, sizeof(password),
-                  salt, sizeof(salt),
-                  secret, sizeof(secret),
-                  ad, sizeof(ad),
-                  3, 32, 4,
-                  ARGON2_ID,
-                  tag, sizeof(tag)));
-   COMPARE_TESTVECTOR(tag, sizeof(tag), expected_argon2id, sizeof(expected_argon2id), "Argon2id", 2);
+   for (n = 0; n < LTC_ARRAY_SIZE(argon_testcase); ++n) {
+      DO(argon2_hash(password, sizeof(password),
+                     salt, sizeof(salt),
+                     secret, sizeof(secret),
+                     ad, sizeof(ad),
+                     3, 32, 4,
+                     argon_testcase[n].type,
+                     tag, sizeof(tag)));
+      COMPARE_TESTVECTOR(tag, sizeof(tag), argon_testcase[n].expected, argon_testcase[n].elen, argon_testcase[n].name, n);
+   }
 
    return CRYPT_OK;
 }

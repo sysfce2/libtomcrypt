@@ -55,11 +55,12 @@ int base16_decode(const          char *in,  unsigned long  inlen,
 
 /* ---- Argon2 password hashing function (RFC 9106) ---- */
 #ifdef LTC_ARGON2
-typedef enum {
+typedef enum argon2_type {
    ARGON2_D  = 0,
    ARGON2_I  = 1,
    ARGON2_ID = 2
 } argon2_type;
+
 int argon2_hash(const unsigned char *pwd,  unsigned long pwdlen,
                 const unsigned char *salt, unsigned long saltlen,
                 const unsigned char *secret, unsigned long secretlen,

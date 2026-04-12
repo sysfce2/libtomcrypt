@@ -19,12 +19,12 @@
 #define ARGON2_BLAKE2B_OUTBYTES    64
 
 /* 1024-byte memory block */
-typedef struct argon2_block_ {
+typedef struct argon2_block {
    ulong64 v[ARGON2_QWORDS_IN_BLOCK];
 } argon2_block;
 
 /* instance state */
-typedef struct {
+typedef struct argon2_instance {
    argon2_block *memory;
    ulong32       passes;
    ulong32       memory_blocks;
@@ -35,7 +35,7 @@ typedef struct {
 } argon2_instance;
 
 /* position within the memory matrix */
-typedef struct {
+typedef struct argon2_position {
    ulong32       pass;
    ulong32       lane;
    unsigned char slice;
@@ -491,17 +491,15 @@ int argon2_hash(const unsigned char *pwd,  unsigned long pwdlen,
    int err;
 
    LTC_ARGCHK(out != NULL);
-
-   /* Validate inputs */
-   if (outlen < ARGON2_MIN_OUTLEN)       return CRYPT_INVALID_ARG;
-   if (pwd == NULL && pwdlen != 0)       return CRYPT_INVALID_ARG;
-   if (salt == NULL && saltlen != 0)     return CRYPT_INVALID_ARG;
-   if (secret == NULL && secretlen != 0) return CRYPT_INVALID_ARG;
-   if (ad == NULL && adlen != 0)         return CRYPT_INVALID_ARG;
-   if (t_cost < 1)                       return CRYPT_INVALID_ARG;
-   if (parallelism < 1)                  return CRYPT_INVALID_ARG;
-   if (m_cost < 8 * parallelism)         return CRYPT_INVALID_ARG;
-   if (type != ARGON2_D && type != ARGON2_I && type != ARGON2_ID) return CRYPT_INVALID_ARG;
+   LTC_ARGCHK(outlen >= ARGON2_MIN_OUTLEN);
+   LTC_ARGCHK(pwd != NULL || pwdlen == 0);
+   LTC_ARGCHK(salt != NULL || saltlen == 0);
+   LTC_ARGCHK(secret != NULL || secretlen == 0);
+   LTC_ARGCHK(ad != NULL || adlen == 0);
+   LTC_ARGCHK(t_cost >= 1);
+   LTC_ARGCHK(parallelism >= 1);
+   LTC_ARGCHK(m_cost >= 8 * parallelism);
+   LTC_ARGCHK(type == ARGON2_D || type == ARGON2_I || type == ARGON2_ID);
 
    /* Align memory: ensure memory_blocks is a multiple of 4*parallelism */
    memory_blocks = (ulong32)m_cost;
@@ -525,9 +523,9 @@ int argon2_hash(const unsigned char *pwd,  unsigned long pwdlen,
       unsigned long alloc_size = (unsigned long)memory_blocks * sizeof(argon2_block);
       /* overflow check */
       if (alloc_size / sizeof(argon2_block) != memory_blocks) {
-         return CRYPT_MEM;
+         return CRYPT_OVERFLOW;
       }
-      instance.memory = (argon2_block *)XMALLOC(alloc_size);
+      instance.memory = XMALLOC(alloc_size);
       if (instance.memory == NULL) {
          return CRYPT_MEM;
       }
@@ -547,8 +545,6 @@ int argon2_hash(const unsigned char *pwd,  unsigned long pwdlen,
    /* Generate first blocks */
    err = s_fill_first_blocks(blockhash, &instance);
    if (err != CRYPT_OK) goto cleanup;
-
-   zeromem(blockhash, ARGON2_PREHASH_SEED_LEN);
 
    /* Fill memory */
    s_fill_memory(&instance);

@@ -86,6 +86,8 @@ static int s_key_cmp(ltc_pka_key *key)
       case LTC_PKA_ED25519:
       case LTC_PKA_X25519:
       case LTC_PKA_DH:
+      case LTC_PKA_X448:
+      case LTC_PKA_ED448:
          return CRYPT_OK;
       default:
          return CRYPT_INVALID_ARG;

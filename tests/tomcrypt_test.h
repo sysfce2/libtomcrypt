@@ -42,6 +42,7 @@ int padding_test(void);
 int x25519_test(void);
 int ed25519_test(void);
 int ssh_test(void);
+int argon2_test(void);
 int bcrypt_test(void);
 int no_null_termination_check_test(void);
 int pk_oid_test(void);

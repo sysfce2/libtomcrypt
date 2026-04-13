@@ -1408,6 +1408,14 @@
 				>
 			</File>
 			<Filter
+				Name="argon2"
+				>
+				<File
+					RelativePath="src\misc\argon2\argon2.c"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="base16"
 				>
 				<File

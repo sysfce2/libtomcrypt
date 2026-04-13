@@ -451,6 +451,9 @@ const char *crypt_build_settings =
 #if defined(LTC_BASE16)
     " BASE16 "
 #endif
+#if defined(LTC_ARGON2)
+    " ARGON2 "
+#endif
 #if defined(LTC_BCRYPT)
     " BCRYPT "
     " " NAME_VALUE(LTC_BCRYPT_DEFAULT_ROUNDS) " "

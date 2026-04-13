@@ -4,6 +4,9 @@
 
 int misc_test(void)
 {
+#ifdef LTC_ARGON2
+   DO(argon2_test());
+#endif
 #ifdef LTC_BCRYPT
    DO(bcrypt_test());
 #endif

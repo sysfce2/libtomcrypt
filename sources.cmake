@@ -190,6 +190,7 @@ src/math/rand_bn.c
 src/math/rand_prime.c
 src/math/tfm_desc.c
 src/misc/adler32.c
+src/misc/argon2/argon2.c
 src/misc/base16/base16_decode.c
 src/misc/base16/base16_encode.c
 src/misc/base32/base32_decode.c

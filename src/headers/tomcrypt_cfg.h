@@ -314,11 +314,22 @@ typedef unsigned long ltc_mp_digit;
    #if !defined(LTC_NO_SHA1_X86)
       #define LTC_SHA1_X86
    #endif
+   #if !defined(LTC_NO_SHA224_X86)
+      #define LTC_SHA224_X86
+   #endif
+   #if !defined(LTC_NO_SHA256_X86)
+      #define LTC_SHA256_X86
+   #endif
 #endif
 
 #if defined(__GNUC__)
+   #define LTC_ALIGN_MSVC(n)
    #define LTC_ALIGN(n) __attribute__((aligned(n)))
+#elif defined(_MSC_VER)
+   #define LTC_ALIGN_MSVC(n) __declspec(align(n))
+   #define LTC_ALIGN(n)
 #else
+   #define LTC_ALIGN_MSVC(n)
    #define LTC_ALIGN(n)
 #endif
 

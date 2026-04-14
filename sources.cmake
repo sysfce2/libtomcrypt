@@ -253,6 +253,7 @@ src/misc/pkcs12/pkcs12_utf8_to_utf16.c
 src/misc/pkcs5/pkcs_5_1.c
 src/misc/pkcs5/pkcs_5_2.c
 src/misc/pkcs5/pkcs_5_test.c
+src/misc/scrypt/scrypt.c
 src/misc/ssh/ssh_decode_sequence_multi.c
 src/misc/ssh/ssh_encode_sequence_multi.c
 src/misc/zeromem.c

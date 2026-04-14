@@ -7629,6 +7629,33 @@ The output tag of length \textit{outlen} (minimum 4 bytes) is written to \textit
 The function returns \texttt{CRYPT\_OK} on success, \texttt{CRYPT\_MEM} if memory allocation fails, or \texttt{CRYPT\_INVALID\_ARG} if any parameter is out of range.
 
 
+\subsection{scrypt}
+\index{scrypt}
+\label{scrypt}
+
+scrypt is a memory-hard password-based key derivation function defined in \href{https://datatracker.ietf.org/doc/html/rfc7914}{\texttt{RFC 7914}}.
+It is designed so that a large amount of memory is required for evaluation, making hardware brute-force attacks more costly.
+Internally it uses PBKDF2-HMAC-SHA-256 and a reduced-round Salsa20 core.
+
+To enable scrypt, define \texttt{LTC\_SCRYPT} in \textit{tomcrypt\_custom.h} (it also requires \texttt{LTC\_PKCS\_5} and \texttt{LTC\_SHA256}).
+
+\index{scrypt\_pbkdf()}
+\begin{alltt}
+int scrypt_pbkdf(const unsigned char *password, unsigned long password_len,
+                 const unsigned char *salt,     unsigned long salt_len,
+                 unsigned long N, unsigned long r, unsigned long p,
+                 unsigned char *out, unsigned long outlen);
+\end{alltt}
+
+The \textit{password} parameter is the password of length \textit{password\_len}.
+The \textit{salt} parameter is a random salt of length \textit{salt\_len}.
+The \textit{N} parameter is the CPU/memory cost; it must be greater than 1 and a power of 2.
+The \textit{r} parameter is the block size (minimum 1; a typical value is 8).
+The \textit{p} parameter is the parallelisation factor (minimum 1); this implementation is single-threaded, so increasing \textit{p} raises the computational cost without improving performance.
+The derived key of length \textit{outlen} is written to \textit{out}.
+The function returns \texttt{CRYPT\_OK} on success or an error code on failure.
+
+
 \mysection{PKCS \#8}
 \index{PKCS \#8}
 \label{pkcs8}

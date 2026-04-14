@@ -301,13 +301,14 @@ src/misc/padding/padding_pad.o src/misc/password_free.o src/misc/pbes/pbes.o src
 src/misc/pbes/pbes2.o src/misc/pem/pem.o src/misc/pem/pem_pkcs.o src/misc/pem/pem_read.o \
 src/misc/pem/pem_ssh.o src/misc/pkcs12/pkcs12_kdf.o src/misc/pkcs12/pkcs12_utf8_to_utf16.o \
 src/misc/pkcs5/pkcs_5_1.o src/misc/pkcs5/pkcs_5_2.o src/misc/pkcs5/pkcs_5_test.o \
-src/misc/ssh/ssh_decode_sequence_multi.o src/misc/ssh/ssh_encode_sequence_multi.o src/misc/zeromem.o \
-src/modes/cbc/cbc_decrypt.o src/modes/cbc/cbc_done.o src/modes/cbc/cbc_encrypt.o \
-src/modes/cbc/cbc_getiv.o src/modes/cbc/cbc_setiv.o src/modes/cbc/cbc_start.o \
-src/modes/cfb/cfb_decrypt.o src/modes/cfb/cfb_done.o src/modes/cfb/cfb_encrypt.o \
-src/modes/cfb/cfb_getiv.o src/modes/cfb/cfb_setiv.o src/modes/cfb/cfb_start.o \
-src/modes/ctr/ctr_decrypt.o src/modes/ctr/ctr_done.o src/modes/ctr/ctr_encrypt.o \
-src/modes/ctr/ctr_getiv.o src/modes/ctr/ctr_setiv.o src/modes/ctr/ctr_start.o src/modes/ctr/ctr_test.o \
+src/misc/scrypt/scrypt.o src/misc/ssh/ssh_decode_sequence_multi.o \
+src/misc/ssh/ssh_encode_sequence_multi.o src/misc/zeromem.o src/modes/cbc/cbc_decrypt.o \
+src/modes/cbc/cbc_done.o src/modes/cbc/cbc_encrypt.o src/modes/cbc/cbc_getiv.o \
+src/modes/cbc/cbc_setiv.o src/modes/cbc/cbc_start.o src/modes/cfb/cfb_decrypt.o \
+src/modes/cfb/cfb_done.o src/modes/cfb/cfb_encrypt.o src/modes/cfb/cfb_getiv.o \
+src/modes/cfb/cfb_setiv.o src/modes/cfb/cfb_start.o src/modes/ctr/ctr_decrypt.o \
+src/modes/ctr/ctr_done.o src/modes/ctr/ctr_encrypt.o src/modes/ctr/ctr_getiv.o \
+src/modes/ctr/ctr_setiv.o src/modes/ctr/ctr_start.o src/modes/ctr/ctr_test.o \
 src/modes/ecb/ecb_decrypt.o src/modes/ecb/ecb_done.o src/modes/ecb/ecb_encrypt.o \
 src/modes/ecb/ecb_start.o src/modes/f8/f8_decrypt.o src/modes/f8/f8_done.o src/modes/f8/f8_encrypt.o \
 src/modes/f8/f8_getiv.o src/modes/f8/f8_setiv.o src/modes/f8/f8_start.o src/modes/f8/f8_test_mode.o \
@@ -432,7 +433,7 @@ tests/misc_test.o tests/modes_test.o tests/mpi_test.o tests/multi_test.o \
 tests/no_null_termination_check_test.o tests/no_prng.o tests/padding_test.o tests/pem_test.o \
 tests/pk_oid_test.o tests/pkcs_1_eme_test.o tests/pkcs_1_emsa_test.o tests/pkcs_1_oaep_test.o \
 tests/pkcs_1_pss_test.o tests/pkcs_1_test.o tests/prng_test.o tests/rotate_test.o tests/rsa_test.o \
-tests/ssh_test.o tests/store_test.o tests/test.o tests/x25519_test.o
+tests/scrypt_test.o tests/ssh_test.o tests/store_test.o tests/test.o tests/x25519_test.o
 
 # The following headers will be installed by "make install"
 HEADERS_PUB=src/headers/tomcrypt.h src/headers/tomcrypt_argchk.h src/headers/tomcrypt_cfg.h \

@@ -12,6 +12,7 @@ dh_test.c
 dsa_test.c
 ecc_test.c
 ed25519_test.c
+ed448_test.c
 file_test.c
 mac_test.c
 misc_test.c
@@ -37,5 +38,6 @@ ssh_test.c
 store_test.c
 test.c
 x25519_test.c
+x448_test.c
 )
 

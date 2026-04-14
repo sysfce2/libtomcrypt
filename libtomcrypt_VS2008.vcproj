@@ -2420,6 +2420,26 @@
 				</File>
 			</Filter>
 			<Filter
+				Name="ec448"
+				>
+				<File
+					RelativePath="src\pk\ec448\ec448_common.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\ec448\ec448_crypto_ctx.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\ec448\ec448_export.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\ec448\ec448_import_pkcs8.c"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="ecc"
 				>
 				<File
@@ -2656,6 +2676,42 @@
 				</File>
 			</Filter>
 			<Filter
+				Name="ed448"
+				>
+				<File
+					RelativePath="src\pk\ed448\ed448_export.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\ed448\ed448_import.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\ed448\ed448_import_pkcs8.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\ed448\ed448_import_raw.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\ed448\ed448_import_x509.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\ed448\ed448_make_key.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\ed448\ed448_sign.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\ed448\ed448_verify.c"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="pkcs1"
 				>
 				<File
@@ -2784,6 +2840,38 @@
 				</File>
 				<File
 					RelativePath="src\pk\x25519\x25519_shared_secret.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="x448"
+				>
+				<File
+					RelativePath="src\pk\x448\x448_export.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\x448\x448_import.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\x448\x448_import_pkcs8.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\x448\x448_import_raw.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\x448\x448_import_x509.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\x448\x448_make_key.c"
+					>
+				</File>
+				<File
+					RelativePath="src\pk\x448\x448_shared_secret.c"
 					>
 				</File>
 			</Filter>

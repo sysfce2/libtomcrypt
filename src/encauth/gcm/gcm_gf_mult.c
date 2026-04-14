@@ -38,8 +38,8 @@ static LTC_INLINE int s_pclmul_is_supported(void)
           );
 
       is_supported = ((c >> 1) & 1);
-      initialized = 1;
 #endif
+      initialized = 1;
    }
 
    return is_supported;

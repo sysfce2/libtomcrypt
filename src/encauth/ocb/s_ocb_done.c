@@ -77,10 +77,18 @@ int s_ocb_done(ocb_state *ocb, const unsigned char *pt, unsigned long ptlen,
    }
 
    if (mode == 1) {
-      /* decrypt mode, so let's xor it first */
-      /* xor C[m] into checksum */
+      /* decrypt mode: xor C[m] into checksum.  The function's parameter
+       * names are misleading (see header comment) -- in decrypt mode the
+       * input ciphertext lives in `pt` (not `ct`), and `ct` is the output
+       * plaintext buffer that has not been written yet.  Reading from `ct`
+       * here only happens to work when the caller aliases the input and
+       * output buffers (in-place decryption); with separate buffers the
+       * checksum is computed against uninitialised memory and the tag
+       * verification fails.  Use `pt` (the input parameter) so the code
+       * works for both in-place and separate-buffer callers.
+       */
       for (x = 0; x < (int)ptlen; x++) {
-         ocb->checksum[x] ^= ct[x];
+         ocb->checksum[x] ^= pt[x];
       }
    }
 

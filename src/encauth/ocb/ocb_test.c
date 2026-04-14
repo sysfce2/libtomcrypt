@@ -158,7 +158,7 @@ int ocb_test(void)
 
    int err, x, idx, res;
    unsigned long len;
-   unsigned char outct[MAXBLOCKSIZE], outtag[MAXBLOCKSIZE];
+   unsigned char outct[MAXBLOCKSIZE], outtag[MAXBLOCKSIZE], outpt[MAXBLOCKSIZE];
 
     /* AES can be under rijndael or aes... try to find it */
     if ((idx = find_cipher("aes")) == -1) {
@@ -179,6 +179,25 @@ int ocb_test(void)
            return CRYPT_FAIL_TESTVECTOR;
         }
 
+        /* Decrypt with separate input and output buffers.  Historically
+         * s_ocb_done() had an aliasing bug in its decrypt path that only
+         * surfaced when ct and pt were distinct buffers (the earlier
+         * in-place call below masked it).  Run this case first so it is
+         * exercised on every test vector.
+         */
+        XMEMSET(outpt, 0, sizeof(outpt));
+        if ((err = ocb_decrypt_verify_memory(idx, tests[x].key, 16, tests[x].nonce, outct, tests[x].ptlen,
+             outpt, tests[x].tag, len, &res)) != CRYPT_OK) {
+           return err;
+        }
+        if ((res != 1) || ltc_compare_testvector(outpt, tests[x].ptlen, tests[x].pt, tests[x].ptlen, "OCB separate-buffer", x)) {
+#ifdef LTC_TEST_DBG
+           printf("\n\nOCB: Failure-decrypt (separate buffers) - res = %d\n", res);
+#endif
+           return CRYPT_FAIL_TESTVECTOR;
+        }
+
+        /* Also exercise the in-place form for backward compatibility. */
         if ((err = ocb_decrypt_verify_memory(idx, tests[x].key, 16, tests[x].nonce, outct, tests[x].ptlen,
              outct, tests[x].tag, len, &res)) != CRYPT_OK) {
            return err;

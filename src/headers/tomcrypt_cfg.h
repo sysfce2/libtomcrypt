@@ -315,9 +315,13 @@ typedef unsigned long ltc_mp_digit;
    #define LTC_HAVE_CTZL_BUILTIN
 #endif
 
-#if (defined(__x86_64__) || defined(_M_X64))
+#if (defined(__x86_64__) || defined(__i386__) || defined(_M_X64) || defined(_M_IX86))
    #if !defined(LTC_NO_AES_NI)
       #define LTC_AES_NI
+   #endif
+   #if !defined(LTC_NO_GCM_PCLMUL)
+      #define LTC_GCM_PCLMUL
+      #undef LTC_GCM_TABLES
    #endif
    #if !defined(LTC_NO_SHA1_X86)
       #define LTC_SHA1_X86
@@ -390,19 +394,6 @@ typedef unsigned long ltc_mp_digit;
 #  define LTC_ATTRIBUTE(x) __attribute__(x)
 #else
 #  define LTC_ATTRIBUTE(x)
-#endif
-
-#if !defined(LTC_NO_GCM_PCLMUL) && (defined(__x86_64__) || defined(__i386__) || defined(_M_X64) || defined(_M_IX86))
-#define LTC_GCM_PCLMUL
-#undef LTC_GCM_TABLES
-#endif
-
-#if defined(__clang__) || defined(__GNUC__)
-#define LTC_GCM_PCLMUL_TARGET __attribute__((target("pclmul,ssse3")))
-#define LTC_SHA_TARGET __attribute__((__target__("sse2,ssse3,sse4.1,sha")))
-#else
-#define LTC_GCM_PCLMUL_TARGET
-#define LTC_SHA_TARGET
 #endif
 
 #if !defined(LTC_NO_GCM_PMULL) && (defined(__aarch64__) || defined(_M_ARM64))

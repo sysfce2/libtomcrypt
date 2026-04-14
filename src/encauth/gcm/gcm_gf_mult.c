@@ -9,6 +9,9 @@
 
 #if defined(LTC_GCM_MODE) || defined(LTC_LRW_MODE)
 #if defined(LTC_GCM_PCLMUL)
+
+#define LTC_GCM_PCLMUL_TARGET LTC_ATTRIBUTE((__target__("pclmul,ssse3")))
+
 #if defined(_MSC_VER)
 #include <intrin.h>
 #else

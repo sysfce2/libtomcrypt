@@ -13,9 +13,12 @@ const char *crypt_build_settings =
    "LibTomCrypt " SCRYPT " (www.libtom.net)\n"
    "LibTomCrypt is public domain software.\n"
 #if defined(INCLUDE_BUILD_DATE)
-   "Built on " __DATE__ " at " __TIME__ "\n"
+   "Built on " __DATE__ " at " __TIME__ "\n\n"
 #endif
-   "\n\nEndianness: "
+#if defined(LTC_ARCH_X86)
+   "LTC_ARCH_X86\n"
+#endif
+   "\nEndianness: "
 #if defined(ENDIAN_NEUTRAL)
    "neutral/"
 #endif

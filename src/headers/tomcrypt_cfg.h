@@ -316,6 +316,7 @@ typedef unsigned long ltc_mp_digit;
 #endif
 
 #if (defined(__x86_64__) || defined(__i386__) || defined(_M_X64) || defined(_M_IX86))
+   #define LTC_ARCH_X86
    #if !defined(LTC_NO_AES_NI)
       #define LTC_AES_NI
    #endif

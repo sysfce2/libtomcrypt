@@ -9,46 +9,7 @@
 
 #include "tomcrypt_private.h"
 
-#if defined(LTC_RIJNDAEL)
-
-#ifndef ENCRYPT_ONLY
-
-#define AES_SETUP aes_setup
-#define AES_ENC   aes_ecb_encrypt
-#define AES_DEC   aes_ecb_decrypt
-#define AES_DONE  aes_done
-#define AES_TEST  aes_test
-#define AES_KS    aes_keysize
-
-const struct ltc_cipher_descriptor aes_desc =
-{
-    "aes",
-    6,
-    16, 32, 16, 10,
-    AES_SETUP, AES_ENC, AES_DEC, AES_TEST, AES_DONE, AES_KS,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
-};
-
-#else
-
-#define AES_SETUP aes_enc_setup
-#define AES_ENC   aes_enc_ecb_encrypt
-#define AES_DONE  aes_enc_done
-#define AES_TEST  aes_enc_test
-#define AES_KS    aes_enc_keysize
-
-const struct ltc_cipher_descriptor aes_enc_desc =
-{
-    "aes",
-    6,
-    16, 32, 16, 10,
-    AES_SETUP, AES_ENC, NULL, NULL, AES_DONE, AES_KS,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
-};
-
-#endif
-
-#if defined(LTC_AES_NI)
+#if defined(LTC_ARCH_X86) && (defined(LTC_AES_NI) || !defined(ENCRYPT_ONLY))
 
 #if !defined (LTC_S_X86_CPUID)
 #define LTC_S_X86_CPUID
@@ -89,17 +50,56 @@ static LTC_INLINE int s_aesni_is_supported(void)
 
    return is_supported;
 }
-#endif
+#endif /* LTC_ARCH_X86 */
 
 #ifndef ENCRYPT_ONLY
 int aesni_is_supported(void)
 {
-#ifdef LTC_AES_NI
+#if defined(LTC_ARCH_X86)
    return s_aesni_is_supported();
 #else
    return 0;
 #endif
 }
+#endif /* ENCRYPT_ONLY */
+
+#if defined(LTC_RIJNDAEL)
+
+#ifndef ENCRYPT_ONLY
+
+#define AES_SETUP aes_setup
+#define AES_ENC   aes_ecb_encrypt
+#define AES_DEC   aes_ecb_decrypt
+#define AES_DONE  aes_done
+#define AES_TEST  aes_test
+#define AES_KS    aes_keysize
+
+const struct ltc_cipher_descriptor aes_desc =
+{
+    "aes",
+    6,
+    16, 32, 16, 10,
+    AES_SETUP, AES_ENC, AES_DEC, AES_TEST, AES_DONE, AES_KS,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+};
+
+#else
+
+#define AES_SETUP aes_enc_setup
+#define AES_ENC   aes_enc_ecb_encrypt
+#define AES_DONE  aes_enc_done
+#define AES_TEST  aes_enc_test
+#define AES_KS    aes_enc_keysize
+
+const struct ltc_cipher_descriptor aes_enc_desc =
+{
+    "aes",
+    6,
+    16, 32, 16, 10,
+    AES_SETUP, AES_ENC, NULL, NULL, AES_DONE, AES_KS,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+};
+
 #endif
 
  /**

@@ -299,22 +299,28 @@ typedef struct {
    int               block_len;               /* length of block */
 } ocb_state;
 
+LTC_DEPRECATED(ocb3_init)
 int ocb_init(ocb_state *ocb, int cipher,
              const unsigned char *key, unsigned long keylen, const unsigned char *nonce);
 
+LTC_DEPRECATED(ocb3_encrypt)
 int ocb_encrypt(ocb_state *ocb, const unsigned char *pt, unsigned char *ct);
+LTC_DEPRECATED(ocb3_decrypt)
 int ocb_decrypt(ocb_state *ocb, const unsigned char *ct, unsigned char *pt);
 
+LTC_DEPRECATED(ocb3_done)
 int ocb_done_encrypt(ocb_state *ocb,
                      const unsigned char *pt,  unsigned long ptlen,
                            unsigned char *ct,
                            unsigned char *tag, unsigned long *taglen);
 
+LTC_DEPRECATED(ocb3_done)
 int ocb_done_decrypt(ocb_state *ocb,
                      const unsigned char *ct,  unsigned long ctlen,
                            unsigned char *pt,
                      const unsigned char *tag, unsigned long taglen, int *stat);
 
+LTC_DEPRECATED(ocb3_encrypt_authenticate_memory)
 int ocb_encrypt_authenticate_memory(int cipher,
     const unsigned char *key,    unsigned long keylen,
     const unsigned char *nonce,
@@ -322,6 +328,7 @@ int ocb_encrypt_authenticate_memory(int cipher,
           unsigned char *ct,
           unsigned char *tag,    unsigned long *taglen);
 
+LTC_DEPRECATED(ocb3_decrypt_verify_memory)
 int ocb_decrypt_verify_memory(int cipher,
     const unsigned char *key,    unsigned long keylen,
     const unsigned char *nonce,
@@ -330,11 +337,15 @@ int ocb_decrypt_verify_memory(int cipher,
     const unsigned char *tag,    unsigned long taglen,
           int           *stat);
 
+LTC_DEPRECATED(ocb3_test)
 int ocb_test(void);
 
 /* internal functions */
+LTC_DEPRECATED(nothing. API will be removed.)
 void ocb_shift_xor(ocb_state *ocb, unsigned char *Z);
+LTC_DEPRECATED(nothing. API will be removed.)
 int ocb_ntz(unsigned long x);
+LTC_DEPRECATED(nothing. API will be removed.)
 int s_ocb_done(ocb_state *ocb, const unsigned char *pt, unsigned long ptlen,
                unsigned char *ct, unsigned char *tag, unsigned long *taglen, int mode);
 

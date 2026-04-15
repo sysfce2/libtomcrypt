@@ -1871,119 +1871,13 @@ the tag it computed while decrypting the message.  If the tags match then it sto
 
 LibTomCrypt provides support for a mode called OCB in version 1 ''OCB''\footnote{See
 P. Rogaway, M. Bellare, J. Black, T. Krovetz, \textit{OCB: A Block Cipher Mode of Operation for Efficient Authenticated Encryption}.}
+-- which has been deprecated in favor of the standardized version 3 --
 and version 3 ''OCB3''\footnote{See RFC7253, T. Krovetz, P. Rogaway, \textit{The OCB Authenticated-Encryption Algorithm}.}.
 OCB is an encryption protocol that simultaneously provides authentication.  It is slightly faster to use than EAX mode
 but is less flexible.
 
 All versions of OCB were patented, but have been put into the public domain in 2013 and since then are free to use
 -- see \url{http://web.cs.ucdavis.edu/~rogaway/ocb/license.htm}.
-
-\subsection{OCB}
-\subsubsection{Initialization and processing}
-
-Let's review how to initialize an OCB context.
-
-\index{ocb\_init()}
-\begin{verbatim}
-int ocb_init(          ocb_state *ocb,
-                             int  cipher,
-             const unsigned char *key,
-                   unsigned long  keylen,
-             const unsigned char *nonce);
-\end{verbatim}
-
-This will initialize the \textit{ocb} context using cipher descriptor \textit{cipher}.  It will use a \textit{key} of length \textit{keylen}
-and the random \textit{nonce}.  Note that \textit{nonce} must be a random (public) string the same length as the block ciphers
-block size (e.g. 16 bytes for AES).
-
-This mode has no \textit{Associated Data} like EAX mode does which means you cannot authenticate metadata along with the stream.
-To encrypt or decrypt data use the following.
-
-\index{ocb\_encrypt()} \index{ocb\_decrypt()}
-\begin{verbatim}
-int ocb_encrypt(          ocb_state *ocb,
-                const unsigned char *pt,
-                      unsigned char *ct);
-
-int ocb_decrypt(          ocb_state *ocb,
-                const unsigned char *ct,
-                      unsigned char *pt);
-\end{verbatim}
-
-This will encrypt (or decrypt for the latter) a fixed length of data from \textit{pt} to \textit{ct} (vice versa for the latter).
-They assume that \textit{pt} and \textit{ct} are the same size as the block cipher's block size.  Note that you cannot call
-both functions given a single \textit{ocb} state.  For bi-directional communication you will have to initialize two \textit{ocb}
-states (with different nonces).  Also \textit{pt} and \textit{ct} may point to the same location in memory.
-
-\subsubsection{State Termination}
-
-When you are finished encrypting the message you call the following function to compute the tag.
-
-\index{ocb\_done\_encrypt()}
-\begin{verbatim}
-int ocb_done_encrypt(          ocb_state *ocb,
-                     const unsigned char *pt,
-                           unsigned long  ptlen,
-                           unsigned char *ct,
-                           unsigned char *tag,
-                           unsigned long *taglen);
-\end{verbatim}
-
-This will terminate an encrypt stream \textit{ocb}.  If you have trailing bytes of plaintext that will not complete a block
-you can pass them here.  This will also encrypt the \textit{ptlen} bytes in \textit{pt} and store them in \textit{ct}.  It will also
-store up to \textit{taglen} bytes of the tag into \textit{tag}.
-
-Note that \textit{ptlen} must be less than or equal to the block size of block cipher chosen.  Also note that if you have
-an input message equal to the length of the block size then you pass the data here (not to ocb\_encrypt()) only.
-
-To terminate a decrypt stream and compared the tag you call the following.
-
-\index{ocb\_done\_decrypt()}
-\begin{verbatim}
-int ocb_done_decrypt(          ocb_state *ocb,
-                     const unsigned char *ct,
-                           unsigned long  ctlen,
-                           unsigned char *pt,
-                     const unsigned char *tag,
-                           unsigned long  taglen,
-                                     int *res);
-\end{verbatim}
-Similarly to the previous function you can pass trailing message bytes into this function.  This will compute the
-tag of the message (internally) and then compare it against the \textit{taglen} bytes of \textit{tag} provided.  By default
-\textit{res} is set to zero.  If all \textit{taglen} bytes of \textit{tag} can be verified then \textit{res} is set to one (authenticated
-message).
-
-\subsubsection{Packet Functions}
-To make life simpler the following two functions are provided for memory bound OCB.
-
-%\index{ocb\_encrypt\_authenticate\_memory()}
-\begin{verbatim}
-int ocb_encrypt_authenticate_memory(
-                    int  cipher,
-    const unsigned char *key,    unsigned long keylen,
-    const unsigned char *nonce,
-    const unsigned char *pt,     unsigned long ptlen,
-          unsigned char *ct,
-          unsigned char *tag,    unsigned long *taglen);
-\end{verbatim}
-
-This will OCB encrypt the message \textit{pt} of length \textit{ptlen}, and store the ciphertext in \textit{ct}.  The length \textit{ptlen}
-can be any arbitrary length.
-
-\index{ocb\_decrypt\_verify\_memory()}
-\begin{verbatim}
-int ocb_decrypt_verify_memory(
-                    int  cipher,
-    const unsigned char *key,    unsigned long keylen,
-    const unsigned char *nonce,
-    const unsigned char *ct,     unsigned long ctlen,
-          unsigned char *pt,
-    const unsigned char *tag,    unsigned long taglen,
-          int           *res);
-\end{verbatim}
-
-Similarly, this will OCB decrypt, and compare the internally computed tag against the tag provided. \textit{res} is set
-appropriately to \textit{1} if the tag matches or to \textit{0} if it doesn't match.
 
 \subsection{OCB3}
 \subsubsection{Initialization and processing}
@@ -10802,6 +10696,112 @@ int rsa_verify_hash_ex(
                 rsa_key *key);
 \end{verbatim}
 
+\subsection{OCB}
+\subsubsection{Initialization and processing}
+
+Let's review how to initialize an OCB context.
+
+\index{ocb\_init()}
+\begin{verbatim}
+int ocb_init(          ocb_state *ocb,
+                             int  cipher,
+             const unsigned char *key,
+                   unsigned long  keylen,
+             const unsigned char *nonce);
+\end{verbatim}
+
+This will initialize the \textit{ocb} context using cipher descriptor \textit{cipher}.  It will use a \textit{key} of length \textit{keylen}
+and the random \textit{nonce}.  Note that \textit{nonce} must be a random (public) string the same length as the block ciphers
+block size (e.g. 16 bytes for AES).
+
+This mode has no \textit{Associated Data} like EAX mode does which means you cannot authenticate metadata along with the stream.
+To encrypt or decrypt data use the following.
+
+\index{ocb\_encrypt()} \index{ocb\_decrypt()}
+\begin{verbatim}
+int ocb_encrypt(          ocb_state *ocb,
+                const unsigned char *pt,
+                      unsigned char *ct);
+
+int ocb_decrypt(          ocb_state *ocb,
+                const unsigned char *ct,
+                      unsigned char *pt);
+\end{verbatim}
+
+This will encrypt (or decrypt for the latter) a fixed length of data from \textit{pt} to \textit{ct} (vice versa for the latter).
+They assume that \textit{pt} and \textit{ct} are the same size as the block cipher's block size.  Note that you cannot call
+both functions given a single \textit{ocb} state.  For bi-directional communication you will have to initialize two \textit{ocb}
+states (with different nonces).  Also \textit{pt} and \textit{ct} may point to the same location in memory.
+
+\subsubsection{State Termination}
+
+When you are finished encrypting the message you call the following function to compute the tag.
+
+\index{ocb\_done\_encrypt()}
+\begin{verbatim}
+int ocb_done_encrypt(          ocb_state *ocb,
+                     const unsigned char *pt,
+                           unsigned long  ptlen,
+                           unsigned char *ct,
+                           unsigned char *tag,
+                           unsigned long *taglen);
+\end{verbatim}
+
+This will terminate an encrypt stream \textit{ocb}.  If you have trailing bytes of plaintext that will not complete a block
+you can pass them here.  This will also encrypt the \textit{ptlen} bytes in \textit{pt} and store them in \textit{ct}.  It will also
+store up to \textit{taglen} bytes of the tag into \textit{tag}.
+
+Note that \textit{ptlen} must be less than or equal to the block size of block cipher chosen.  Also note that if you have
+an input message equal to the length of the block size then you pass the data here (not to ocb\_encrypt()) only.
+
+To terminate a decrypt stream and compared the tag you call the following.
+
+\index{ocb\_done\_decrypt()}
+\begin{verbatim}
+int ocb_done_decrypt(          ocb_state *ocb,
+                     const unsigned char *ct,
+                           unsigned long  ctlen,
+                           unsigned char *pt,
+                     const unsigned char *tag,
+                           unsigned long  taglen,
+                                     int *res);
+\end{verbatim}
+Similarly to the previous function you can pass trailing message bytes into this function.  This will compute the
+tag of the message (internally) and then compare it against the \textit{taglen} bytes of \textit{tag} provided.  By default
+\textit{res} is set to zero.  If all \textit{taglen} bytes of \textit{tag} can be verified then \textit{res} is set to one (authenticated
+message).
+
+\subsubsection{Packet Functions}
+To make life simpler the following two functions are provided for memory bound OCB.
+
+%\index{ocb\_encrypt\_authenticate\_memory()}
+\begin{verbatim}
+int ocb_encrypt_authenticate_memory(
+                    int  cipher,
+    const unsigned char *key,    unsigned long keylen,
+    const unsigned char *nonce,
+    const unsigned char *pt,     unsigned long ptlen,
+          unsigned char *ct,
+          unsigned char *tag,    unsigned long *taglen);
+\end{verbatim}
+
+This will OCB encrypt the message \textit{pt} of length \textit{ptlen}, and store the ciphertext in \textit{ct}.  The length \textit{ptlen}
+can be any arbitrary length.
+
+\index{ocb\_decrypt\_verify\_memory()}
+\begin{verbatim}
+int ocb_decrypt_verify_memory(
+                    int  cipher,
+    const unsigned char *key,    unsigned long keylen,
+    const unsigned char *nonce,
+    const unsigned char *ct,     unsigned long ctlen,
+          unsigned char *pt,
+    const unsigned char *tag,    unsigned long taglen,
+          int           *res);
+\end{verbatim}
+
+Similarly, this will OCB decrypt, and compare the internally computed tag against the tag provided. \textit{res} is set
+appropriately to \textit{1} if the tag matches or to \textit{0} if it doesn't match.
 
 \clearpage
 \addcontentsline{toc}{chapter}{Index}

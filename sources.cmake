@@ -62,17 +62,6 @@ src/encauth/gcm/gcm_mult_h.c
 src/encauth/gcm/gcm_process.c
 src/encauth/gcm/gcm_reset.c
 src/encauth/gcm/gcm_test.c
-src/encauth/ocb/ocb_decrypt.c
-src/encauth/ocb/ocb_decrypt_verify_memory.c
-src/encauth/ocb/ocb_done_decrypt.c
-src/encauth/ocb/ocb_done_encrypt.c
-src/encauth/ocb/ocb_encrypt.c
-src/encauth/ocb/ocb_encrypt_authenticate_memory.c
-src/encauth/ocb/ocb_init.c
-src/encauth/ocb/ocb_ntz.c
-src/encauth/ocb/ocb_shift_xor.c
-src/encauth/ocb/ocb_test.c
-src/encauth/ocb/s_ocb_done.c
 src/encauth/ocb3/ocb3_add_aad.c
 src/encauth/ocb3/ocb3_decrypt.c
 src/encauth/ocb3/ocb3_decrypt_last.c

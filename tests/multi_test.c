@@ -9,10 +9,16 @@ int multi_test(void)
    unsigned char buf[2][MAXBLOCKSIZE];
    unsigned long len, len2;
 
+   /* Suppress warnings when building with -DLTC_MINIMAL */
+   LTC_UNUSED_PARAM(key);
+   LTC_UNUSED_PARAM(buf);
+   LTC_UNUSED_PARAM(len);
+   LTC_UNUSED_PARAM(len2);
 /* register algos */
    register_hash(&sha256_desc);
    register_cipher(&aes_desc);
 
+#ifdef LTC_HASH_HELPERS
 /* HASH testing */
    len = sizeof(buf[0]);
 #if defined(ENDIAN_32BITWORD) || defined(_WIN32) || defined(ENDIAN_64BITWORD_ILP32)
@@ -43,6 +49,7 @@ int multi_test(void)
       printf("Failed: %d %lu %lu\n", __LINE__, len, len2);
       return CRYPT_FAIL_TESTVECTOR;
    }
+#endif
 
 #ifdef LTC_HMAC
    len = sizeof(buf[0]);

@@ -2098,5 +2098,9 @@ int ecc_test(void)
 #endif
    return CRYPT_OK;
 }
-
+#else
+int ecc_test(void)
+{
+   return CRYPT_NOP;
+}
 #endif

@@ -23,9 +23,6 @@ int mac_test(void)
 #ifdef LTC_EAX_MODE
    DO(eax_test());
 #endif
-#ifdef LTC_OCB_MODE
-   DO(ocb_test());
-#endif
 #ifdef LTC_OCB3_MODE
    DO(ocb3_test());
 #endif

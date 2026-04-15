@@ -8,7 +8,7 @@
 */
 
 
-#ifdef LTC_SHA1_X86
+#if defined(LTC_SHA1) && defined(LTC_SHA1_X86)
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic push

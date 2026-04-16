@@ -12,6 +12,11 @@
 
 #define LTC_GCM_PCLMUL_TARGET LTC_ATTRIBUTE((__target__("pclmul,ssse3")))
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+#pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
+#endif
 #if defined(_MSC_VER)
 #include <intrin.h>
 #else
@@ -20,6 +25,9 @@
 #include <wmmintrin.h>
 #include <smmintrin.h>
 #include <emmintrin.h>
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
 #if !defined (LTC_S_X86_CPUID)
 #define LTC_S_X86_CPUID
@@ -130,10 +138,11 @@ static void s_gcm_gf_mult_pclmul(const unsigned char *a, const unsigned char *b,
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wbad-function-cast"
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wcast-align"
 #pragma GCC diagnostic ignored "-Wmissing-braces"
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 #include <arm_neon.h>
 #if defined(__GNUC__)

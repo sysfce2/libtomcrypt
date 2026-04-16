@@ -219,6 +219,7 @@
 
 /* stream ciphers */
 #define LTC_CHACHA
+#define LTC_XCHACHA20
 #define LTC_SALSA20
 #define LTC_XSALSA20
 #define LTC_SOSEMANUK
@@ -704,6 +705,10 @@
 
 #if defined(LTC_CHACHA20_PRNG) && !defined(LTC_CHACHA)
    #error LTC_CHACHA20_PRNG requires LTC_CHACHA
+#endif
+
+#if defined(LTC_XCHACHA20) && !defined(LTC_CHACHA)
+   #error LTC_XCHACHA20 requires LTC_CHACHA
 #endif
 
 #if defined(LTC_XSALSA20) && !defined(LTC_SALSA20)

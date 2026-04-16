@@ -1305,14 +1305,28 @@ implemented like encryption of a stream of \textit{0x00} bytes.
 
 Note: You shouldn't use the keystream interface as a PRNG, as it doesn't allow to re-seed the internal state.
 
-\mysection{ChaCha}
+\mysection{ChaCha and XChaCha20}
 
 \textit{ChaCha} is currently the most modern stream cipher included in LibTomCrypt, so use this one unless you
 have a reason for using some of the older algorithms.
+\vspace{1mm}
+
+\textit{XChaCha20} is a variant of \textit{ChaCha20} designed to accept only a 256-bit key and a
+longer 192-bit nonce (24 bytes), which dramatically reduces the risk of nonce collisions when
+generating nonces randomly.  Initialization is the only difference between \textit{XChaCha20}
+and \textit{ChaCha20}.  Even the \textit{chacha\_state} is the same.  Thereafter,
+chacha\_crypt(), chacha\_keystream(), and chacha\_done() are used unaltered.
+chacha\_ivctr32() and chacha\_ivctr64() are NOT used with xchacha20\_setup().
+\vspace{1mm}
 
 For more information about ChaCha see \url{https://en.wikipedia.org/wiki/ChaCha_(cipher)}.
+\vspace{1mm}
 
-Supported key size: 16 or 32 bytes (128 or 256 bits).
+For more information about XChaCha20 see
+\url{https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-xchacha}.
+\vspace{1mm}
+
+Supported key size: 16 or 32 bytes (128 or 256 bits) for ChaCha, 32 bytes only for XChaCha20.
 
 You can initialize ChaCha with 96bit \textit{nonce} + 32bit \textit{counter}:
 \begin{verbatim}
@@ -1328,9 +1342,17 @@ err = chacha_setup(&st, key, key_len, rounds);
 err = chacha_ivctr64(&st, nonce, 8, initial_64bit_ctr);
 \end{verbatim}
 
+To initialize \textit{XChaCha20} for the recommended 20 rounds with a 256-bit
+key (32 bytes) and a 192-bit nonce (24 bytes), use:
+\begin{verbatim}
+chacha_state st;
+err = xchacha20_setup(&st, key, key_len, nonce, nonce_len, rounds);
+\end{verbatim}
+
 The \textit{chacha\_setup} takes the number of rounds as a parameter -- choose 20 if you are not sure.
 As always never ever use the same key + nonce pair more than once.
 
+Both \textit{ChaCha} and \textit{XChaCha20} use the following functions.
 For the actual encryption or decryption you have to call:
 \begin{verbatim}
 err = chacha_crypt(&st, in_buffer, in_len, out_buffer);
@@ -1353,6 +1375,39 @@ memory with a single function call, the following function may be used.
 \begin{verbatim}
 err = chacha_memory(key, keylen, iv, ivlen, datain, datalen, rounds, dataout);
 \end{verbatim}
+
+To encrypt plaintext (or decrypt ciphertext) using XChaCha20 for data already in
+memory with a single function call, the following function may be used.
+\begin{verbatim}
+err = xchacha20_memory(key, keylen, rounds, nonce, nonce_len, datain, datalen, dataout);
+\end{verbatim}
+
+For both \textit{ChaCha} and \textit{XChaCha20} rounds must be an even number
+and if set to 0 the default number of rounds, 20, will be used.
+\vspace{1mm}
+
+\subsection{HChaCha20}
+
+\textit{HChaCha20} is the key derivation function underlying \textit{XChaCha20}.  It applies the
+ChaCha20 block function (without the final addition step) to a 256-bit key and a 128-bit input,
+producing a 256-bit derived key.  It is also useful as a standalone KDF, for example in NaCl-style
+\textit{crypto\_box} constructions.
+
+\index{xchacha20\_hchacha20()}
+\begin{verbatim}
+int xchacha20_hchacha20(unsigned char *out,  unsigned long outlen,
+                        const unsigned char *key, unsigned long keylen,
+                        const unsigned char *in,  unsigned long inlen,
+                        int rounds);
+\end{verbatim}
+This derives a 32-byte subkey from a 32-byte \textit{key} and a 16-byte \textit{in} using
+\textit{rounds} ChaCha20 rounds (0 = default 20).  The output is stored in \textit{out}
+(\textit{outlen} must be 32, \textit{keylen} must be 32, \textit{inlen} must be 16).
+\vspace{1mm}
+
+If you define \textit{LTC\_XCHACHA20} to include \textit{XChaCha20} and \textit{HChaCha20} in a
+minimal \textit{libtomcrypt} library build, you must also define \textit{LTC\_CHACHA}.
+\vspace{1mm}
 
 \mysection{Salsa20 and XSalsa20}
 
@@ -2462,6 +2517,9 @@ int main(void)
 
 This authenticated encryption is based on the ChaCha20 stream cipher and Poly1305 authenticator.
 It is defined by \url{https://tools.ietf.org/html/rfc8439}.
+When \textit{LTC\_XCHACHA20} is enabled, this mode also supports 24-byte IVs for
+\textit{XChaCha20--Poly1305} as defined by
+\url{https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-xchacha}.
 
 IMPORTANT NOTICE: The Chacha20--Poly1305 implementation of LibTomCrypt is compliant to \textbf{RFC8439}, which differs slightly
 to what OpenSSH defined as \textbf{chacha20-poly1305@openssh.com}. The OpenSSH compatibility mode can be enabled
@@ -2489,8 +2547,10 @@ int chacha20poly1305_setiv(chacha20poly1305_state *st,
                               const unsigned char *iv,
                                     unsigned long  ivlen);
 \end{verbatim}
-This adds the initialization vector from \textit{iv} of length \textit{ivlen} octects (valid lengths: 8 or 12) to
-the ChaCha20--Poly1305 state \textit{st}.
+This adds the initialization vector from \textit{iv} of length \textit{ivlen} octects (valid lengths: 8, 12,
+or 24 when \textit{LTC\_XCHACHA20} is enabled) to the ChaCha20--Poly1305 state \textit{st}.
+When \textit{ivlen} is 24, this operates as \textit{XChaCha20--Poly1305}, internally deriving
+a subkey via HChaCha20 before proceeding.
 
 \index{chacha20poly1305\_setiv\_rfc7905()}
 \begin{verbatim}

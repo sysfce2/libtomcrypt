@@ -3027,10 +3027,15 @@ An addition to the suite of hash functions is the \textit{Cipher Hash Constructi
 applicable block ciphers (such as AES) can be turned into hash functions that other LTC functions can use.  In
 particular this allows a cryptosystem to be designed using very few moving parts.
 
+The \code{CHC} mode implements a Miyaguchi–Preneel Hash Construction
+\footnote{\href{https://en.wikipedia.org/wiki/One-way_compression_function\#Miyaguchi–Preneel}{\nolinkurl{https://en.wikipedia.org/wiki/One-way_compression_function\#Miyaguchi-Preneel}}}
+(MPHC), but provides an improved, \code{chc\_done()} implementation.
+
+
 In order to use the CHC system the developer will have to take a few extra steps.  First the \textit{chc\_desc} hash
-descriptor must be registered with register\_hash().  At this point the CHC hash cannot be used to hash
+descriptor must be registered with \code{register\_hash()}.  At this point the CHC hash cannot be used to hash
 data.  While it is in the hash system you still have to tell the CHC code which cipher to use.  This is accomplished
-via the chc\_register() function.
+via the \code{chc\_register()} function.
 
 \index{chc\_register()}
 \begin{verbatim}
@@ -3038,7 +3043,7 @@ int chc_register(int cipher);
 \end{verbatim}
 
 A cipher has to be registered with CHC (and also in the cipher descriptor tables with
-register\_cipher()).  The chc\_register() function will bind a cipher to the CHC system.  Only one cipher can
+\code{register\_cipher()}).  The \code{chc\_register()} function will bind a cipher to the CHC system.  Only one cipher can
 be bound to the CHC hash at a time.  There are additional requirements for the system to work.
 
 \begin{enumerate}

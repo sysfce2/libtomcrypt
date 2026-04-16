@@ -643,21 +643,21 @@ static int s_ecc_new_api(void)
 #ifdef LTC_ECC_SHAMIR
          if (strcmp(ltc_mp.name, "TomsFastMath") != 0) {
             /* XXX-FIXME: TFM does not support sqrtmod_prime */
-            int found = 0, recid;
+            int found = 0;
             ecc_key reckey;
             /* test recovery */
-            sig_opts.recid = &recid;
+            sig_opts.enable_recovery_id = 1;
             len = sizeof(buf);
             DO(ecc_sign_hash_v2(data16, privkey.dp.size, buf, &len, &sig_opts, &privkey));
             DO(ecc_set_curve(dp, &reckey));
             for (k = 0; k < 2*(1+privkey.dp.cofactor); k++) {
-               recid = k;
+               sig_opts.recovery_id = k;
                stat = ecc_recover_key(buf, len, data16, privkey.dp.size, &sig_opts, &reckey);
                if (stat != CRYPT_OK) continue; /* last two will almost always fail, only possible if x<(prime mod order) */
                stat = ecc_key_cmp(PK_PUBLIC, &pubkey, &reckey);
                if (stat == CRYPT_OK) found++;
             }
-            sig_opts.recid = NULL;
+            sig_opts.enable_recovery_id = 0;
             if (found != 1) return CRYPT_FAIL_TESTVECTOR; /* unique match */
             ecc_free(&reckey);
          }
@@ -995,7 +995,7 @@ static int s_ecc_rfc6979(void)
                  }
                 },
                 {
-                 NULL
+                 0
                 }
    };
 
@@ -1971,7 +1971,7 @@ static int s_ecc_test_ethereum(void)
 
 static int s_ecc_test_recovery(void)
 {
-   int i, recid, stat;
+   int i, stat;
    const ltc_ecc_curve* dp;
    ecc_key key, privkey, pubkey, reckey;
    unsigned char buf[1000];
@@ -1998,7 +1998,7 @@ static int s_ecc_test_recovery(void)
    ltc_ecc_sig_opts sig_opts = {
                                 .prng = &yarrow_prng,
                                 .wprng = find_prng ("yarrow"),
-                                .recid = &recid
+                                .enable_recovery_id = 1,
    };
 
    /* XXX-FIXME: TFM does not support sqrtmod_prime */
@@ -2011,14 +2011,14 @@ static int s_ecc_test_recovery(void)
    DO(ecc_set_key(eth_pubkey, sizeof(eth_pubkey), PK_PUBLIC, &pubkey));
 
    DO(ecc_set_curve(dp, &reckey));
-   recid = 0;
+   sig_opts.recovery_id = 0;
    sig_opts.type = LTC_ECCSIG_RFC7518;
    DO(ecc_recover_key(eth_sig, sizeof(eth_sig)-1, eth_hash, sizeof(eth_hash), &sig_opts, &reckey));
    DO(ecc_key_cmp(PK_PUBLIC, &pubkey, &reckey));
    ecc_free(&reckey);
 
    DO(ecc_set_curve(dp, &reckey));
-   recid = -1;
+   sig_opts.recovery_id = -1;
    sig_opts.type = LTC_ECCSIG_ETH27;
    DO(ecc_recover_key(eth_sig, sizeof(eth_sig), eth_hash, sizeof(eth_hash), &sig_opts, &reckey));
    DO(ecc_key_cmp(PK_PUBLIC, &pubkey, &reckey));
@@ -2055,7 +2055,7 @@ static int s_ecc_test_recovery(void)
 
       /* test signature */
       len = sizeof(buf);
-      recid = 0;
+      sig_opts.recovery_id = 0;
       DO(ecc_sign_hash_v2(data16, 16, buf, &len, &sig_opts, &privkey));
 
       /* test verification */

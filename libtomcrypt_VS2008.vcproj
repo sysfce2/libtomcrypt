@@ -2910,6 +2910,18 @@
 					RelativePath="src\stream\chacha\chacha_test.c"
 					>
 				</File>
+				<File
+					RelativePath="src\stream\chacha\xchacha20_memory.c"
+					>
+				</File>
+				<File
+					RelativePath="src\stream\chacha\xchacha20_setup.c"
+					>
+				</File>
+				<File
+					RelativePath="src\stream\chacha\xchacha20_test.c"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="rabbit"

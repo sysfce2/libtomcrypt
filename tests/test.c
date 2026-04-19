@@ -210,6 +210,9 @@ static void s_unregister_all(void)
 #ifdef LTC_MD4
   unregister_hash(&md4_desc);
 #endif
+#ifdef LTC_SM3
+  unregister_hash(&sm3_desc);
+#endif
 #ifdef LTC_MD5
   unregister_hash(&md5_desc);
 #endif

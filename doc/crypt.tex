@@ -3057,6 +3057,7 @@ The following hashes are provided as of this release within the LibTomCrypt libr
       \hline RIPEMD-256 & rmd160\_desc & 32 & 13 \\
       \hline BLAKE2S-256 & blake2s\_256\_desc & 32 & 24 \\
       \hline BLAKE2B-256 & blake2b\_256\_desc & 32 & 26 \\
+      \hline SM3 & sm3\_desc & 32 & 34 \\
       \hline SHA-512/224 & sha512\_224\_desc & 28 & 15 \\
       \hline Keccak224 & keccak\_224\_desc & 28 & 29 \\
       \hline SHA3-224 & sha3\_224\_desc & 28 & 17 \\
@@ -3298,7 +3299,7 @@ It is highly recommended that you \textbf{not} use the MD2, MD4, MD5, or SHA-1 h
 These hashes are provided for completeness and they still can be used for the purposes of password hashing or one-way accumulators
 (e.g. Yarrow).
 
-The other hashes such as the SHA-2 (that includes SHA-512, SHA-512/384, SHA-384, SHA-512/256, SHA-256 and SHA-224), TIGER-192 and TIGER2-192 are still
+The other hashes such as the SHA-2 (that includes SHA-512, SHA-512/384, SHA-384, SHA-512/256, SHA-256 and SHA-224), SM3, TIGER-192 and TIGER2-192 are still
 considered secure for all purposes you would normally use a hash for.
 
 \chapter{Checksum Functions}

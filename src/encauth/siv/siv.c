@@ -263,7 +263,7 @@ int siv_encrypt_memory(                int  cipher,
    LTC_ARGCHK(key    != NULL);
    LTC_ARGCHK(ad     != NULL);
    LTC_ARGCHK(adlen  != NULL);
-   LTC_ARGCHK(pt     != NULL);
+   LTC_ARGCHK(pt     != NULL || ptlen == 0);
    LTC_ARGCHK(ct     != NULL);
    LTC_ARGCHK(ctlen  != NULL);
 

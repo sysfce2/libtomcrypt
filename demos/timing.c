@@ -1463,6 +1463,7 @@ static void time_siv(eac_ctx *ctx)
                                  ctx->key, 32,
                                  ctx->buf, ctx->size - 16,
                                  ctx->buf, &buflen,
+                                 4 - z,
                                  aad[0], 16,
                                  aad[1], 12,
                                  aad[2], 8,

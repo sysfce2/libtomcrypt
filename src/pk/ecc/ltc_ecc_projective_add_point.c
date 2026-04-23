@@ -36,6 +36,24 @@ int ltc_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, ecc_poi
       return err;
    }
 
+   /* treat internal Z == 0 states as infinity (for elliptic-curve addition: infinity = identity element) */
+   if (P->z != NULL && ltc_mp_iszero(P->z)) {
+      if (Q->z != NULL && ltc_mp_iszero(Q->z)) {
+         /* inf + inf = inf */
+         err = ltc_ecc_set_point_xyz(1, 1, 0, R);
+      }
+      else {
+         /* inf + Q = Q */
+         err = ltc_ecc_copy_point(Q, R);
+      }
+      goto done;
+   }
+   if (Q->z != NULL && ltc_mp_iszero(Q->z)) {
+      /* P + inf = P */
+      err = ltc_ecc_copy_point(P, R);
+      goto done;
+   }
+
    if ((err = ltc_ecc_is_point_at_infinity(P, modulus, &inf)) != CRYPT_OK) return err;
    if (inf) {
       /* P is point at infinity >> Result = Q */
@@ -203,4 +221,3 @@ done:
 }
 
 #endif
-

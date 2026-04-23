@@ -469,6 +469,14 @@ static int tfm_ecc_projective_dbl_point(const ecc_point *P, ecc_point *R, const 
       return CRYPT_OK;
    }
 
+   /* Y == 0 or Z == 0 doubles to infinity. */
+   if (fp_cmp_d(R->y, 0) == FP_EQ || fp_cmp_d(R->z, 0) == FP_EQ) {
+      ltc_mp.set_int(R->x, 1);
+      ltc_mp.set_int(R->y, 1);
+      ltc_mp.set_int(R->z, 0);
+      return CRYPT_OK;
+   }
+
    /* t1 = Z * Z */
    fp_sqr(R->z, &t1);
    fp_montgomery_reduce(&t1, TFM_UNCONST(void *)modulus, mp);
@@ -612,6 +620,29 @@ static int tfm_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, 
    fp_init(&x);
    fp_init(&y);
    fp_init(&z);
+
+   /* treat internal Z == 0 states as infinity */
+   if (P->z != NULL && fp_cmp_d(P->z, 0) == FP_EQ) {
+      if (Q->z != NULL && fp_cmp_d(Q->z, 0) == FP_EQ) {
+         /* inf + inf = inf */
+         ltc_mp.set_int(R->x, 1);
+         ltc_mp.set_int(R->y, 1);
+         ltc_mp.set_int(R->z, 0);
+      } else {
+         /* inf + Q = Q */
+         ltc_mp.copy(Q->x, R->x);
+         ltc_mp.copy(Q->y, R->y);
+         ltc_mp.copy(Q->z, R->z);
+      }
+      return CRYPT_OK;
+   }
+   if (Q->z != NULL && fp_cmp_d(Q->z, 0) == FP_EQ) {
+      /* P + inf = P */
+      ltc_mp.copy(P->x, R->x);
+      ltc_mp.copy(P->y, R->y);
+      ltc_mp.copy(P->z, R->z);
+      return CRYPT_OK;
+   }
 
    if ((err = ltc_ecc_is_point_at_infinity(P, modulus, &inf)) != CRYPT_OK) return err;
    if (inf) {

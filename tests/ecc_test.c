@@ -338,6 +338,7 @@ static int s_ecc_issue446(void)
    const ltc_ecc_curve* cu;
    ecc_key key1, key2, key3, key4;
    int stat = 0;
+   ltc_ecc_sig_opts sig_opts = { .type = LTC_ECCSIG_ANSIX962 };
    unsigned char hash[64];
    unsigned long hashlen;
    const unsigned char msg1[] = { 0x31,0x32,0x33,0x34,0x30,0x30 };
@@ -447,47 +448,36 @@ static int s_ecc_issue446(void)
    hashlen = sizeof(hash);
    DO(hash_memory(find_hash("sha256"), msg1, sizeof(msg1), hash, &hashlen));
 
-   DO(ecc_verify_hash(sig1, sizeof(sig1), hash, hashlen, &stat, &key1));
+   DO(ecc_verify_hash_v2(sig1, sizeof(sig1), hash, hashlen, &sig_opts, &stat, &key1));
    ENSUREX(stat == 1, "sig1 - wycheproof / Valid");
 
-   SHOULD_FAIL(ecc_verify_hash(sig2, sizeof(sig2), hash, hashlen, &stat, &key1));
+   SHOULD_FAIL(ecc_verify_hash_v2(sig2, sizeof(sig2), hash, hashlen, &sig_opts, &stat, &key1));
    ENSUREX(stat == 0, "sig2 - wycheproof / changing tag value of sequence");
 
-   SHOULD_FAIL(ecc_verify_hash(sig4, sizeof(sig4), hash, hashlen, &stat, &key1));
+   SHOULD_FAIL(ecc_verify_hash_v2(sig4, sizeof(sig4), hash, hashlen, &sig_opts, &stat, &key1));
    ENSUREX(stat == 0, "sig4 - wycheproof / long form encoding of length");
 
-   SHOULD_FAIL(ecc_verify_hash(sig5, sizeof(sig5), hash, hashlen, &stat, &key1));
+   SHOULD_FAIL(ecc_verify_hash_v2(sig5, sizeof(sig5), hash, hashlen, &sig_opts, &stat, &key1));
    ENSUREX(stat == 0, "sig5 - wycheproof / length contains leading 0");
 
    hashlen = sizeof(hash);
    DO(hash_memory(find_hash("sha256"), msg2, sizeof(msg2), hash, &hashlen));
 
-   DO(ecc_verify_hash(sig3, sizeof(sig3), hash, hashlen, &stat, &key1));
-   if (stat != 1) {
-      fprintf(stderr, "XXX-TODO should be valid - wycheproof / Edge case for Shamir multiplication\n");
-      /* return CRYPT_FAIL_TESTVECTOR; / * expected result: VALID */
-   }
+   DO(ecc_verify_hash_v2(sig3, sizeof(sig3), hash, hashlen, &sig_opts, &stat, &key1));
+   ENSUREX(stat == 1, "wycheproof / Edge case for Shamir multiplication");
 
    hashlen = sizeof(hash);
    DO(hash_memory(find_hash("sha224"), msg3, sizeof(msg3), hash, &hashlen));
-   DO(ecc_verify_hash(sig6, sizeof(sig6), hash, hashlen, &stat, &key2));
-   if (stat != 1) {
-      fprintf(stderr, "XXX-TODO should be valid - wycheproof / extreme value for k and edgecase s\n");
-      /* return CRYPT_FAIL_TESTVECTOR; / * expected result: VALID */
-   }
+   DO(ecc_verify_hash_v2(sig6, sizeof(sig6), hash, hashlen, &sig_opts, &stat, &key2));
+   ENSUREX(stat == 1, "wycheproof / extreme value for k and edgecase s");
 
    hashlen = sizeof(hash);
    DO(hash_memory(find_hash("sha256"), msg4, sizeof(msg4), hash, &hashlen));
-   DO(ecc_verify_hash(sig7, sizeof(sig7), hash, hashlen, &stat, &key3));
-   if (stat != 1) {
-      fprintf(stderr, "XXX-TODO should be valid - wycheproof / extreme value for k\n");
-      /* return CRYPT_FAIL_TESTVECTOR; / * expected result: VALID */
-   }
-   DO(ecc_verify_hash(sig8, sizeof(sig8), hash, hashlen, &stat, &key4));
-   if (stat != 1) {
-      fprintf(stderr, "XXX-TODO should be valid - wycheproof / extreme value for k and s^-1\n");
-      /* return CRYPT_FAIL_TESTVECTOR; / * expected result: VALID */
-   }
+   DO(ecc_verify_hash_v2(sig7, sizeof(sig7), hash, hashlen, &sig_opts, &stat, &key3));
+   ENSUREX(stat == 1, "wycheproof / extreme value for k");
+
+   DO(ecc_verify_hash_v2(sig8, sizeof(sig8), hash, hashlen, &sig_opts, &stat, &key4));
+   ENSUREX(stat == 1, "wycheproof / extreme value for k and s^-1");
 
    ecc_free(&key1);
    ecc_free(&key2);

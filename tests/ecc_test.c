@@ -245,6 +245,41 @@ static int s_ecc_issue630(void)
    return 0;
 }
 
+/* https://github.com/libtom/libtomcrypt/issues/116
+   verifies that ECDSA verification succeeds for an all-zero hash when the non-Shamir fallback is used
+   i.e. when u1 == 0 and the code path computes 0 * G + u2 * Q via two separate point multiplications
+ */
+static int s_ecc_issue116(void)
+{
+   const ltc_ecc_curve *dp;
+   ecc_key key;
+   int err, stat;
+   unsigned long siglen;
+   unsigned char hash[20];
+   unsigned char sig[128];
+   ltc_ecc_sig_opts sig_opts = { .type = LTC_ECCSIG_RFC7518, .prng = &yarrow_prng, .wprng = find_prng("yarrow") };
+   int (*saved_mul2add)(const ecc_point *A, void *kA, const ecc_point *B, void *kB, ecc_point *C, const void *ma, const void *modulus);
+
+   XMEMSET(hash, 0, sizeof(hash));
+
+   DO(ecc_find_curve("SECP256R1", &dp));
+   DO(ecc_make_key_ex(&yarrow_prng, find_prng("yarrow"), &key, dp));
+
+   siglen = sizeof(sig);
+   DO(ecc_sign_hash_v2(hash, sizeof(hash), sig, &siglen, &sig_opts, &key));
+
+   saved_mul2add = ltc_mp.ecc_mul2add;
+   ltc_mp.ecc_mul2add = NULL;
+   stat = 0;
+   err = ecc_verify_hash_v2(sig, siglen, hash, sizeof(hash), &(ltc_ecc_sig_opts){ .type = LTC_ECCSIG_RFC7518 }, &stat, &key);
+   ltc_mp.ecc_mul2add = saved_mul2add;
+   ecc_free(&key);
+
+   if (err != CRYPT_OK) return err;
+   if (stat != 1) return CRYPT_FAIL_TESTVECTOR;
+   return CRYPT_OK;
+}
+
 /* https://github.com/libtom/libtomcrypt/issues/108 */
 static int s_ecc_issue108(void)
 {
@@ -2246,6 +2281,7 @@ int ecc_test(void)
    DO(s_ecc_issue108());
    DO(s_ecc_issue443_447());
    DO(s_ecc_issue630());
+   DO(s_ecc_issue116());
 #ifdef LTC_ECC_SHAMIR
    DO(s_ecc_test_shamir());
    DO(s_ecc_test_recovery());

@@ -5,11 +5,11 @@
 
 #ifdef LTC_PADDING
 
-typedef struct padding_testcase_ padding_testcase;
+typedef struct padding_testcase padding_testcase;
 
 typedef int (*cmp_padding_testcase)(const padding_testcase*, const unsigned char*, unsigned long);
 
-struct padding_testcase_ {
+struct padding_testcase {
    unsigned long is, should, max, mode;
    const char* name;
    cmp_padding_testcase cmp;

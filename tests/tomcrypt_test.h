@@ -17,6 +17,7 @@ typedef struct {
 int cipher_hash_test(void);
 int modes_test(void);
 int mac_test(void);
+int siv_wycheproof_test(void);
 int pkcs_1_test(void);
 int pkcs_1_pss_test(void);
 int pkcs_1_oaep_test(void);

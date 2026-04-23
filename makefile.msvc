@@ -238,7 +238,8 @@ tests/misc_test.obj tests/modes_test.obj tests/mpi_test.obj tests/multi_test.obj
 tests/no_null_termination_check_test.obj tests/no_prng.obj tests/padding_test.obj tests/pem_test.obj \
 tests/pk_oid_test.obj tests/pkcs_1_eme_test.obj tests/pkcs_1_emsa_test.obj tests/pkcs_1_oaep_test.obj \
 tests/pkcs_1_pss_test.obj tests/pkcs_1_test.obj tests/prng_test.obj tests/rotate_test.obj tests/rsa_test.obj \
-tests/scrypt_test.obj tests/ssh_test.obj tests/store_test.obj tests/test.obj tests/x25519_test.obj
+tests/scrypt_test.obj tests/siv_wycheproof_test.obj tests/ssh_test.obj tests/store_test.obj tests/test.obj \
+tests/x25519_test.obj
 
 #The following headers will be installed by "make install"
 HEADERS_PUB=src/headers/tomcrypt.h src/headers/tomcrypt_argchk.h src/headers/tomcrypt_cfg.h \

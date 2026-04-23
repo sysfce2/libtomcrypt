@@ -1054,130 +1054,206 @@ static void time_ecc(void)
 static void time_ecc(void) { fprintf(stderr, "NO ECC\n"); }
 #endif
 
-static void time_macs_(unsigned long MAC_SIZE)
-{
-#if defined(LTC_OMAC) || defined(LTC_XCBC) || defined(LTC_F9_MODE) || defined(LTC_PMAC) || defined(LTC_PELICAN) || defined(LTC_HMAC)
-   unsigned char *buf, key[16], tag[16];
-   ulong64 t1, t2;
-   unsigned long x, z;
-   int err, cipher_idx, hash_idx;
-
-   fprintf(stderr, "\nMAC Timings (cycles/byte on %luKB blocks):\n", MAC_SIZE);
-
-   buf = XMALLOC(MAC_SIZE*1024);
-   if (buf == NULL) {
-      fprintf(stderr, "\n\nout of heap yo\n\n");
-      exit(EXIT_FAILURE);
-   }
-
-   cipher_idx = find_cipher("aes");
-   hash_idx   = find_hash("sha1");
-
-   if (cipher_idx == -1 || hash_idx == -1) {
-      fprintf(stderr, "Warning the MAC tests requires AES and SHA1 to operate... so sorry\n");
-      exit(EXIT_FAILURE);
-   }
-
-   yarrow_read(buf, MAC_SIZE*1024, &yarrow_prng);
-   yarrow_read(key, 16, &yarrow_prng);
+typedef struct mac_ctx {
+   unsigned char *buf, key[32], tag[16];
+   unsigned long size;
+   int cipher_idx, hash_idx;
+} mac_ctx;
 
 #ifdef LTC_OMAC
+static void time_omac(mac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x, z;
+   int err;
+
    t2 = -1;
    for (x = 0; x < 10000; x++) {
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = omac_memory(cipher_idx, key, 16, buf, MAC_SIZE*1024, tag, &z)) != CRYPT_OK) {
-           fprintf(stderr, "\n\nomac-%s error... %s\n", cipher_descriptor[cipher_idx].name, error_to_string(err));
+        if ((err = omac_memory(ctx->cipher_idx, ctx->key, 16, ctx->buf, ctx->size, ctx->tag, &z)) != CRYPT_OK) {
+           fprintf(stderr, "\n\nomac-%s error... %s\n", cipher_descriptor[ctx->cipher_idx].name, error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "OMAC-%s\t\t%9"PRI64"u\n", cipher_descriptor[cipher_idx].name, t2/(ulong64)(MAC_SIZE*1024));
+   fprintf(stderr, "OMAC-%s\t\t%9"PRI64"u\n", cipher_descriptor[ctx->cipher_idx].name, t2/(ulong64)(ctx->size));
+}
 #endif
 
 #ifdef LTC_XCBC
+static void time_xcbc(mac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x, z;
+   int err;
+
    t2 = -1;
    for (x = 0; x < 10000; x++) {
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = xcbc_memory(cipher_idx, key, 16, buf, MAC_SIZE*1024, tag, &z)) != CRYPT_OK) {
-           fprintf(stderr, "\n\nxcbc-%s error... %s\n", cipher_descriptor[cipher_idx].name, error_to_string(err));
+        if ((err = xcbc_memory(ctx->cipher_idx, ctx->key, 16, ctx->buf, ctx->size, ctx->tag, &z)) != CRYPT_OK) {
+           fprintf(stderr, "\n\nxcbc-%s error... %s\n", cipher_descriptor[ctx->cipher_idx].name, error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "XCBC-%s\t\t%9"PRI64"u\n", cipher_descriptor[cipher_idx].name, t2/(ulong64)(MAC_SIZE*1024));
+   fprintf(stderr, "XCBC-%s\t\t%9"PRI64"u\n", cipher_descriptor[ctx->cipher_idx].name, t2/(ulong64)(ctx->size));
+}
 #endif
 
 #ifdef LTC_F9_MODE
+static void time_f9(mac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x, z;
+   int err;
+
    t2 = -1;
    for (x = 0; x < 10000; x++) {
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = f9_memory(cipher_idx, key, 16, buf, MAC_SIZE*1024, tag, &z)) != CRYPT_OK) {
-           fprintf(stderr, "\n\nF9-%s error... %s\n", cipher_descriptor[cipher_idx].name, error_to_string(err));
+        if ((err = f9_memory(ctx->cipher_idx, ctx->key, 16, ctx->buf, ctx->size, ctx->tag, &z)) != CRYPT_OK) {
+           fprintf(stderr, "\n\nF9-%s error... %s\n", cipher_descriptor[ctx->cipher_idx].name, error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "F9-%s\t\t\t%9"PRI64"u\n", cipher_descriptor[cipher_idx].name, t2/(ulong64)(MAC_SIZE*1024));
+   fprintf(stderr, "F9-%s\t\t\t%9"PRI64"u\n", cipher_descriptor[ctx->cipher_idx].name, t2/(ulong64)(ctx->size));
+}
 #endif
 
 #ifdef LTC_PMAC
+static void time_pmac(mac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x, z;
+   int err;
+
    t2 = -1;
    for (x = 0; x < 10000; x++) {
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = pmac_memory(cipher_idx, key, 16, buf, MAC_SIZE*1024, tag, &z)) != CRYPT_OK) {
-           fprintf(stderr, "\n\npmac-%s error... %s\n", cipher_descriptor[cipher_idx].name, error_to_string(err));
+        if ((err = pmac_memory(ctx->cipher_idx, ctx->key, 16, ctx->buf, ctx->size, ctx->tag, &z)) != CRYPT_OK) {
+           fprintf(stderr, "\n\npmac-%s error... %s\n", cipher_descriptor[ctx->cipher_idx].name, error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "PMAC-%s\t\t%9"PRI64"u\n", cipher_descriptor[cipher_idx].name, t2/(ulong64)(MAC_SIZE*1024));
+   fprintf(stderr, "PMAC-%s\t\t%9"PRI64"u\n", cipher_descriptor[ctx->cipher_idx].name, t2/(ulong64)(ctx->size));
+}
 #endif
 
 #ifdef LTC_PELICAN
+static void time_pelican(mac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x;
+   int err;
+
    t2 = -1;
    for (x = 0; x < 10000; x++) {
         t_start();
         t1 = t_read();
-        z = 16;
-        if ((err = pelican_memory(key, 16, buf, MAC_SIZE*1024, tag)) != CRYPT_OK) {
+        if ((err = pelican_memory(ctx->key, 16, ctx->buf, ctx->size, ctx->tag)) != CRYPT_OK) {
            fprintf(stderr, "\n\npelican error... %s\n", error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "PELICAN \t\t%9"PRI64"u\n", t2/(ulong64)(MAC_SIZE*1024));
+   fprintf(stderr, "PELICAN \t\t%9"PRI64"u\n", t2/(ulong64)(ctx->size));
+}
 #endif
 
 #ifdef LTC_HMAC
+static void time_hmac(mac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x, z;
+   int err;
+
    t2 = -1;
    for (x = 0; x < 10000; x++) {
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = hmac_memory(hash_idx, key, 16, buf, MAC_SIZE*1024, tag, &z)) != CRYPT_OK) {
-           fprintf(stderr, "\n\nhmac-%s error... %s\n", hash_descriptor[hash_idx].name, error_to_string(err));
+        if ((err = hmac_memory(ctx->hash_idx, ctx->key, 16, ctx->buf, ctx->size, ctx->tag, &z)) != CRYPT_OK) {
+           fprintf(stderr, "\n\nhmac-%s error... %s\n", hash_descriptor[ctx->hash_idx].name, error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "HMAC-%s\t\t%9"PRI64"u\n", hash_descriptor[hash_idx].name, t2/(ulong64)(MAC_SIZE*1024));
+   fprintf(stderr, "HMAC-%s\t\t%9"PRI64"u\n", hash_descriptor[ctx->hash_idx].name, t2/(ulong64)(ctx->size));
+}
 #endif
 
-   XFREE(buf);
+static void time_macs_(unsigned long MAC_SIZE)
+{
+#if defined(LTC_OMAC) || defined(LTC_XCBC) || defined(LTC_F9_MODE) || defined(LTC_PMAC) || defined(LTC_PELICAN) || defined(LTC_HMAC)
+   mac_ctx ctx;
+   struct {
+      const char *name;
+      void (*time_fun)(mac_ctx*);
+   } time_funs[] = {
+#define TIME_FUN(n) { #n, time_ ## n }
+#ifdef LTC_OMAC
+                  TIME_FUN(omac),
+#endif
+#ifdef LTC_XCBC
+                  TIME_FUN(xcbc),
+#endif
+#ifdef LTC_F9_MODE
+                  TIME_FUN(f9),
+#endif
+#ifdef LTC_PMAC
+                  TIME_FUN(pmac),
+#endif
+#ifdef LTC_PELICAN
+                  TIME_FUN(pelican),
+#endif
+#ifdef LTC_HMAC
+                  TIME_FUN(hmac),
+#endif
+#undef TIME_FUN
+   };
+   unsigned long n;
+
+   fprintf(stderr, "\nMAC Timings (cycles/byte on %luKB blocks):\n", MAC_SIZE);
+
+   ctx.size = MAC_SIZE*1024;
+   ctx.buf = XMALLOC(ctx.size);
+   if (ctx.buf == NULL) {
+      fprintf(stderr, "\n\nout of heap yo\n\n");
+      exit(EXIT_FAILURE);
+   }
+
+   ctx.cipher_idx = find_cipher("aes");
+   ctx.hash_idx   = find_hash("sha1");
+
+   if (ctx.cipher_idx == -1 || ctx.hash_idx == -1) {
+      fprintf(stderr, "Warning the MAC tests requires AES and SHA1 to operate... so sorry\n");
+      exit(EXIT_FAILURE);
+   }
+
+   yarrow_read(ctx.buf, ctx.size, &yarrow_prng);
+   yarrow_read(ctx.key, 16, &yarrow_prng);
+
+   for (n = 0; n < LTC_ARRAY_SIZE(time_funs); ++n) {
+      if (!should_skip(time_funs[n].name))
+         time_funs[n].time_fun(&ctx);
+   }
+
+   XFREE(ctx.buf);
 #else
    LTC_UNUSED_PARAM(MAC_SIZE);
    fprintf(stderr, "NO MACs\n");
@@ -1191,137 +1267,147 @@ static void time_macs(void)
    time_macs_(32);
 }
 
-static void time_encmacs_(unsigned long MAC_SIZE)
-{
-#if defined(LTC_EAX_MODE) || defined(LTC_OCB_MODE) || defined(LTC_OCB3_MODE) || \
-   defined(LTC_CCM_MODE) || defined(LTC_GCM_MODE) || defined(LTC_SIV_MODE)
-#if defined(LTC_SIV_MODE)
-   unsigned char *aad[4];
-   unsigned long buflen;
-#endif
+typedef struct eac_ctx {
    unsigned char *buf, IV[16], key[32], tag[16];
-   ulong64 t1, t2;
-   unsigned long x, z;
-   int err, cipher_idx;
-   symmetric_ECB skey;
-
-   fprintf(stderr, "\nENC+MAC Timings (zero byte AAD, 16 byte IV, cycles/byte on %luKB blocks):\n", MAC_SIZE);
-
-   buf = XMALLOC(MAC_SIZE*1024);
-   if (buf == NULL) {
-      fprintf(stderr, "\n\nout of heap yo\n\n");
-      exit(EXIT_FAILURE);
-   }
-
-   cipher_idx = find_cipher("aes");
-
-   yarrow_read(buf, MAC_SIZE*1024, &yarrow_prng);
-   yarrow_read(key, sizeof(key), &yarrow_prng);
-   yarrow_read(IV, sizeof(IV), &yarrow_prng);
+   unsigned long size;
+   int cipher_idx;
+} eac_ctx;
 
 #ifdef LTC_EAX_MODE
+static void time_eax(eac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x, z;
+   int err;
+
    t2 = -1;
    for (x = 0; x < 10000; x++) {
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = eax_encrypt_authenticate_memory(cipher_idx, key, 16, IV, 16, NULL, 0, buf, MAC_SIZE*1024, buf, tag, &z)) != CRYPT_OK) {
+        if ((err = eax_encrypt_authenticate_memory(ctx->cipher_idx, ctx->key, 16, ctx->IV, 16, NULL, 0, ctx->buf, ctx->size, ctx->buf, ctx->tag, &z)) != CRYPT_OK) {
            fprintf(stderr, "\nEAX error... %s\n", error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "EAX \t\t\t%9"PRI64"u\n", t2/(ulong64)(MAC_SIZE*1024));
+   fprintf(stderr, "EAX \t\t\t%9"PRI64"u\n", t2/(ulong64)(ctx->size));
+}
 #endif
 
-#ifdef LTC_OCB_MODE
+#if defined(LTC_OCB_MODE)
+static void time_ocb(eac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x, z;
+   int err;
+
    t2 = -1;
    for (x = 0; x < 10000; x++) {
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = ocb_encrypt_authenticate_memory(cipher_idx, key, 16, IV, buf, MAC_SIZE*1024, buf, tag, &z)) != CRYPT_OK) {
+        if ((err = ocb_encrypt_authenticate_memory(ctx->cipher_idx, ctx->key, 16, ctx->IV, ctx->buf, ctx->size, ctx->buf, ctx->tag, &z)) != CRYPT_OK) {
            fprintf(stderr, "\nOCB error... %s\n", error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "OCB \t\t\t%9"PRI64"u\n", t2/(ulong64)(MAC_SIZE*1024));
+   fprintf(stderr, "OCB \t\t\t%9"PRI64"u\n", t2/(ulong64)(ctx->size));
+}
 #endif
 
-#ifdef LTC_OCB3_MODE
+#if defined(LTC_OCB3_MODE)
+static void time_ocb3(eac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x, z;
+   int err;
+
    t2 = -1;
    for (x = 0; x < 10000; x++) {
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = ocb3_encrypt_authenticate_memory(cipher_idx, key, 16, IV, 15, (unsigned char*)"", 0, buf, MAC_SIZE*1024, buf, tag, &z)) != CRYPT_OK) {
+        if ((err = ocb3_encrypt_authenticate_memory(ctx->cipher_idx, ctx->key, 16, ctx->IV, 15, (unsigned char*)"", 0, ctx->buf, ctx->size, ctx->buf, ctx->tag, &z)) != CRYPT_OK) {
            fprintf(stderr, "\nOCB3 error... %s\n", error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "OCB3 \t\t\t%9"PRI64"u\n", t2/(ulong64)(MAC_SIZE*1024));
+   fprintf(stderr, "OCB3 \t\t\t%9"PRI64"u\n", t2/(ulong64)(ctx->size));
+}
 #endif
 
-#ifdef LTC_CCM_MODE
-   t2 = -1;
-   for (x = 0; x < 10000; x++) {
-        t_start();
-        t1 = t_read();
-        z = 16;
-        if ((err = ccm_memory(cipher_idx, key, 16, NULL, IV, 16, NULL, 0, buf, MAC_SIZE*1024, buf, tag, &z, CCM_ENCRYPT)) != CRYPT_OK) {
-           fprintf(stderr, "\nCCM error... %s\n", error_to_string(err));
-           exit(EXIT_FAILURE);
-        }
-        t1 = t_read() - t1;
-        if (t1 < t2) t2 = t1;
-   }
-   fprintf(stderr, "CCM (no-precomp) \t%9"PRI64"u\n", t2/(ulong64)(MAC_SIZE*1024));
+#if defined(LTC_CCM_MODE)
+static void time_ccm(eac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x, z;
+   int err;
+   symmetric_ECB skey;
 
-   ecb_start(cipher_idx, key, 16, 0, &skey);
    t2 = -1;
    for (x = 0; x < 10000; x++) {
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = ccm_memory(cipher_idx, key, 16, &skey, IV, 16, NULL, 0, buf, MAC_SIZE*1024, buf, tag, &z, CCM_ENCRYPT)) != CRYPT_OK) {
+        if ((err = ccm_memory(ctx->cipher_idx, ctx->key, 16, NULL, ctx->IV, 16, NULL, 0, ctx->buf, ctx->size, ctx->buf, ctx->tag, &z, CCM_ENCRYPT)) != CRYPT_OK) {
            fprintf(stderr, "\nCCM error... %s\n", error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "CCM (precomp) \t\t%9"PRI64"u\n", t2/(ulong64)(MAC_SIZE*1024));
+   fprintf(stderr, "CCM (no-precomp) \t%9"PRI64"u\n", t2/(ulong64)(ctx->size));
+
+   ecb_start(ctx->cipher_idx, ctx->key, 16, 0, &skey);
+   t2 = -1;
+   for (x = 0; x < 10000; x++) {
+        t_start();
+        t1 = t_read();
+        z = 16;
+        if ((err = ccm_memory(ctx->cipher_idx, ctx->key, 16, &skey, ctx->IV, 16, NULL, 0, ctx->buf, ctx->size, ctx->buf, ctx->tag, &z, CCM_ENCRYPT)) != CRYPT_OK) {
+           fprintf(stderr, "\nCCM error... %s\n", error_to_string(err));
+           exit(EXIT_FAILURE);
+        }
+        t1 = t_read() - t1;
+        if (t1 < t2) t2 = t1;
+   }
+   fprintf(stderr, "CCM (precomp) \t\t%9"PRI64"u\n", t2/(ulong64)(ctx->size));
    ecb_done(&skey);
+}
 #endif
 
-#ifdef LTC_GCM_MODE
+#if defined (LTC_GCM_MODE)
+static void time_gcm(eac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x, z;
+   int err;
+   gcm_state gcm
+#ifdef LTC_GCM_TABLES_SSE2
+__attribute__ ((aligned (16)))
+#endif
+;
    t2 = -1;
    for (x = 0; x < 100; x++) {
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = gcm_memory(cipher_idx, key, 16, IV, 16, NULL, 0, buf, MAC_SIZE*1024, buf, tag, &z, GCM_ENCRYPT)) != CRYPT_OK) {
+        if ((err = gcm_memory(ctx->cipher_idx, ctx->key, 16, ctx->IV, 16, NULL, 0, ctx->buf, ctx->size, ctx->buf, ctx->tag, &z, GCM_ENCRYPT)) != CRYPT_OK) {
            fprintf(stderr, "\nGCM error... %s\n", error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "GCM (no-precomp)\t%9"PRI64"u\n", t2/(ulong64)(MAC_SIZE*1024));
+   fprintf(stderr, "GCM (no-precomp)\t%9"PRI64"u\n", t2/(ulong64)(ctx->size));
 
-   {
-   gcm_state gcm
-#ifdef LTC_GCM_TABLES_SSE2
-__attribute__ ((aligned (16)))
-#endif
-;
-
-   if ((err = gcm_init(&gcm, cipher_idx, key, 16)) != CRYPT_OK) { fprintf(stderr, "gcm_init: %s\n", error_to_string(err)); exit(EXIT_FAILURE); }
+   if ((err = gcm_init(&gcm, ctx->cipher_idx, ctx->key, 16)) != CRYPT_OK) { fprintf(stderr, "gcm_init: %s\n", error_to_string(err)); exit(EXIT_FAILURE); }
    t2 = -1;
    for (x = 0; x < 10000; x++) {
         t_start();
@@ -1331,7 +1417,7 @@ __attribute__ ((aligned (16)))
             fprintf(stderr, "\nGCM error[%d]... %s\n", __LINE__, error_to_string(err));
            exit(EXIT_FAILURE);
         }
-        if ((err = gcm_add_iv(&gcm, IV, 16)) != CRYPT_OK) {
+        if ((err = gcm_add_iv(&gcm, ctx->IV, 16)) != CRYPT_OK) {
             fprintf(stderr, "\nGCM error[%d]... %s\n", __LINE__, error_to_string(err));
            exit(EXIT_FAILURE);
         }
@@ -1339,36 +1425,45 @@ __attribute__ ((aligned (16)))
             fprintf(stderr, "\nGCM error[%d]... %s\n", __LINE__, error_to_string(err));
            exit(EXIT_FAILURE);
         }
-        if ((err = gcm_process(&gcm, buf, MAC_SIZE*1024, buf, GCM_ENCRYPT)) != CRYPT_OK) {
+        if ((err = gcm_process(&gcm, ctx->buf, ctx->size, ctx->buf, GCM_ENCRYPT)) != CRYPT_OK) {
             fprintf(stderr, "\nGCM error[%d]... %s\n", __LINE__, error_to_string(err));
            exit(EXIT_FAILURE);
         }
 
-        if ((err = gcm_done(&gcm, tag, &z)) != CRYPT_OK) {
+        if ((err = gcm_done(&gcm, ctx->tag, &z)) != CRYPT_OK) {
             fprintf(stderr, "\nGCM error[%d]... %s\n", __LINE__, error_to_string(err));
            exit(EXIT_FAILURE);
         }
         t1 = t_read() - t1;
         if (t1 < t2) t2 = t1;
    }
-   fprintf(stderr, "GCM (precomp)\t\t%9"PRI64"u\n", t2/(ulong64)(MAC_SIZE*1024));
-   }
+   fprintf(stderr, "GCM (precomp)\t\t%9"PRI64"u\n", t2/(ulong64)(ctx->size));
+}
 #endif
 
-#ifdef LTC_SIV_MODE
+#if defined(LTC_SIV_MODE)
+static void time_siv(eac_ctx *ctx)
+{
+   ulong64 t1, t2;
+   unsigned long x, z;
+   int err;
+   unsigned char *aad[4];
+   unsigned long buflen;
+
    for(z = 0; z < 4; z++) {
-      aad[z] = IV + z * 4;
+      aad[z] = ctx->IV + z * 4;
    }
    for(z = 0; z < 4; z++) {
       t2 = -1;
       for (x = 0; x < 10000; x++) {
-           buflen = MAC_SIZE*1024;
+           buflen = ctx->size;
            t_start();
            t1 = t_read();
-           if ((err = siv_memory(cipher_idx, LTC_ENCRYPT,
-                                 key, 32,
-                                 buf, MAC_SIZE*1024 - 16,
-                                 buf, &buflen,
+           if ((err = siv_memory(ctx->cipher_idx, LTC_ENCRYPT,
+                                 ctx->key, 32,
+                                 ctx->buf, ctx->size - 16,
+                                 ctx->buf, &buflen,
+                                 4 - z,
                                  aad[0], 16,
                                  aad[1], 12,
                                  aad[2], 8,
@@ -1381,11 +1476,64 @@ __attribute__ ((aligned (16)))
            if (t1 < t2) t2 = t1;
       }
       aad[3-z] = NULL;
-      fprintf(stderr, "SIV (%lu x AAD)\t\t%9"PRI64"u\n", 4-z, t2/(ulong64)(MAC_SIZE*1024));
+      fprintf(stderr, "SIV (%lu x AAD)\t\t%9"PRI64"u\n", 4-z, t2/(ulong64)(ctx->size));
    }
+}
 #endif
 
-   XFREE(buf);
+static void time_eacs_(unsigned long MAC_SIZE)
+{
+#if defined(LTC_EAX_MODE) || defined(LTC_OCB_MODE) || defined(LTC_OCB3_MODE) || \
+   defined(LTC_CCM_MODE) || defined(LTC_GCM_MODE) || defined(LTC_SIV_MODE)
+   eac_ctx ctx;
+   struct {
+      const char *name;
+      void (*time_fun)(eac_ctx*);
+   } time_funs[] = {
+#define TIME_FUN(n) { #n, time_ ## n }
+#ifdef LTC_EAX_MODE
+                    TIME_FUN(eax),
+#endif
+#ifdef LTC_OCB_MODE
+                    TIME_FUN(ocb),
+#endif
+#ifdef LTC_OCB3_MODE
+                    TIME_FUN(ocb3),
+#endif
+#ifdef LTC_CCM_MODE
+                    TIME_FUN(ccm),
+#endif
+#ifdef LTC_GCM_MODE
+                    TIME_FUN(gcm),
+#endif
+#ifdef LTC_SIV_MODE
+                    TIME_FUN(siv),
+#endif
+#undef TIME_FUN
+   };
+   unsigned long n;
+
+   fprintf(stderr, "\nENC+MAC Timings (zero byte AAD, 16 byte IV, cycles/byte on %luKB blocks):\n", MAC_SIZE);
+
+   ctx.size = MAC_SIZE*1024;
+   ctx.buf = XMALLOC(ctx.size);
+   if (ctx.buf == NULL) {
+      fprintf(stderr, "\n\nout of heap yo\n\n");
+      exit(EXIT_FAILURE);
+   }
+
+   ctx.cipher_idx = find_cipher("aes");
+
+   yarrow_read(ctx.buf, ctx.size, &yarrow_prng);
+   yarrow_read(ctx.key, sizeof(ctx.key), &yarrow_prng);
+   yarrow_read(ctx.IV, sizeof(ctx.IV), &yarrow_prng);
+
+   for (n = 0; n < LTC_ARRAY_SIZE(time_funs); ++n) {
+      if (!should_skip(time_funs[n].name))
+         time_funs[n].time_fun(&ctx);
+   }
+
+   XFREE(ctx.buf);
 #else
    LTC_UNUSED_PARAM(MAC_SIZE);
    fprintf(stderr, "NO ENCMACs\n");
@@ -1393,11 +1541,11 @@ __attribute__ ((aligned (16)))
 
 }
 
-static void time_encmacs(void)
+static void time_eacs(void)
 {
-   time_encmacs_(1);
-   time_encmacs_(4);
-   time_encmacs_(32);
+   time_eacs_(1);
+   time_eacs_(4);
+   time_eacs_(32);
 }
 
 static void LTC_NORETURN die(int status)
@@ -1434,7 +1582,7 @@ const struct
    LTC_TEST_FN(cipher_lrw),
    LTC_TEST_FN(hash),
    LTC_TEST_FN(macs),
-   LTC_TEST_FN(encmacs),
+   LTC_TEST_FN(eacs),
    LTC_TEST_FN(prng),
    LTC_TEST_FN(mult),
    LTC_TEST_FN(sqr),

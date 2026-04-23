@@ -28,6 +28,10 @@ int file_test(void)
    isha256 = find_hash("sha256");
    iaes = find_cipher("aes");
 
+   /* Suppress warnings when building with -DLTC_MINIMAL */
+   LTC_UNUSED_PARAM(iaes);
+   LTC_UNUSED_PARAM(key);
+
    len = sizeof(buf);
    if ((in = fopen(fname, "rb")) == NULL)                                       return CRYPT_FILE_NOTFOUND;
    err = hash_filehandle(isha256, in, buf, &len);

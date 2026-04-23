@@ -52,6 +52,7 @@ int mac_test(void)
 #endif
 #ifdef LTC_SIV_MODE
    DO(siv_test());
+   DO(siv_wycheproof_test());
 #endif
    return 0;
 }

@@ -56,6 +56,27 @@ int cipher_hash_test(void)
       DOX(hash_descriptor[x].test(), hash_descriptor[x].name);
    }
 
+   /* explicit SHA-NI + portable implementations tests */
+   if (shani_is_supported()) {
+#if defined(LTC_SHA256) && defined(LTC_SHA256_X86)
+      DO(sha256_x86_test());
+#endif
+#if defined(LTC_SHA224) && defined(LTC_SHA224_X86)
+      DO(sha224_x86_test());
+#endif
+#if defined(LTC_SHA1) && defined(LTC_SHA1_X86)
+      DO(sha1_x86_test());
+#endif
+   }
+#if defined(LTC_SHA256)
+      DO(sha256_c_test());
+#endif
+#if defined(LTC_SHA224)
+      DO(sha224_c_test());
+#endif
+#if defined(LTC_SHA1)
+      DO(sha1_c_test());
+#endif
 #ifdef LTC_SHA3
    /* SHAKE128 + SHAKE256 tests are a bit special */
    DOX(sha3_shake_test(), "sha3_shake");

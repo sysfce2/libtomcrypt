@@ -152,12 +152,12 @@ static size_t s_pkcs7_pad(union paddable *buf, size_t nb, int block_length,
 
    if(is_padding) {
       length = sizeof(buf->pad);
-      if (padding_pad(buf->pad, nb, &length, block_length) != CRYPT_OK)
+      if (padding_pad(buf->pad, nb, &length, LTC_PAD_PKCS7 | block_length) != CRYPT_OK)
          return 0;
       return length;
    } else {
       length = nb;
-      if (padding_depad(buf->pad, &length, 0) != CRYPT_OK)
+      if (padding_depad(buf->pad, &length, LTC_PAD_PKCS7) != CRYPT_OK)
          return 0;
       return length;
    }

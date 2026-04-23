@@ -396,6 +396,43 @@ static int s_rfc_8032_7_3_test(void)
    return CRYPT_OK;
 }
 
+static int s_signature_malleability_test(void)
+{
+   /* Wycheproof Ed25519 signature malleability test vectors. */
+   static const struct {
+      int tc_id;
+      const char *sig;
+   } test_cases[] = {
+      { 63, "7c38e026f29e14aabd059a0f2db8b0cd783040609a8be684db12f82a27774ab067654bce3832c2d76f8f6f5dafc08d9339d4eef676573336a5c51eb6f946b31d" },
+      { 64, "7c38e026f29e14aabd059a0f2db8b0cd783040609a8be684db12f82a27774ab05439412b5395d42f462c67008eba6ca839d4eef676573336a5c51eb6f946b32d" },
+      { 65, "7c38e026f29e14aabd059a0f2db8b0cd783040609a8be684db12f82a27774ab02ee12ce5875bf9dff26556464bae2ad239d4eef676573336a5c51eb6f946b34d" },
+      { 66, "7c38e026f29e14aabd059a0f2db8b0cd783040609a8be684db12f82a27774ab0e2300459f1e742404cd934d2c595a6253ad4eef676573336a5c51eb6f946b38d" },
+   };
+   const char *public_key = "7d4d0e7f6153a69b6242b522abbee685fda4420f8834b108c3bdae369ef549fa";
+   const char *message = "54657374";
+   unsigned long n, mlen, plen, siglen;
+   unsigned char msg[32], pub[32], sig[64];
+   curve25519_key key;
+   int ret;
+   const int should = 0;
+
+   plen = sizeof(pub);
+   DO(base16_decode(public_key, XSTRLEN(public_key), pub, &plen));
+   mlen = sizeof(msg);
+   DO(base16_decode(message, XSTRLEN(message), msg, &mlen));
+   DO(ed25519_import_raw(pub, plen, PK_PUBLIC, &key));
+
+   for (n = 0; n < LTC_ARRAY_SIZE(test_cases); ++n) {
+      siglen = sizeof(sig);
+      DO(base16_decode(test_cases[n].sig, XSTRLEN(test_cases[n].sig), sig, &siglen));
+      DO(ed25519_verify(msg, mlen, sig, siglen, &ret, &key));
+      COMPARE_TESTVECTOR(&ret, sizeof(ret), &should, sizeof(should), "Ed25519 malleability rejection", test_cases[n].tc_id);
+   }
+
+   zeromem(&key, sizeof(key));
+   return CRYPT_OK;
+}
+
 /**
   Test the ed25519 system
   @return CRYPT_OK if successful
@@ -421,6 +458,9 @@ int ed25519_test(void)
       return ret;
    }
    if ((ret = s_rfc_8032_7_3_test()) != CRYPT_OK) {
+      return ret;
+   }
+   if ((ret = s_signature_malleability_test()) != CRYPT_OK) {
       return ret;
    }
 

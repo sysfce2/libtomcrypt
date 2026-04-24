@@ -32,6 +32,9 @@ int cipher_hash_test(void)
 #ifdef LTC_CHACHA
    DO(chacha_test());
 #endif
+#ifdef LTC_XCHACHA20
+   DO(xchacha20_test());
+#endif
 #ifdef LTC_SALSA20
    DO(salsa20_test());
 #endif

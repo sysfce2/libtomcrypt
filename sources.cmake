@@ -518,6 +518,9 @@ src/stream/chacha/chacha_keystream.c
 src/stream/chacha/chacha_memory.c
 src/stream/chacha/chacha_setup.c
 src/stream/chacha/chacha_test.c
+src/stream/chacha/xchacha20_memory.c
+src/stream/chacha/xchacha20_setup.c
+src/stream/chacha/xchacha20_test.c
 src/stream/rabbit/rabbit.c
 src/stream/rabbit/rabbit_memory.c
 src/stream/rc4/rc4_stream.c

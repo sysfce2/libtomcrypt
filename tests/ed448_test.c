@@ -469,12 +469,17 @@ int ed448_test(void)
    DO(s_rfc_8032_5_2_6_ctx_test());
    DO(s_rfc_8032_5_2_6_ph_test());
    DO(s_signature_malleability_test());
-   if (ltc_mp.name != NULL) {
-      DO(s_ed448_compat_test());
-   }
+   return CRYPT_OK;
+}
+
+int ed448_mpi_test(void)
+{
+   if (ltc_mp.name == NULL) return CRYPT_NOP;
+   DO(s_ed448_compat_test());
    return CRYPT_OK;
 }
 
 #else
 LTC_NOP_TEST(ed448_test)
+LTC_NOP_TEST(ed448_mpi_test)
 #endif

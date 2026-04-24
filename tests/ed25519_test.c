@@ -446,27 +446,22 @@ int ed25519_test(void)
       return ret;
    }
 
-   if (ltc_mp.name == NULL) return CRYPT_NOP;
-
-   if ((ret = s_rfc_8410_10_test()) != CRYPT_OK) {
-      return ret;
-   }
-   if ((ret = s_rfc_8032_7_1_test()) != CRYPT_OK) {
-      return ret;
-   }
-   if ((ret = s_rfc_8032_7_2_test()) != CRYPT_OK) {
-      return ret;
-   }
-   if ((ret = s_rfc_8032_7_3_test()) != CRYPT_OK) {
-      return ret;
-   }
-   if ((ret = s_signature_malleability_test()) != CRYPT_OK) {
-      return ret;
-   }
+   DO(s_rfc_8032_7_1_test());
+   DO(s_rfc_8032_7_2_test());
+   DO(s_rfc_8032_7_3_test());
+   DO(s_signature_malleability_test());
 
    return ret;
 }
 
+int ed25519_mpi_test(void)
+{
+   if (ltc_mp.name == NULL) return CRYPT_NOP;
+   DO(s_rfc_8410_10_test());
+   return CRYPT_OK;
+}
+
 #else
 LTC_NOP_TEST(ed25519_test)
+LTC_NOP_TEST(ed25519_mpi_test)
 #endif

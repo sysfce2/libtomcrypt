@@ -34,6 +34,8 @@ static const test_function test_functions[] =
       LTC_TEST_FN(dsa_test),
       LTC_TEST_FN(ed25519_test),
       LTC_TEST_FN(x25519_test),
+      LTC_TEST_FN(ed448_test),
+      LTC_TEST_FN(x448_test),
       LTC_TEST_FN(file_test),
       LTC_TEST_FN(multi_test),
       LTC_TEST_FN(pem_test),

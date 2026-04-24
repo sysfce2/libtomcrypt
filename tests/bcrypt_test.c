@@ -136,11 +136,5 @@ int bcrypt_test(void)
 }
 
 #else
-
-
-int bcrypt_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(bcrypt_test)
 #endif

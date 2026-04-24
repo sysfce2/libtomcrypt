@@ -56,11 +56,6 @@ int pkcs_1_emsa_test(void)
 }
 
 #else
-
-int pkcs_1_emsa_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(pkcs_1_emsa_test)
 #endif
 

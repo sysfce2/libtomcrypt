@@ -476,10 +476,5 @@ int ed448_test(void)
 }
 
 #else
-
-int ed448_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(ed448_test)
 #endif

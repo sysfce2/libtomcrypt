@@ -62,11 +62,6 @@ int pkcs_1_oaep_test(void)
 }
 
 #else
-
-int pkcs_1_oaep_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(pkcs_1_oaep_test)
 #endif
 

@@ -397,10 +397,5 @@ int dh_test(void)
 }
 
 #else
-
-int dh_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(dh_test)
 #endif

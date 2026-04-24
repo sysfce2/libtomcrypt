@@ -9,6 +9,8 @@
   Steffen Jaeckel
 */
 
+LTC_NOP_TEST(nop_test)
+
 void run_cmd(int res, int line, const char *file, const char *cmd, const char *algorithm)
 {
    if (res != CRYPT_OK) {

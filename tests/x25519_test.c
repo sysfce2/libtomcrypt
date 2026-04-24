@@ -248,10 +248,5 @@ int x25519_test(void)
 }
 
 #else
-
-int x25519_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(x25519_test)
 #endif

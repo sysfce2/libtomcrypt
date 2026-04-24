@@ -202,10 +202,5 @@ int pem_test(void)
 }
 
 #else
-
-int pem_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(pem_test)
 #endif

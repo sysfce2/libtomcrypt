@@ -736,54 +736,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="ocb"
-				>
-				<File
-					RelativePath="src\encauth\ocb\ocb_decrypt.c"
-					>
-				</File>
-				<File
-					RelativePath="src\encauth\ocb\ocb_decrypt_verify_memory.c"
-					>
-				</File>
-				<File
-					RelativePath="src\encauth\ocb\ocb_done_decrypt.c"
-					>
-				</File>
-				<File
-					RelativePath="src\encauth\ocb\ocb_done_encrypt.c"
-					>
-				</File>
-				<File
-					RelativePath="src\encauth\ocb\ocb_encrypt.c"
-					>
-				</File>
-				<File
-					RelativePath="src\encauth\ocb\ocb_encrypt_authenticate_memory.c"
-					>
-				</File>
-				<File
-					RelativePath="src\encauth\ocb\ocb_init.c"
-					>
-				</File>
-				<File
-					RelativePath="src\encauth\ocb\ocb_ntz.c"
-					>
-				</File>
-				<File
-					RelativePath="src\encauth\ocb\ocb_shift_xor.c"
-					>
-				</File>
-				<File
-					RelativePath="src\encauth\ocb\ocb_test.c"
-					>
-				</File>
-				<File
-					RelativePath="src\encauth\ocb\s_ocb_done.c"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="ocb3"
 				>
 				<File

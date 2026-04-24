@@ -1296,29 +1296,6 @@ static void time_eax(eac_ctx *ctx)
 }
 #endif
 
-#if defined(LTC_OCB_MODE)
-static void time_ocb(eac_ctx *ctx)
-{
-   ulong64 t1, t2;
-   unsigned long x, z;
-   int err;
-
-   t2 = -1;
-   for (x = 0; x < 10000; x++) {
-        t_start();
-        t1 = t_read();
-        z = 16;
-        if ((err = ocb_encrypt_authenticate_memory(ctx->cipher_idx, ctx->key, 16, ctx->IV, ctx->buf, ctx->size, ctx->buf, ctx->tag, &z)) != CRYPT_OK) {
-           fprintf(stderr, "\nOCB error... %s\n", error_to_string(err));
-           exit(EXIT_FAILURE);
-        }
-        t1 = t_read() - t1;
-        if (t1 < t2) t2 = t1;
-   }
-   fprintf(stderr, "OCB \t\t\t%9"PRI64"u\n", t2/(ulong64)(ctx->size));
-}
-#endif
-
 #if defined(LTC_OCB3_MODE)
 static void time_ocb3(eac_ctx *ctx)
 {
@@ -1483,7 +1460,7 @@ static void time_siv(eac_ctx *ctx)
 
 static void time_eacs_(unsigned long MAC_SIZE)
 {
-#if defined(LTC_EAX_MODE) || defined(LTC_OCB_MODE) || defined(LTC_OCB3_MODE) || \
+#if defined(LTC_EAX_MODE) || defined(LTC_OCB3_MODE) || \
    defined(LTC_CCM_MODE) || defined(LTC_GCM_MODE) || defined(LTC_SIV_MODE)
    eac_ctx ctx;
    struct {
@@ -1493,9 +1470,6 @@ static void time_eacs_(unsigned long MAC_SIZE)
 #define TIME_FUN(n) { #n, time_ ## n }
 #ifdef LTC_EAX_MODE
                     TIME_FUN(eax),
-#endif
-#ifdef LTC_OCB_MODE
-                    TIME_FUN(ocb),
 #endif
 #ifdef LTC_OCB3_MODE
                     TIME_FUN(ocb3),

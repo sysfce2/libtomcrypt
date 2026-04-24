@@ -305,7 +305,6 @@
 
 #define LTC_EAX_MODE
 
-#define LTC_OCB_MODE
 #define LTC_OCB3_MODE
 #define LTC_CCM_MODE
 #define LTC_GCM_MODE
@@ -753,7 +752,7 @@
    #error LTC_ECB_MODE not defined, but all other modes depend on it
 #endif
 #if defined(LTC_OMAC) || defined(LTC_PMAC) || defined(LTC_XCBC) || defined(LTC_F9_MODE) || defined(LTC_EAX_MODE) || \
-    defined(LTC_OCB_MODE) || defined(LTC_OCB3_MODE) || defined(LTC_CCM_MODE) || defined(LTC_GCM_MODE) )
+    defined(LTC_OCB3_MODE) || defined(LTC_CCM_MODE) || defined(LTC_GCM_MODE) )
    #error LTC_ECB_MODE not defined, but most MAC and AEAD modes depend on it
 #endif
 #endif

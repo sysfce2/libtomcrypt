@@ -630,11 +630,11 @@ int ltc_ecc_fp_mulmod(const void *k, const ecc_point *G, ecc_point *R, const voi
 /* functions for saving/loading/freeing/adding to fixed point cache */
 int ltc_ecc_fp_save_state(unsigned char **out, unsigned long *outlen);
 int ltc_ecc_fp_restore_state(unsigned char *in, unsigned long inlen);
-void ltc_ecc_fp_free(void);
+int ltc_ecc_fp_free(void);
 int ltc_ecc_fp_add_point(const ecc_point *g, const void *ma, const void *modulus, int lock);
 
 /* lock/unlock all points currently in fixed point cache */
-void ltc_ecc_fp_tablelock(int lock);
+int ltc_ecc_fp_tablelock(int lock);
 #endif
 
 /* R = kG */

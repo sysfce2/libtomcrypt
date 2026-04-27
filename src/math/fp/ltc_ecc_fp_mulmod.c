@@ -1332,11 +1332,12 @@ static void s_ltc_ecc_fp_free_cache(void)
 }
 
 /** Free the Fixed Point cache */
-void ltc_ecc_fp_free(void)
+int ltc_ecc_fp_free(void)
 {
    LTC_MUTEX_LOCK(&ltc_ecc_fp_lock);
    s_ltc_ecc_fp_free_cache();
    LTC_MUTEX_UNLOCK(&ltc_ecc_fp_lock);
+   return CRYPT_OK;
 }
 
 /** Add a point to the cache and initialize the LUT
@@ -1405,7 +1406,7 @@ LBL_ERR:
 /** Prevent/permit the FP cache from being updated
     @param flag        If flag is 0, remove cache lock (unlock), otherwise lock it
 */
-void ltc_ecc_fp_tablelock(int lock)
+int ltc_ecc_fp_tablelock(int lock)
 {
    int i;
 
@@ -1414,6 +1415,7 @@ void ltc_ecc_fp_tablelock(int lock)
       fp_cache[i].lock = lock;
    }
    LTC_MUTEX_UNLOCK(&ltc_ecc_fp_lock);
+   return CRYPT_OK;
 }
 
 /** Export the current cache as a binary packet

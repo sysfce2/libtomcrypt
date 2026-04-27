@@ -1037,14 +1037,20 @@ static void der_Xcode_test(void)
    ltc_mp_clear(mpinteger);
 }
 
-#ifdef LTC_TEST_READDIR
 static int s_der_decode_sequence_flexi(const void *in, unsigned long inlen, void* ctx)
 {
+   int err;
    ltc_asn1_list** list = ctx;
-   if (der_decode_sequence_flexi(in, &inlen, list) == CRYPT_OK) {
+   if ((err = der_decode_sequence_flexi(in, &inlen, list)) == CRYPT_OK) {
       s_der_tests_print_flexi(*list);
       der_sequence_free(*list);
    }
+   return err;
+}
+#ifdef LTC_TEST_READDIR
+static int s_der_decode_sequence_flexi_always_OK(const void *in, unsigned long inlen, void* ctx)
+{
+   s_der_decode_sequence_flexi(in, inlen, ctx);
    return CRYPT_OK;
 }
 #endif
@@ -1291,6 +1297,30 @@ static void s_der_recursion_limit(void)
    }
 }
 
+static void s_der_issue743(void)
+{
+   const unsigned char tests_asn1_0x028101FF_der[] = {
+     0x02, 0x81, 0x01, 0xff
+   };
+   const unsigned char tests_asn1_0x0500FF_der[] = {
+     0x05, 0x00, 0xff
+   };
+   const struct {
+      const unsigned char *d;
+      unsigned long l;
+   } test_cases[] = {
+#define TEST_CASE(n) { n, sizeof(n) }
+                     TEST_CASE(tests_asn1_0x028101FF_der),
+                     TEST_CASE(tests_asn1_0x0500FF_der),
+#undef TEST_CASE
+   };
+   unsigned long n;
+   ltc_asn1_list *asn1 = NULL;
+   for (n = 0; n < LTC_ARRAY_SIZE(test_cases); ++n) {
+      SHOULD_FAIL(s_der_decode_sequence_flexi(test_cases[n].d, test_cases[n].l, &asn1));
+   }
+}
+
 int der_test(void)
 {
    unsigned long x, y, z, zz, oid[2][32];
@@ -1332,12 +1362,14 @@ int der_test(void)
 
    if (ltc_mp.name == NULL) return CRYPT_NOP;
 
+   s_der_issue743();
+
    s_der_recursion_limit();
 
    der_Xcode_test();
 
 #ifdef LTC_TEST_READDIR
-   DO(test_process_dir("tests/asn1", &list, s_der_decode_sequence_flexi, NULL, NULL, "DER ASN.1 special cases"));
+   DO(test_process_dir("tests/asn1", &list, s_der_decode_sequence_flexi_always_OK, NULL, NULL, "DER ASN.1 special cases"));
 #endif
 
    der_custom_test();

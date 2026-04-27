@@ -930,7 +930,7 @@ static void time_ecc(void)
 #ifdef LTC_ECC_SECP384R1
 384/8,
 #endif
-#ifdef LTC_ECC_SECP512R1
+#ifdef LTC_ECC_SECP521R1
 521/8,
 #endif
 100000};

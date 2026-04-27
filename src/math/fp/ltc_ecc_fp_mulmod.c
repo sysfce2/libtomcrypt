@@ -909,8 +909,8 @@ static int ss_accel_fp_mul2add(int idx1, int idx2,
                             ecc_point *R, const void *a, const void *modulus, void *mp)
 {
    unsigned char kb[2][128];
-   int      x;
-   unsigned y, z, err, bitlen, bitpos, lut_gap, first, zA, zB;
+   long     x, y;
+   unsigned z, err, bitlen, bitpos, lut_gap, first, zA, zB;
    void     *tka, *tkb, *order;
 
    /* if it's smaller than modulus we fine */
@@ -1002,7 +1002,7 @@ static int ss_accel_fp_mul2add(int idx1, int idx2,
    if (tka != kA) {
       ltc_mp_clear(tka);
    }
-   while ((unsigned)x < y) {
+   while (x < y) {
       z = kb[0][x]; kb[0][x] = kb[0][y]; kb[0][y] = z;
       ++x; --y;
    }

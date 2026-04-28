@@ -405,14 +405,14 @@ int sha256_done(hash_state * md, unsigned char *out);
 int sha256_test(void);
 extern const struct ltc_hash_descriptor sha256_desc;
 
-int sha256_c_init(hash_state * md);
+#define sha256_c_init sha256_init
 int sha256_c_process(hash_state * md, const unsigned char *in, unsigned long inlen);
 int sha256_c_done(hash_state * md, unsigned char *out);
 int sha256_c_test(void);
 extern const struct ltc_hash_descriptor sha256_portable_desc;
 
 #ifdef LTC_SHA256_X86
-int sha256_x86_init(hash_state * md);
+#define sha256_x86_init sha256_init
 int sha256_x86_process(hash_state * md, const unsigned char *in, unsigned long inlen);
 int sha256_x86_done(hash_state * md, unsigned char *out);
 int sha256_x86_test(void);
@@ -430,14 +430,14 @@ int sha224_done(hash_state * md, unsigned char *out);
 int sha224_test(void);
 extern const struct ltc_hash_descriptor sha224_desc;
 
-int sha224_c_init(hash_state * md);
+#define sha224_c_init sha224_init
 #define sha224_c_process sha256_c_process
 int sha224_c_done(hash_state * md, unsigned char *out);
 int sha224_c_test(void);
 extern const struct ltc_hash_descriptor sha224_portable_desc;
 
 #ifdef LTC_SHA224_X86
-int sha224_x86_init(hash_state * md);
+#define sha224_x86_init sha224_init
 #define sha224_x86_process sha256_x86_process
 int sha224_x86_done(hash_state * md, unsigned char *out);
 int sha224_x86_test(void);
@@ -452,14 +452,14 @@ int sha1_done(hash_state * md, unsigned char *out);
 int sha1_test(void);
 extern const struct ltc_hash_descriptor sha1_desc;
 
-int sha1_c_init(hash_state * md);
+#define sha1_c_init sha1_init
 int sha1_c_process(hash_state * md, const unsigned char *in, unsigned long inlen);
 int sha1_c_done(hash_state * md, unsigned char *out);
 int sha1_c_test(void);
 extern const struct ltc_hash_descriptor sha1_portable_desc;
 
 #ifdef LTC_SHA1_X86
-int sha1_x86_init(hash_state * md);
+#define sha1_x86_init sha1_init
 int sha1_x86_process(hash_state * md, const unsigned char *in, unsigned long inlen);
 int sha1_x86_done(hash_state * md, unsigned char *out);
 int sha1_x86_test(void);

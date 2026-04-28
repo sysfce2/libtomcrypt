@@ -89,12 +89,19 @@ static LTC_INLINE int s_sha224_x86_is_supported(void)
 */
 int sha224_init(hash_state * md)
 {
-#if defined LTC_SHA224_X86
-    if(s_sha224_x86_is_supported()) {
-        return sha224_x86_init(md);
-    }
-#endif
-    return sha224_c_init(md);
+   LTC_ARGCHK(md != NULL);
+
+   md->sha256.curlen = 0;
+   md->sha256.length = 0;
+   md->sha256.state[0] = 0xc1059ed8UL;
+   md->sha256.state[1] = 0x367cd507UL;
+   md->sha256.state[2] = 0x3070dd17UL;
+   md->sha256.state[3] = 0xf70e5939UL;
+   md->sha256.state[4] = 0xffc00b31UL;
+   md->sha256.state[5] = 0x68581511UL;
+   md->sha256.state[6] = 0x64f98fa7UL;
+   md->sha256.state[7] = 0xbefa4fa4UL;
+   return CRYPT_OK;
 }
 
 /**

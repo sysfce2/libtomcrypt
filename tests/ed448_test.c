@@ -382,6 +382,51 @@ static int s_rfc_8032_5_2_6_ph_test(void)
    return CRYPT_OK;
 }
 
+/* Wycheproof ed448_test.json tcId=63/64/65 signature malleability vectors */
+static int s_signature_malleability_test(void)
+{
+   static const struct {
+      int tc_id;
+      const char *sig;
+   } test_cases[] = {
+      { 63,
+        "5db94c53101f521f6c1f43b60ea4d7e06fbd49c2e8afaf4fcc289e645e0880a87b8e55858df4cf2291a7303ffda446b82a117b4dd408cff2811adf92201088e0"
+        "51ee48b57aecf46edfc68e5baeed5ae4910ba5681d370f75ab593811e18293ef0808581c254196bcbf2b4c454136a6711b00"
+      },
+      { 64,
+        "5db94c53101f521f6c1f43b60ea4d7e06fbd49c2e8afaf4fcc289e645e0880a87b8e55858df4cf2291a7303ffda446b82a117b4dd408cff2825e06c3999e8308"
+        "be439c40940b0075d3e4f65147c1608cbe6e9c432e33bed6686f9393ae2568f0ad60febcb4b6179c0d90d034e7c3c4681000"
+      },
+      { 65,
+        "5db94c53101f521f6c1f43b60ea4d7e06fbd49c2e8afaf4fcc289e645e0880a87b8e55858df4cf2291a7303ffda446b82a117b4dd408cff2c02456bbd141df04"
+        "8dbf1843be6d5fef402483314c2af547b361a09f3319489eaede43404df9faf634c1298d678b5261c808b0be3726013e3900"
+      },
+   };
+   const char *public_key = "419610a534af127f583b04818cdb7f0ff300b025f2e01682bcae33fd691cee039511df0cddc690ee978426e8b38e50ce5af7dcfba50f704c00";
+   const char *message = "313233343030";
+   unsigned long n, mlen, plen, siglen;
+   unsigned char msg[8], pub[57], sig[114];
+   curve448_key key;
+   int ret;
+   const int should = 0;
+
+   plen = sizeof(pub);
+   DO(base16_decode(public_key, XSTRLEN(public_key), pub, &plen));
+   mlen = sizeof(msg);
+   DO(base16_decode(message, XSTRLEN(message), msg, &mlen));
+   DO(ed448_import_raw(pub, plen, PK_PUBLIC, &key));
+
+   for (n = 0; n < LTC_ARRAY_SIZE(test_cases); ++n) {
+      siglen = sizeof(sig);
+      DO(base16_decode(test_cases[n].sig, XSTRLEN(test_cases[n].sig), sig, &siglen));
+      DO(ed448_verify(msg, mlen, sig, siglen, &ret, &key));
+      COMPARE_TESTVECTOR(&ret, sizeof(ret), &should, sizeof(should), "Ed448 malleability rejection", test_cases[n].tc_id);
+   }
+
+   zeromem(&key, sizeof(key));
+   return CRYPT_OK;
+}
+
 /* Export/import round-trip for Ed448 (requires MPI for DER/PKCS8) */
 static int s_ed448_compat_test(void)
 {
@@ -423,6 +468,7 @@ int ed448_test(void)
    DO(s_rfc_8032_5_2_6_pure_test());
    DO(s_rfc_8032_5_2_6_ctx_test());
    DO(s_rfc_8032_5_2_6_ph_test());
+   DO(s_signature_malleability_test());
    if (ltc_mp.name != NULL) {
       DO(s_ed448_compat_test());
    }

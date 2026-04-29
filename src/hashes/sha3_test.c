@@ -419,7 +419,7 @@ static LTC_INLINE int s_turbo_shake_test_one(const turbo_shake_test_case *testca
    unsigned long offset;
    unsigned long rem;
    unsigned long count;
-   unsigned char input[1024];
+   unsigned char input[1024] = {0};
    unsigned char digest[64];
    const char *expected_hex;
    unsigned char expected_digest_bin[sizeof(digest)];
@@ -523,7 +523,7 @@ static LTC_INLINE int s_kangaroo_twelve_test_one(const kangaroo_twelve_test_case
    unsigned long offset;
    unsigned long rem;
    unsigned long count;
-   unsigned char input[1024];
+   unsigned char input[1024] = {0};
    unsigned char digest[64];
    const char *expected_hex;
    unsigned char expected_digest_bin[sizeof(digest)];

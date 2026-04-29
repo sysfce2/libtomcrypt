@@ -353,7 +353,7 @@ static int s_ecc_wycheproof_p256_pem_invalid_explicit(void)
       "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCBPNBTRWJtJ9xctQ5y7\n"
       "545bU1Dchd6kDNLWJ0dAxuAjnA==\n"
       "-----END PRIVATE KEY-----\n";
-   /* tcId=352 — WrongOrder (order = -secp256r1.order) */
+   /* tcId=352 WrongOrder (order = -secp256r1.order) */
    static const char pub_pem[] =
       "-----BEGIN PUBLIC KEY-----\n"
       "MIIBMzCB7AYHKoZIzj0CATCB4AIBATAsBgcqhkjOPQEBAiEA/////wAAAAEAAAAA\n"

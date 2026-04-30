@@ -215,6 +215,30 @@ int padding_test(void)
       SHOULD_FAIL(padding_depad(data, &len, (LTC_PAD_PKCS7 | 16)));
    }
 
+   /* zero-length input must be rejected for every mode except LTC_PAD_ZERO */
+   {
+      const unsigned long modes[] = {
+         LTC_PAD_PKCS7 | 16,
+#ifdef LTC_RNG_GET_BYTES
+         LTC_PAD_ISO_10126 | 16,
+#endif
+         LTC_PAD_ANSI_X923 | 16,
+         LTC_PAD_SSH | 16,
+         LTC_PAD_ONE_AND_ZERO | 16,
+         LTC_PAD_ZERO_ALWAYS | 16,
+      };
+      unsigned char dummy = 0;
+      unsigned long zlen, j;
+      for (j = 0; j < LTC_ARRAY_SIZE(modes); ++j) {
+         zlen = 0;
+         SHOULD_FAIL(padding_depad(&dummy, &zlen, modes[j]));
+      }
+      /* LTC_PAD_ZERO with len=0 must round-trip to len=0 (CRYPT_OK). */
+      zlen = 0;
+      DO(padding_depad(&dummy, &zlen, LTC_PAD_ZERO | 16));
+      DO(EQ(zlen, 0));
+   }
+
    return CRYPT_OK;
 }
 #endif

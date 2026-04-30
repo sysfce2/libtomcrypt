@@ -175,6 +175,23 @@ static int s_x448_keygen_dh_test(void)
    return CRYPT_OK;
 }
 
+/* Wycheproof x448_test.json tcId=22 (Twist + SpecialPublicKey) */
+static int s_x448_wycheproof_special_test(void)
+{
+   const char *priv_hex = "8c37fb35eac1dbda6a3b5bf492c1f642c761be3adf0ab7617a66002576c45bba8202970bae6c5e05f645f5439ca2f42b89dacace1a5d0e82";
+   const char *pub_hex  = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000040";
+   const char *exp_hex  = "60c468df97e2e4427f27420cc6bc9eebaa2bceb827eb55a187fc5c29555e72a663243f6af4095641d72caeacb369720ea18cadd6efdbece6";
+   unsigned char priv[56], pub[56], expected[56], out[56];
+   unsigned long len;
+
+   len = sizeof(priv);     DO(base16_decode(priv_hex, XSTRLEN(priv_hex), priv, &len));
+   len = sizeof(pub);      DO(base16_decode(pub_hex,  XSTRLEN(pub_hex),  pub,  &len));
+   len = sizeof(expected); DO(base16_decode(exp_hex,  XSTRLEN(exp_hex),  expected, &len));
+   ec448_scalarmult_internal(out, priv, pub);
+   COMPARE_TESTVECTOR(out, 56, expected, 56, "X448 Wycheproof tcId=22", 22);
+   return CRYPT_OK;
+}
+
 /* Export/import round-trip (requires MPI for DER/PKCS8) */
 static int s_x448_compat_test(void)
 {
@@ -215,6 +232,7 @@ int x448_test(void)
    DO(s_x448_rfc7748_scalarmult_test());
    DO(s_x448_rfc7748_iter_test());
    DO(s_x448_keygen_dh_test());
+   DO(s_x448_wycheproof_special_test());
    if (ltc_mp.name != NULL) {
       DO(s_x448_compat_test());
    }

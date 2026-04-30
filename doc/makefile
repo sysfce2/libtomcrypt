@@ -59,5 +59,5 @@ termdoc: docdvi
 	dvi2tty crypt.dvi -w120
 
 clean:
-	rm -f $(LEFTOVERS)
-	rm -rf doxygen/
+	${silent} rm -f $(LEFTOVERS)
+	${silent} rm -rf doxygen/

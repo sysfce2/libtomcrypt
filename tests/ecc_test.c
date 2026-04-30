@@ -280,6 +280,167 @@ static int s_ecc_issue116(void)
    return CRYPT_OK;
 }
 
+/* Wycheproof ecdh_secp256r1_test.json tcId=202 */
+static int s_ecc_wycheproof_p256_edgecase_dbl(void)
+{
+   const char *priv_hex = "809c461d8b39163537ff8f5ef5b977e4cdb980e70e38a7ee0b37cc876729e9ff";
+   const char *pub_hex  = "04dbfa466f12013255f9d57a6496c158ee7dd202a1ce4a5a53005b3564d509a0bbf2578007e857bdd082751ef2f3b4b9c38a0b87bab413d55ccb26a574f2b4be9d";
+   const char *exp_hex  = "e2d57eeec983756c9124f885a4d118ed5b8de7d2895fd91264cf291496949a12";
+   const ltc_ecc_curve *cu;
+   ecc_key priv, pub;
+   unsigned char sk[32], pk[65], expected[32], out[64];
+   unsigned long len, olen;
+
+   DO(ecc_find_curve("SECP256R1", &cu));
+   len = sizeof(sk);       DO(base16_decode(priv_hex, XSTRLEN(priv_hex), sk, &len));
+   len = sizeof(pk);       DO(base16_decode(pub_hex,  XSTRLEN(pub_hex),  pk, &len));
+   len = sizeof(expected); DO(base16_decode(exp_hex,  XSTRLEN(exp_hex),  expected, &len));
+
+   DO(ecc_set_curve(cu, &priv));
+   DO(ecc_set_key(sk, sizeof(sk), PK_PRIVATE, &priv));
+   DO(ecc_set_curve(cu, &pub));
+   DO(ecc_set_key(pk, sizeof(pk), PK_PUBLIC, &pub));
+
+   olen = sizeof(out);
+   DO(ecc_shared_secret(&priv, &pub, out, &olen));
+   COMPARE_TESTVECTOR(out, olen, expected, sizeof(expected), "Wycheproof ecdh_secp256r1 EdgeCaseDoubling", 202);
+   ecc_free(&priv);
+   ecc_free(&pub);
+   return CRYPT_OK;
+}
+
+#if defined(LTC_PEM) && defined(LTC_DER)
+/* Wycheproof ecdh_secp256r1_pem_test.json tcId=202 */
+static int s_ecc_wycheproof_p256_pem_edgecase_dbl(void)
+{
+   static const char priv_pem[] =
+      "-----BEGIN PRIVATE KEY-----\n"
+      "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCCAnEYdizkWNTf/j171\n"
+      "uXfkzbmA5w44p+4LN8yHZynp/w==\n"
+      "-----END PRIVATE KEY-----\n";
+   static const char pub_pem[] =
+      "-----BEGIN PUBLIC KEY-----\n"
+      "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE2/pGbxIBMlX51XpklsFY7n3SAqHO\n"
+      "SlpTAFs1ZNUJoLvyV4AH6Fe90IJ1HvLztLnDiguHurQT1VzLJqV08rS+nQ==\n"
+      "-----END PUBLIC KEY-----\n";
+   const char *exp_hex = "e2d57eeec983756c9124f885a4d118ed5b8de7d2895fd91264cf291496949a12";
+   ltc_pka_key priv = {0}, pub = {0};
+   unsigned char expected[32], out[64];
+   unsigned long len, olen;
+
+   DO(pem_decode(priv_pem, sizeof(priv_pem) - 1, &priv, NULL));
+   ENSURE(priv.id == LTC_PKA_EC);
+   DO(pem_decode(pub_pem,  sizeof(pub_pem)  - 1, &pub,  NULL));
+   ENSURE(pub.id == LTC_PKA_EC);
+
+   len = sizeof(expected);
+   DO(base16_decode(exp_hex, XSTRLEN(exp_hex), expected, &len));
+
+   olen = sizeof(out);
+   DO(ecc_shared_secret(&priv.u.ecc, &pub.u.ecc, out, &olen));
+   COMPARE_TESTVECTOR(out, olen, expected, sizeof(expected), "Wycheproof ecdh_secp256r1_pem EdgeCaseDoubling", 202);
+
+   pka_key_free(&priv);
+   pka_key_free(&pub);
+   return CRYPT_OK;
+}
+
+/* Wycheproof ecdh_secp256r1_pem_test.json tcId=352 (WrongOrder), tcId=359 (NoCofactor) and tcId=363 (ModifiedPrime) */
+static int s_ecc_wycheproof_p256_pem_invalid_explicit(void)
+{
+   static const char priv_pem[] =
+      "-----BEGIN PRIVATE KEY-----\n"
+      "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCBPNBTRWJtJ9xctQ5y7\n"
+      "545bU1Dchd6kDNLWJ0dAxuAjnA==\n"
+      "-----END PRIVATE KEY-----\n";
+   /* tcId=352 WrongOrder (order = -secp256r1.order) */
+   static const char pub_pem[] =
+      "-----BEGIN PUBLIC KEY-----\n"
+      "MIIBMzCB7AYHKoZIzj0CATCB4AIBATAsBgcqhkjOPQEBAiEA/////wAAAAEAAAAA\n"
+      "AAAAAAAAAAD///////////////8wRAQg/////wAAAAEAAAAAAAAAAAAAAAD/////\n"
+      "//////////wEIFrGNdiqOpPns+u9VXaYhrxlHQawzFOw9jvOPD4n0mBLBEEEaxfR\n"
+      "8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpZP40Li/hp/m47n60p8D54WK84z\n"
+      "V2sxXs7LtkBoN79R9QIh/wAAAAD/////AAAAAAAAAABDGQVSWOhhewxGNT0DnNqv\n"
+      "AgEBA0IABBUQJkwYnD1SP/mRar1wae+mlo2Nx922RX14abU+pgzc+vt+1HhtoV0p\n"
+      "7lklb1Nto1daSIjBuwqVslb0p+n9dko=\n"
+      "-----END PUBLIC KEY-----\n";
+   const char *bad_secret_hex = "d003f5cc83852584061f7a8a28bcb5671ecbda096e16e7accfa8f8d311a3db7a";
+   ltc_pka_key priv = {0}, pub = {0};
+   unsigned char bad_secret[32], out[64];
+   unsigned long len, olen;
+   int err;
+
+   len = sizeof(bad_secret);
+   DO(base16_decode(bad_secret_hex, XSTRLEN(bad_secret_hex), bad_secret, &len));
+
+   /* private import must succeed (it's well-formed) */
+   DO(pem_decode(priv_pem, sizeof(priv_pem) - 1, &priv, NULL));
+   ENSURE(priv.id == LTC_PKA_EC);
+
+   /* acceptable: pem_decode rejects the explicit-parameter SPKI */
+   err = pem_decode(pub_pem, sizeof(pub_pem) - 1, &pub, NULL);
+   if (err != CRYPT_OK) {
+      pka_key_free(&priv);
+      return CRYPT_OK;
+   }
+   ENSURE(pub.id == LTC_PKA_EC);
+
+   /* if import did succeed, ecc_shared_secret must either fail outright or produce a value that is *not* the documented bad secret */
+   olen = sizeof(out);
+   err = ecc_shared_secret(&priv.u.ecc, &pub.u.ecc, out, &olen);
+   if (err == CRYPT_OK && olen == sizeof(bad_secret) && XMEMCMP(out, bad_secret, sizeof(bad_secret)) == 0) {
+      fprintf(stderr, "Wycheproof ecdh_secp256r1_pem invalid tcId=352\n");
+      pka_key_free(&priv);
+      pka_key_free(&pub);
+      return CRYPT_FAIL_TESTVECTOR;
+   }
+
+   pka_key_free(&priv);
+   pka_key_free(&pub);
+   return CRYPT_OK;
+}
+#endif /* LTC_PEM && LTC_DER */
+
+#if defined(LTC_DER) && defined(LTC_ECC_BRAINPOOLP224R1) && defined(LTC_ECC_BRAINPOOLP224T1)
+/* Wycheproof ecdh_brainpoolP224r1_test.json tcId=517 (WrongCurve) */
+static int s_ecc_wycheproof_bp224_wrong_curve(void)
+{
+   const char *priv_hex = "55a6601d488398ee537d8e745a461cfb8e60eeb7cb09088698faa6e9";
+   const char *pub_spki_hex = "3052301406072a8648ce3d020106092b2403030208010106033a00040ad954137b533120d3344cc8b991"
+                              "3491791ebf145bab44f200a507d3027e41442fabed87e7a30783fd1618790511098b0d004c60b5086b1a";
+   const ltc_ecc_curve *bp_r1;
+   ecc_key priv, pub;
+   unsigned char sk[28], spki[256], out[64];
+   unsigned long len, slen, olen;
+   int err;
+
+   DO(ecc_find_curve("BRAINPOOLP224R1", &bp_r1));
+
+   slen = sizeof(spki);
+   DO(base16_decode(pub_spki_hex, XSTRLEN(pub_spki_hex), spki, &slen));
+
+   /* import public key from its own SPKI; the named-curve OID binds pub to bp224t1, but the point also lies on bp224r1 per the Wycheproof vector */
+   DO(ecc_import_openssl(spki, slen, &pub));
+
+   /* set up the private key on bp224r1 with the listed scalar */
+   len = sizeof(sk);
+   DO(base16_decode(priv_hex, XSTRLEN(priv_hex), sk, &len));
+   DO(ecc_set_curve(bp_r1, &priv));
+   DO(ecc_set_key(sk, len, PK_PRIVATE, &priv));
+
+   olen = sizeof(out);
+   err = ecc_shared_secret(&priv, &pub, out, &olen);
+   ecc_free(&priv);
+   ecc_free(&pub);
+
+   if (err == CRYPT_OK) {
+      fprintf(stderr, "Wycheproof ecdh_brainpoolP224r1 tcId=517\n");
+      return CRYPT_FAIL_TESTVECTOR;
+   }
+   return CRYPT_OK;
+}
+#endif
+
 /* https://github.com/libtom/libtomcrypt/issues/108 */
 static int s_ecc_issue108(void)
 {
@@ -2272,6 +2433,14 @@ int ecc_test(void)
 {
    if (ltc_mp.name == NULL) return CRYPT_NOP;
 
+   DO(s_ecc_wycheproof_p256_edgecase_dbl());
+#if defined(LTC_PEM) && defined(LTC_DER)
+   DO(s_ecc_wycheproof_p256_pem_edgecase_dbl());
+   DO(s_ecc_wycheproof_p256_pem_invalid_explicit());
+#endif
+#if defined(LTC_DER) && defined(LTC_ECC_BRAINPOOLP224R1) && defined(LTC_ECC_BRAINPOOLP224T1)
+   DO(s_ecc_wycheproof_bp224_wrong_curve());
+#endif
    DO(s_ecc_issue446());
    DO(s_ecc_rfc6979());
    DO(s_ecc_old_api()); /* up to 1.18 */

@@ -272,12 +272,12 @@ int AES_KS(int *keysize)
    return CRYPT_OK;
 }
 
+#endif
+
 #undef AES_SETUP
 #undef AES_ENC
 #undef AES_DEC
 #undef AES_DONE
 #undef AES_TEST
 #undef AES_KS
-
-#endif
 

@@ -218,6 +218,30 @@ static int s_x25519_compat_test(void)
    return CRYPT_OK;
 }
 
+static int s_x25519_zero_shared_secret_test(void)
+{
+   curve25519_key alice, bob, zero_pub;
+   unsigned char shared[32], zeros[32];
+   unsigned long len;
+   int prng_idx = find_prng("yarrow");
+
+   zeromem(zeros, sizeof(zeros));
+
+   DO(x25519_make_key(&yarrow_prng, prng_idx, &alice));
+   DO(x25519_make_key(&yarrow_prng, prng_idx, &bob));
+
+   len = sizeof(shared);
+   DO(x25519_shared_secret(&alice, &bob, shared, &len));
+   ENSURE(len == sizeof(shared));
+
+   DO(x25519_import_raw(zeros, sizeof(zeros), PK_PUBLIC, &zero_pub));
+
+   len = sizeof(shared);
+   SHOULD_FAIL_WITH(x25519_shared_secret(&alice, &zero_pub, shared, &len), CRYPT_INVALID_PACKET);
+
+   return CRYPT_OK;
+}
+
 /**
   Test the x25519 system
   @return CRYPT_OK if successful
@@ -226,6 +250,7 @@ int x25519_test(void)
 {
    DO(s_rfc_7748_5_2_test());
    DO(s_rfc_7748_6_test());
+   DO(s_x25519_zero_shared_secret_test());
    return CRYPT_OK;
 }
 

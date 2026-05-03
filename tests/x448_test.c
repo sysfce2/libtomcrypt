@@ -227,12 +227,37 @@ static int s_x448_compat_test(void)
    return CRYPT_OK;
 }
 
+static int s_x448_zero_shared_secret_test(void)
+{
+   curve448_key alice, bob, zero_pub;
+   unsigned char shared[56], zeros[56];
+   unsigned long len;
+   int prng_idx = find_prng("yarrow");
+
+   zeromem(zeros, sizeof(zeros));
+
+   DO(x448_make_key(&yarrow_prng, prng_idx, &alice));
+   DO(x448_make_key(&yarrow_prng, prng_idx, &bob));
+
+   len = sizeof(shared);
+   DO(x448_shared_secret(&alice, &bob, shared, &len));
+   ENSURE(len == sizeof(shared));
+
+   DO(x448_import_raw(zeros, sizeof(zeros), PK_PUBLIC, &zero_pub));
+
+   len = sizeof(shared);
+   SHOULD_FAIL_WITH(x448_shared_secret(&alice, &zero_pub, shared, &len), CRYPT_INVALID_PACKET);
+
+   return CRYPT_OK;
+}
+
 int x448_test(void)
 {
    DO(s_x448_rfc7748_scalarmult_test());
    DO(s_x448_rfc7748_iter_test());
    DO(s_x448_keygen_dh_test());
    DO(s_x448_wycheproof_special_test());
+   DO(s_x448_zero_shared_secret_test());
    return CRYPT_OK;
 }
 

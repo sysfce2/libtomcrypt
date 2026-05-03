@@ -521,6 +521,51 @@ static int s_rsa_pss_test(void)
    return CRYPT_OK;
 }
 
+static int s_rsa_oaep_small_ciphertext_test(int prng_idx)
+{
+   rsa_key key;
+   unsigned char ciphertext[256], plaintext[256], ct_zero[256], ct_one[256];
+   unsigned long ciphertext_len, plaintext_len, modulus_len;
+   int hash_idx, stat;
+   const unsigned char msg[] = "hello strict-mode roundtrip";
+   ltc_rsa_op_parameters rsa_params = {
+      .padding = LTC_PKCS_1_OAEP,
+   };
+
+   hash_idx = find_hash("sha256");
+   if (hash_idx == -1) return CRYPT_NOP;
+
+   rsa_params.prng = &yarrow_prng;
+   rsa_params.wprng = prng_idx;
+   rsa_params.params.hash_idx = hash_idx;
+   rsa_params.params.mgf1_hash_idx = hash_idx;
+
+   DO(rsa_make_key(&yarrow_prng, prng_idx, 1024/8, 65537, &key));
+   modulus_len = (unsigned long)rsa_get_size(&key);
+   ENSURE(modulus_len <= sizeof(ciphertext));
+
+   zeromem(ct_zero, modulus_len);
+   zeromem(ct_one, modulus_len);
+   ct_one[modulus_len - 1] = 1;
+
+   plaintext_len = sizeof(plaintext);
+   SHOULD_FAIL_WITH(rsa_decrypt_key_v2(ct_zero, modulus_len, plaintext, &plaintext_len, &rsa_params, &stat, &key), CRYPT_INVALID_PACKET);
+
+   plaintext_len = sizeof(plaintext);
+   SHOULD_FAIL_WITH(rsa_decrypt_key_v2(ct_one, modulus_len, plaintext, &plaintext_len, &rsa_params, &stat, &key), CRYPT_INVALID_PACKET);
+
+   ciphertext_len = sizeof(ciphertext);
+   DO(rsa_encrypt_key_v2(msg, sizeof(msg) - 1, ciphertext, &ciphertext_len, &rsa_params, &key));
+
+   plaintext_len = sizeof(plaintext);
+   DO(rsa_decrypt_key_v2(ciphertext, ciphertext_len, plaintext, &plaintext_len, &rsa_params, &stat, &key));
+   ENSURE(stat == 1);
+   COMPARE_TESTVECTOR(plaintext, plaintext_len, msg, sizeof(msg) - 1, "rsa oaep roundtrip", 0);
+
+   rsa_free(&key);
+   return CRYPT_OK;
+}
+
 int rsa_test(void)
 {
    unsigned char in[1024], out[1024], tmp[3072];
@@ -564,6 +609,7 @@ int rsa_test(void)
    DO(s_rsa_cryptx_issue_69());
    DO(s_rsa_issue_301(prng_idx));
    DO(s_rsa_public_ubin_e(prng_idx));
+   DO(s_rsa_oaep_small_ciphertext_test(prng_idx));
 
    /* make 10 random key */
    for (cnt = 0; cnt < 10; cnt++) {

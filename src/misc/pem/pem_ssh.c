@@ -324,7 +324,7 @@ struct ssh_pka {
    int (*decode)(const unsigned char*, unsigned long*, ltc_pka_key*, enum pem_flags);
 };
 
-struct ssh_pka ssh_pkas[] = {
+static struct ssh_pka ssh_pkas[] = {
 #ifdef LTC_CURVE25519
                              { SET_CSTR(.name, "ssh-ed25519"),
                                LTC_PKA_ED25519,

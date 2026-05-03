@@ -9,14 +9,6 @@
 
 #ifdef LTC_PEM
 
-extern const struct str pem_proc_type_encrypted;
-#ifdef LTC_SSH
-extern const struct str pem_ssh_comment;
-#endif
-extern const struct str pem_dek_info_start;
-extern const struct blockcipher_info pem_dek_infos[];
-extern const unsigned long pem_dek_infos_num;
-
 static LTC_INLINE unsigned long s_bufp_alloc_len(struct bufp *buf)
 {
    if (buf->start == NULL || buf->end == NULL)

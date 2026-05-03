@@ -57,6 +57,11 @@ int pk_oid_test(void);
 int deprecated_test(void);
 int nop_test(void);
 
+extern const char ltc_der_tests_cacert_root_cert[];
+extern const unsigned long ltc_der_tests_cacert_root_cert_size;
+extern const unsigned char ltc_openssl_public_rsa[];
+extern const unsigned long ltc_openssl_public_rsa_sz;
+
 #ifdef LTC_PKCS_1
 struct ltc_prng_descriptor* no_prng_desc_get(void);
 void no_prng_desc_free(struct ltc_prng_descriptor*);

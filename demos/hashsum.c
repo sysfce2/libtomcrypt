@@ -10,6 +10,7 @@
  * more functions ;)
 */
 
+#define _POSIX_C_SOURCE 200809L /* otherwise PATH_MAX + strdup are not defined for build with -std=c99 */
 #include <tomcrypt.h>
 
 #include <string.h>

@@ -555,6 +555,7 @@ static int s_read_authorized_keys(const void *buf, unsigned long len, ssh_author
    }
    XMEMCPY(cpy, buf, len);
    s = cpy;
+   err = CRYPT_ERROR;
    while (clen && (err = s_parse_line(s, &clen, key, &comment)) == CRYPT_OK) {
       if (cb(key, comment, ctx)) {
          break;

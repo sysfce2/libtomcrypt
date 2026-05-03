@@ -2,7 +2,7 @@
 /* SPDX-License-Identifier: Unlicense */
 
 #define LTC_NO_NULL_TERMINATION_CHECK
-#include "tomcrypt.h"
+#include <tomcrypt_test.h>
 
 #define NNTCT_NULL ((void *)0)
 

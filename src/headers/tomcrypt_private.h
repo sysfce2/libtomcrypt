@@ -47,6 +47,43 @@ LTC_STATIC_ASSERT(correct_ltc_uintptr_size, sizeof(ltc_uintptr) == sizeof(void*)
 
 #define LTC_ARRAY_SIZE(arr) (sizeof(arr)/sizeof(arr[0]))
 
+#ifdef LTC_FAST
+/* The LTC_FAST helpers operate on byte buffers that are not guaranteed to be aligned for LTC_FAST_TYPE.
+   Use memcpy for loads/stores to avoid undefined behavior from unaligned or aliasing-unsafe typed-pointer dereferences.
+   On GCC/Clang prefer __builtin_memcpy: it is guaranteed to be inlined for constant sizes regardless of any
+   user override of XMEMCPY (e.g. embedded builds). Other compilers fall back to XMEMCPY.
+*/
+static LTC_INLINE LTC_FAST_TYPE LTC_FAST_LOAD(const void *p)
+{
+   LTC_FAST_TYPE v;
+#if defined(__GNUC__)
+   __builtin_memcpy(&v, p, sizeof(v));
+#else
+   XMEMCPY(&v, p, sizeof(v));
+#endif
+   return v;
+}
+
+static LTC_INLINE void LTC_FAST_STORE(void *p, LTC_FAST_TYPE v)
+{
+#if defined(__GNUC__)
+   __builtin_memcpy(p, &v, sizeof(v));
+#else
+   XMEMCPY(p, &v, sizeof(v));
+#endif
+}
+
+static LTC_INLINE void LTC_FAST_XOR2(void *dst, const void *src)
+{
+   LTC_FAST_STORE(dst, LTC_FAST_LOAD(dst) ^ LTC_FAST_LOAD(src));
+}
+
+static LTC_INLINE void LTC_FAST_XOR3(void *dst, const void *src1, const void *src2)
+{
+   LTC_FAST_STORE(dst, LTC_FAST_LOAD(src1) ^ LTC_FAST_LOAD(src2));
+}
+#endif
+
 /*
  * Internal Enums
  */

@@ -261,16 +261,16 @@ typedef unsigned long ltc_mp_digit;
    #define LTC_NO_SHA256_X86
 #endif
 
-/* No LTC_FAST if: explicitly disabled OR non-gcc/non-clang compiler OR old gcc OR using -ansi -std=c99 */
-#if defined(LTC_NO_FAST) || (__GNUC__ < 4) || defined(__STRICT_ANSI__)
+/* No LTC_FAST if explicitly disabled */
+#if defined(LTC_NO_FAST)
    #undef LTC_FAST
 #endif
 
 #ifdef LTC_FAST
    #ifdef ENDIAN_64BITWORD
-   typedef ulong64 __attribute__((__may_alias__)) LTC_FAST_TYPE;
+   typedef ulong64 LTC_FAST_TYPE;
    #else
-   typedef ulong32 __attribute__((__may_alias__)) LTC_FAST_TYPE;
+   typedef ulong32 LTC_FAST_TYPE;
    #endif
    #define LTC_FAST_XOR3(dst, src1, src2) \
       do { \

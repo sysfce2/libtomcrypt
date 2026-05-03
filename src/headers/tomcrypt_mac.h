@@ -435,14 +435,14 @@ int ccm_test(void);
 
 #endif /* LTC_CCM_MODE */
 
-#if defined(LTC_LRW_MODE) || defined(LTC_GCM_MODE)
+#if defined(LTC_LRW_MODE) || defined(LTC_GCM_MODE) || defined(LTC_GCM_SIV_MODE)
 void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *c);
 #endif
 
 int gcm_hw_pmul_is_supported(void);
 
 /* table shared between GCM and LRW */
-#if defined(LTC_GCM_TABLES) || defined(LTC_LRW_TABLES) || ((defined(LTC_GCM_MODE) || defined(LTC_GCM_MODE)) && defined(LTC_FAST))
+#if defined(LTC_GCM_TABLES) || defined(LTC_LRW_TABLES) || ((defined(LTC_GCM_MODE) || defined(LTC_GCM_SIV_MODE)) && defined(LTC_FAST))
 extern const unsigned char gcm_shift_table[];
 #endif
 
@@ -562,3 +562,15 @@ int siv_test(void);
 
 #endif
 
+#ifdef LTC_GCM_SIV_MODE
+/* RFC 8452 - AES-GCM-SIV */
+int gcm_siv_memory(                int  cipher,
+                   const unsigned char *key,    unsigned long  keylen,
+                   const unsigned char *nonce,  unsigned long  noncelen,
+                   const unsigned char *aad,    unsigned long  aadlen,
+                         unsigned char *in,     unsigned long  inlen,
+                         unsigned char *out,
+                         unsigned char *tag,    unsigned long *taglen,
+                                   int  direction);
+int gcm_siv_test(void);
+#endif

@@ -2690,6 +2690,113 @@ int main(void)
 \end{verbatim}
 \end{small}
 
+\mysection{GCM-SIV}
+\label{GCM-SIV}
+
+AES--GCM--SIV is a nonce--misuse--resistant authenticated encryption mode defined by \url{https://tools.ietf.org/html/rfc8452}.
+Unlike AES--GCM, reusing a nonce with the same key does not break confidentiality or authenticity.
+
+\textbf{There is no streaming API}. The algorithm needs two passes: during encryption, the tag is computed over the whole plaintext
+and then used as the AES--CTR starting counter, so ciphertext cannot be produced early. During decryption, plaintext must not be
+returned before the tag is verified.
+
+The following parameters are fixed by RFC 8452:
+\begin{itemize}
+   \item \textbf{Cipher}: AES. Any 128--bit block cipher registered with libtomcrypt will work, but only AES is interoperable with the RFC.
+   \item \textbf{Key length}: 16 bytes (AEAD\_AES\_128\_GCM\_SIV) or 32 bytes (AEAD\_AES\_256\_GCM\_SIV).
+   \item \textbf{Nonce length}: exactly 12 bytes.
+   \item \textbf{Tag length}: exactly 16 bytes.
+   \item \textbf{Plaintext and AAD length}: at most $2^{36}$ bytes each.
+\end{itemize}
+
+The implementation reuses the GHASH field multiplier (\textit{gcm\_gf\_mult()}) for POLYVAL via the byte--reversal trick from RFC 8452 Appendix A.
+It therefore inherits the same hardware acceleration: Intel PCLMUL, ARMv8 PMULL, or the \texttt{LTC\_FAST} table fallback.
+
+\index{gcm\_siv\_memory()}
+\begin{verbatim}
+int gcm_siv_memory(                int  cipher,
+                   const unsigned char *key,    unsigned long  keylen,
+                   const unsigned char *nonce,  unsigned long  noncelen,
+                   const unsigned char *aad,    unsigned long  aadlen,
+                         unsigned char *in,     unsigned long  inlen,
+                         unsigned char *out,
+                         unsigned char *tag,    unsigned long *taglen,
+                                   int  direction);
+\end{verbatim}
+
+This runs a single AES--GCM--SIV operation in the given \textit{direction} (\texttt{LTC\_ENCRYPT} or \texttt{LTC\_DECRYPT}).
+
+\textit{cipher} is the index of a registered 128--bit block cipher; use \texttt{find\_cipher("aes")} for the standard mode.
+
+\textit{key} (of length \textit{keylen} = 16 or 32) is the key from which the message--authentication key and the message--encryption key
+are derived, together with the 12--byte \textit{nonce}, as described in RFC 8452 Section 4.
+
+\textit{aad} of length \textit{aadlen} is the optional associated data. Pass \texttt{NULL} and \texttt{0} for an empty AAD.
+
+\textit{in} of length \textit{inlen} is the input buffer:
+\begin{itemize}
+   \item on \texttt{LTC\_ENCRYPT} it holds the plaintext, and \textit{out} (of the same length) receives the ciphertext;
+   \item on \texttt{LTC\_DECRYPT} it holds the ciphertext, and \textit{out} receives the plaintext.
+\end{itemize}
+
+\textit{in} and \textit{out} may point at the same buffer for in--place processing.
+
+\textit{tag} is the 16--byte authentication tag:
+\begin{itemize}
+   \item on \texttt{LTC\_ENCRYPT} the function writes it and sets \textit{taglen} to \texttt{16};
+   \item on \texttt{LTC\_DECRYPT} the caller must place the expected tag into \textit{tag} before calling. The function recomputes the tag,
+         compares the two in constant time, and on a mismatch returns \texttt{CRYPT\_ERROR} after zeroing \textit{out}. The decrypted
+         plaintext is never returned to the caller when authentication fails.
+\end{itemize}
+
+\textit{taglen} must be at least \texttt{16} on input.
+
+A short worked example of encryption and decryption with AES--GCM--SIV follows.
+
+\begin{small}
+\begin{verbatim}
+#include <tomcrypt.h>
+
+int main(void)
+{
+   int err;
+   unsigned char key[32]   = {0};   /* AEAD_AES_256_GCM_SIV */
+   unsigned char nonce[12] = {0};
+   unsigned char aad[]     = "header";
+   unsigned char plain[16] = {0};
+   unsigned char ct[sizeof(plain)] = {0};
+   unsigned char dec[sizeof(plain)] = {0};
+   unsigned char tag[16];
+   unsigned long taglen = sizeof(tag);
+
+   register_cipher(&aes_desc);
+
+   if ((err = gcm_siv_memory(find_cipher("aes"),
+                             key, sizeof(key),
+                             nonce, sizeof(nonce),
+                             aad, sizeof(aad) - 1,
+                             plain, sizeof(plain), ct,
+                             tag, &taglen,
+                             LTC_ENCRYPT)) != CRYPT_OK) {
+      whine_and_pout(err);
+   }
+
+   if ((err = gcm_siv_memory(find_cipher("aes"),
+                             key, sizeof(key),
+                             nonce, sizeof(nonce),
+                             aad, sizeof(aad) - 1,
+                             ct, sizeof(ct), dec,
+                             tag, &taglen,
+                             LTC_DECRYPT)) != CRYPT_OK) {
+      /* CRYPT_ERROR here means the tag did not match -- dec has been zeroed */
+      whine_and_pout(err);
+   }
+
+   return EXIT_SUCCESS;
+}
+\end{verbatim}
+\end{small}
+
 \chapter{One-Way Cryptographic Hash Functions}
 \mysection{Core Functions}
 Like the ciphers, there are hash core functions and a universal data type to hold the hash state called \textit{hash\_state}.  To initialize hash

@@ -3,11 +3,9 @@
 
 #include "tomcrypt.h"
 
-#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L
-#include <libgen.h>
-#else
-#define basename(x) x
-#endif
+#include <string.h>
+#define basename(path) ( strrchr((path), '/') ? strrchr((path), '/') + 1 : strrchr((path), '\\') ? strrchr((path), '\\') + 1 : (path) )
+
 /**
   @file demo_crypt_sizes.c
 

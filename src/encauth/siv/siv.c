@@ -161,7 +161,7 @@ static LTC_INLINE int s_siv_S2V_T(siv_omac_ctx_t *ctx,
    } else {
       s_siv_dbl(D);
       XMEMSET(&T, 0, sizeof(T));
-      XMEMCPY(&T, in, inlen);
+      if (inlen != 0) XMEMCPY(&T, in, inlen);
       T.u.byte[inlen] = 0x80;
       s_siv_xor_buf(D, &T);
 

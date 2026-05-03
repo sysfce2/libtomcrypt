@@ -56,8 +56,11 @@ static LTC_INLINE int s_bufp_fits(struct bufp *buf, unsigned long to_write)
 {
    char *d = buf->work;
    char *e = buf->end;
-   char *w = d + to_write;
-   if (d == NULL || w < d || w > e)
+   char *w;
+   if (d == NULL || e == NULL)
+      return 0;
+   w = d + to_write;
+   if (w < d || w > e)
       return 0;
    return 1;
 }

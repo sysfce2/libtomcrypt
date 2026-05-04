@@ -329,13 +329,13 @@ int sha3_shake_memory(int num, const unsigned char *in, unsigned long inlen, uns
 #define keccak_256_init(a)    sha3_256_init(a)
 #define keccak_224_init(a)    sha3_224_init(a)
 #define keccak_process(a,b,c) sha3_process(a,b,c)
-extern const struct ltc_hash_descriptor keccak_512_desc;
+extern const struct ltc_hash_descriptor keccak512_desc;
 int keccak_512_test(void);
-extern const struct ltc_hash_descriptor keccak_384_desc;
+extern const struct ltc_hash_descriptor keccak384_desc;
 int keccak_384_test(void);
-extern const struct ltc_hash_descriptor keccak_256_desc;
+extern const struct ltc_hash_descriptor keccak256_desc;
 int keccak_256_test(void);
-extern const struct ltc_hash_descriptor keccak_224_desc;
+extern const struct ltc_hash_descriptor keccak224_desc;
 int keccak_224_test(void);
 int keccak_done(hash_state *md, unsigned char *out);
 #endif

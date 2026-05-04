@@ -492,3 +492,14 @@ void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *
 
 #endif
 
+int gcm_hw_pmul_is_supported(void)
+{
+#if defined(LTC_GCM_PCLMUL_TARGET)
+   return s_pclmul_is_supported();
+#elif defined(LTC_GCM_PMULL_TARGET)
+   return s_pmull_is_supported();
+#else
+   return 0;
+#endif
+}
+

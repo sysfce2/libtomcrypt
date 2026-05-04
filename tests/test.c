@@ -352,7 +352,9 @@ int main(int argc, char **argv)
    printf("LTC_VERSION  = %s\n%s\n\n", GIT_VERSION, crypt_build_settings);
 
    printf("AES-NI CPU support = %d\n", aesni_is_supported());
-   printf("SHA-NI CPU support = %d\n\n", shani_is_supported());
+   printf("SHA-NI CPU support = %d\n", shani_is_supported());
+   printf("PMUL CPU support = %d\n", gcm_hw_pmul_is_supported());
+   putchar('\n');
 
 #ifdef USE_LTM
    mpi_provider = "ltm";

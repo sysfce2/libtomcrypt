@@ -438,6 +438,9 @@ const char *crypt_build_settings =
 #if defined(LTC_ARCH_X86)
    "    LTC_ARCH_X86\n"
 #endif
+#if defined(LTC_ARCH_AARCH64)
+   "    LTC_ARCH_AARCH64\n"
+#endif
 
     "\nVarious others: "
 #if defined(ARGTYPE)

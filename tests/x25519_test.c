@@ -224,34 +224,21 @@ static int s_x25519_compat_test(void)
 */
 int x25519_test(void)
 {
-   int ret;
+   DO(s_rfc_7748_5_2_test());
+   DO(s_rfc_7748_6_test());
+   return CRYPT_OK;
+}
 
+int x25519_mpi_test(void)
+{
    if (ltc_mp.name == NULL) return CRYPT_NOP;
-
-   if ((ret = s_rfc_7748_5_2_test()) != CRYPT_OK) {
-      return ret;
-   }
-   if ((ret = s_rfc_7748_6_test()) != CRYPT_OK) {
-      return ret;
-   }
-   if ((ret = s_rfc_8410_10_test()) != CRYPT_OK) {
-      return ret;
-   }
-   if ((ret = s_x25519_pkcs8_test()) != CRYPT_OK) {
-      return ret;
-   }
-   if ((ret = s_x25519_compat_test()) != CRYPT_OK) {
-      return ret;
-   }
-
-   return ret;
+   DO(s_x25519_pkcs8_test());
+   DO(s_rfc_8410_10_test());
+   DO(s_x25519_compat_test());
+   return CRYPT_OK;
 }
 
 #else
-
-int x25519_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(x25519_test)
+LTC_NOP_TEST(x25519_mpi_test)
 #endif

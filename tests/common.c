@@ -9,9 +9,15 @@
   Steffen Jaeckel
 */
 
+LTC_NOP_TEST(nop_test)
+
 void run_cmd(int res, int line, const char *file, const char *cmd, const char *algorithm)
 {
    if (res != CRYPT_OK) {
+#ifdef LTC_NO_TEST
+      if (res == CRYPT_NOP)
+         return;
+#endif
       fprintf(stderr, "%s (%d)%s%s\n%s:%d:%s\n",
               error_to_string(res), res,
               (algorithm ? " - " : ""), (algorithm ? algorithm : ""),

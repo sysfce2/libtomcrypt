@@ -536,7 +536,8 @@ HEADER_FILES=$(notdir $(HEADERS_PUB))
 #This rule cleans the source tree of all compiled code, not including the pdf
 #documentation.
 clean: $(call print-help,clean,Clean everything besides the pdf documentation)
-	find . -type f    -name "*.o"   \
+	${silent} find . -type f        \
+                  -name "*.o"     \
                -o -name "*.a"     \
                -o -name "*.obj"   \
                -o -name "*.lib"   \
@@ -551,11 +552,11 @@ clean: $(call print-help,clean,Clean everything besides the pdf documentation)
                -o -name "*.il"    \
                -o -name "*.dyn"   \
                -o -name "*.dpi"  | xargs rm -f
-	rm -f $(TIMING) $(TEST) $(DEMOS)
-	rm -f *_tv.txt
-	rm -f *.pc
-	rm -rf `find . -type d -name "*.bin" | xargs`
-	$(MAKE) -C doc/ clean
+	${silent} rm -f $(TIMING) $(TEST) $(DEMOS)
+	${silent} rm -f *_tv.txt
+	${silent} rm -f *.pc
+	${silent} rm -rf `find . -type d -name "*.bin" | xargs`
+	${silent} $(MAKE) -C doc/ clean V=${V}
 
 zipup: $(call print-help,zipup,Prepare the archives for a release) doc/crypt.pdf
 	@# Update the index, so diff-index won't fail in case the pdf has been created.

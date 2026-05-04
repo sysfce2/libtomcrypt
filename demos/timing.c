@@ -8,7 +8,9 @@
    #define PRI64  "ll"
 #endif
 
-static prng_state yarrow_prng;
+static prng_state timing_prng;
+static const char *timing_prng_name;
+static int timing_prng_id;
 
 /* timing */
 #define KTIMES  25
@@ -166,7 +168,7 @@ static void time_keysched(void)
     kl   = cipher_descriptor[x].min_key_length;
     c1 = (ulong64)-1;
     for (y1 = 0; y1 < KTIMES; y1++) {
-       yarrow_read(key, kl, &yarrow_prng);
+       prng_descriptor[timing_prng_id].read(key, kl, &timing_prng);
        t_start();
        DO1(key);
        t1 = t_read();
@@ -692,11 +694,11 @@ static const struct {
        for (y = 0; y < 4; y++) {
            t_start();
            t1 = t_read();
-           if ((err = dsa_generate_pqg(&yarrow_prng, find_prng("yarrow"), groups[x].group, groups[x].modulus, &key)) != CRYPT_OK) {
+           if ((err = dsa_generate_pqg(&timing_prng, timing_prng_id, groups[x].group, groups[x].modulus, &key)) != CRYPT_OK) {
               fprintf(stderr, "\n\ndsa_generate_pqg says %s, wait...no it should say %s...damn you!\n", error_to_string(err), error_to_string(CRYPT_OK));
               exit(EXIT_FAILURE);
            }
-           if ((err = dsa_generate_key(&yarrow_prng, find_prng("yarrow"), &key)) != CRYPT_OK) {
+           if ((err = dsa_generate_key(&timing_prng, timing_prng_id, &key)) != CRYPT_OK) {
               fprintf(stderr, "\n\ndsa_make_key says %s, wait...no it should say %s...damn you!\n", error_to_string(err), error_to_string(CRYPT_OK));
               exit(EXIT_FAILURE);
            }
@@ -734,8 +736,8 @@ static void time_rsa(void)
    ltc_rsa_op_parameters rsa_params = {
       .u.crypt.lparam = (const unsigned char *)"testprog",
       .u.crypt.lparamlen = 8,
-      .prng = &yarrow_prng,
-      .wprng = find_prng("yarrow"),
+      .prng = &timing_prng,
+      .wprng = timing_prng_id,
       .params.hash_idx = find_hash("sha1"),
       .params.mgf1_hash_idx = find_hash("sha1"),
       .params.saltlen = 8,
@@ -749,7 +751,7 @@ static void time_rsa(void)
        for (y = 0; y < 4; y++) {
            t_start();
            t1 = t_read();
-           if ((err = rsa_make_key(&yarrow_prng, find_prng("yarrow"), x/8, 65537, &key)) != CRYPT_OK) {
+           if ((err = rsa_make_key(&timing_prng, timing_prng_id, x/8, 65537, &key)) != CRYPT_OK) {
               fprintf(stderr, "\n\nrsa_make_key says %s, wait...no it should say %s...damn you!\n", error_to_string(err), error_to_string(CRYPT_OK));
               exit(EXIT_FAILURE);
            }
@@ -882,7 +884,7 @@ static void time_dh(void)
 
            t_start();
            t1 = t_read();
-           if ((err = dh_generate_key(&yarrow_prng, find_prng("yarrow"), &key)) != CRYPT_OK) {
+           if ((err = dh_generate_key(&timing_prng, timing_prng_id, &key)) != CRYPT_OK) {
               fprintf(stderr, "\n\ndh_make_key says %s, wait...no it should say %s...damn you!\n", error_to_string(err), error_to_string(CRYPT_OK));
               exit(EXIT_FAILURE);
            }
@@ -907,7 +909,7 @@ static void time_ecc(void)
    ulong64 t1, t2;
    unsigned char buf[2][256] = { 0 };
    unsigned long i, w, x, y, z;
-   int           err, stat;
+   int           err, stat, hashidx;
    const unsigned long sizes[] = {
 #ifdef LTC_ECC_SECP112R1
 112/8,
@@ -934,20 +936,39 @@ static void time_ecc(void)
 521/8,
 #endif
 100000};
+   prng_state ecc_prng;
    ltc_ecc_sig_opts sig_opts = {
                                 .type = LTC_ECCSIG_RFC7518,
-                                .prng = &yarrow_prng,
-                                .wprng = find_prng ("yarrow")
+                                .prng = &ecc_prng,
+                                .wprng = timing_prng_id
    };
+   const unsigned char prng_entropy[] = {
+                                          0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a,
+                                          0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
+                                          0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
+                                          0x1f, 0x20, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                                          0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12,
+                                          0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c,
+                                          0x1d, 0x1e, 0x1f, 0x20
+   };
+   if ((err = prng_descriptor[timing_prng_id].pimport(prng_entropy, sizeof(prng_entropy), &ecc_prng)) != CRYPT_OK) {
+      fprintf(stderr, "\n\nprng.import() says %s!\n", error_to_string(err));
+      exit(EXIT_FAILURE);
+   }
+   if ((err = prng_descriptor[timing_prng_id].ready(&ecc_prng)) != CRYPT_OK) {
+      fprintf(stderr, "\n\nprng.ready() says %s!\n", error_to_string(err));
+      exit(EXIT_FAILURE);
+   }
 
    if (ltc_mp.name == NULL) return;
+   hashidx = find_hash("sha1");
 
    for (x = sizes[i=0]; x < 100000; x = sizes[++i]) {
        t2 = 0;
        for (y = 0; y < 256; y++) {
            t_start();
            t1 = t_read();
-           if ((err = ecc_make_key(&yarrow_prng, find_prng("yarrow"), x, &key)) != CRYPT_OK) {
+           if ((err = ecc_make_key(sig_opts.prng, sig_opts.wprng, x, &key)) != CRYPT_OK) {
               fprintf(stderr, "\n\necc_make_key says %s, wait...no it should say %s...damn you!\n", error_to_string(err), error_to_string(CRYPT_OK));
               exit(EXIT_FAILURE);
            }
@@ -955,8 +976,8 @@ static void time_ecc(void)
            t2 += t1;
 
 #ifdef LTC_PROFILE
-       t2 <<= 8;
-       break;
+           t2 <<= 8;
+           break;
 #endif
 
            if (y < 255) {
@@ -971,7 +992,7 @@ static void time_ecc(void)
            t_start();
            t1 = t_read();
            z = sizeof(buf[1]);
-           if ((err = ecc_encrypt_key(buf[0], 20, buf[1], &z, &yarrow_prng, find_prng("yarrow"), find_hash("sha1"),
+           if ((err = ecc_encrypt_key(buf[0], 20, buf[1], &z, sig_opts.prng, sig_opts.wprng, hashidx,
                                       &key)) != CRYPT_OK) {
               fprintf(stderr, "\n\necc_encrypt_key says %s, wait...no it should say %s...damn you!\n", error_to_string(err), error_to_string(CRYPT_OK));
               exit(EXIT_FAILURE);
@@ -979,12 +1000,13 @@ static void time_ecc(void)
            t1 = t_read() - t1;
            t2 += t1;
 #ifdef LTC_PROFILE
-       t2 <<= 8;
-       break;
+           t2 <<= 8;
+           break;
 #endif
        }
        t2 >>= 8;
        fprintf(stderr, "ECC-%lu encrypt_key took %15"PRI64"u cycles\n", x*8, t2);
+
 
        t2 = 0;
        for (y = 0; y < 256; y++) {
@@ -998,8 +1020,8 @@ static void time_ecc(void)
            t1 = t_read() - t1;
            t2 += t1;
 #ifdef LTC_PROFILE
-       t2 <<= 8;
-       break;
+           t2 <<= 8;
+           break;
 #endif
        }
        t2 >>= 8;
@@ -1017,8 +1039,8 @@ static void time_ecc(void)
            t1 = t_read() - t1;
            t2 += t1;
 #ifdef LTC_PROFILE
-       t2 <<= 8;
-       break;
+           t2 <<= 8;
+           break;
 #endif
         }
         t2 >>= 8;
@@ -1039,8 +1061,8 @@ static void time_ecc(void)
           t1 = t_read() - t1;
           t2 += t1;
 #ifdef LTC_PROFILE
-       t2 <<= 8;
-       break;
+          t2 <<= 8;
+          break;
 #endif
         }
         t2 >>= 8;
@@ -1245,8 +1267,8 @@ static void time_macs_(unsigned long MAC_SIZE)
       exit(EXIT_FAILURE);
    }
 
-   yarrow_read(ctx.buf, ctx.size, &yarrow_prng);
-   yarrow_read(ctx.key, 16, &yarrow_prng);
+   prng_descriptor[timing_prng_id].read(ctx.buf, ctx.size, &timing_prng);
+   prng_descriptor[timing_prng_id].read(ctx.key, sizeof(ctx.key), &timing_prng);
 
    for (n = 0; n < LTC_ARRAY_SIZE(time_funs); ++n) {
       if (!should_skip(time_funs[n].name))
@@ -1498,9 +1520,9 @@ static void time_eacs_(unsigned long MAC_SIZE)
 
    ctx.cipher_idx = find_cipher("aes");
 
-   yarrow_read(ctx.buf, ctx.size, &yarrow_prng);
-   yarrow_read(ctx.key, sizeof(ctx.key), &yarrow_prng);
-   yarrow_read(ctx.IV, sizeof(ctx.IV), &yarrow_prng);
+   prng_descriptor[timing_prng_id].read(ctx.buf, ctx.size, &timing_prng);
+   prng_descriptor[timing_prng_id].read(ctx.key, sizeof(ctx.key), &timing_prng);
+   prng_descriptor[timing_prng_id].read(ctx.IV, sizeof(ctx.IV), &timing_prng);
 
    for (n = 0; n < LTC_ARRAY_SIZE(time_funs); ++n) {
       if (!should_skip(time_funs[n].name))
@@ -1605,8 +1627,12 @@ register_all_prngs();
    } else if (argc > 3){
       filter_arg = argv[3];
    }
-
-if ((err = rng_make_prng(128, find_prng("yarrow"), &yarrow_prng, NULL)) != CRYPT_OK) {
+if (find_prng("sober128") != -1)
+   timing_prng_name = "sober128";
+else
+   timing_prng_name = "yarrow";
+timing_prng_id = find_prng(timing_prng_name);
+if ((err = rng_make_prng(128, timing_prng_id, &timing_prng, NULL)) != CRYPT_OK) {
    fprintf(stderr, "rng_make_prng failed: %s\n", error_to_string(err));
    exit(EXIT_FAILURE);
 }

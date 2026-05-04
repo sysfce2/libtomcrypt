@@ -233,17 +233,17 @@ int x448_test(void)
    DO(s_x448_rfc7748_iter_test());
    DO(s_x448_keygen_dh_test());
    DO(s_x448_wycheproof_special_test());
-   if (ltc_mp.name != NULL) {
-      DO(s_x448_compat_test());
-   }
+   return CRYPT_OK;
+}
+
+int x448_mpi_test(void)
+{
+   if (ltc_mp.name == NULL) return CRYPT_NOP;
+   DO(s_x448_compat_test());
    return CRYPT_OK;
 }
 
 #else
-
-int x448_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(x448_test)
+LTC_NOP_TEST(x448_mpi_test)
 #endif

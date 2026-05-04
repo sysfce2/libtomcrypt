@@ -3,12 +3,7 @@
 #include <tomcrypt_test.h>
 
 #if !defined(LTC_DER)
-
-int der_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(der_test)
 #else
 
 #include <wchar.h>

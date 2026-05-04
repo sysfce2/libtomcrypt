@@ -33,13 +33,18 @@ static const test_function test_functions[] =
       LTC_TEST_FN(ecc_test),
       LTC_TEST_FN(dsa_test),
       LTC_TEST_FN(ed25519_test),
+      LTC_TEST_FN(ed25519_mpi_test),
       LTC_TEST_FN(x25519_test),
+      LTC_TEST_FN(x25519_mpi_test),
       LTC_TEST_FN(ed448_test),
+      LTC_TEST_FN(ed448_mpi_test),
       LTC_TEST_FN(x448_test),
+      LTC_TEST_FN(x448_mpi_test),
       LTC_TEST_FN(file_test),
       LTC_TEST_FN(multi_test),
       LTC_TEST_FN(pem_test),
       LTC_TEST_FN(deprecated_test),
+      LTC_TEST_FN(nop_test),
       /* keep the prng_test always at the end as
        * it has to be handled specially when
        * testing with LTC_PTHREAD enabled
@@ -347,7 +352,9 @@ int main(int argc, char **argv)
    printf("LTC_VERSION  = %s\n%s\n\n", GIT_VERSION, crypt_build_settings);
 
    printf("AES-NI CPU support = %d\n", aesni_is_supported());
-   printf("SHA-NI CPU support = %d\n\n", shani_is_supported());
+   printf("SHA-NI CPU support = %d\n", shani_is_supported());
+   printf("PMUL CPU support = %d\n", gcm_hw_pmul_is_supported());
+   putchar('\n');
 
 #ifdef USE_LTM
    mpi_provider = "ltm";

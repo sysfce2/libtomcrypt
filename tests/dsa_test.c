@@ -385,10 +385,5 @@ int dsa_test(void)
 }
 
 #else
-
-int dsa_test(void)
-{
-  return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(dsa_test)
 #endif

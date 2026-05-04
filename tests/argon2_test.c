@@ -76,10 +76,5 @@ int argon2_test(void)
 }
 
 #else
-
-int argon2_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(argon2_test)
 #endif

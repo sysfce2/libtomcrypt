@@ -95,5 +95,5 @@ int siv_wycheproof_test(void)
 }
 
 #else
-int siv_wycheproof_test(void) { return CRYPT_NOP; }
+LTC_NOP_TEST(siv_wycheproof_test)
 #endif

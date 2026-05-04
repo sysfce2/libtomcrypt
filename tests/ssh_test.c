@@ -347,10 +347,7 @@ int ssh_test(void)
 
 #else
 
-int ssh_test(void)
-{
-   return CRYPT_NOP;
-}
+LTC_NOP_TEST(ssh_test)
 
 #endif
 

@@ -156,6 +156,10 @@ pre_gen/tomcrypt_amalgam.c: $(TAB_SOURCES) $(SOURCES)
 	printf "#define LTC_WHIRLTAB_C\n\n" >> $@
 	printf "#include \"tomcrypt_private.h\"\n\n" >> $@
 	cat $^ >> $@
+	printf "#define ENCRYPT_ONLY\n\n" >> $@
+	cat src/ciphers/aes/aes.c >> $@
+	cat src/ciphers/aes/aes_desc.c >> $@
+	printf "#undef ENCRYPT_ONLY\n\n" >> $@
 
 pre_gen: pre_gen/tomcrypt_amalgam.c
 

@@ -137,8 +137,5 @@ int mpi_test(void)
    return s_radix_to_bin_test();
 }
 #else
-int mpi_test(void)
-{
-   return CRYPT_NOP;
-}
+LTC_NOP_TEST(mpi_test)
 #endif

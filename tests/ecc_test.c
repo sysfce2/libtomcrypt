@@ -2459,8 +2459,5 @@ int ecc_test(void)
    return CRYPT_OK;
 }
 #else
-int ecc_test(void)
-{
-   return CRYPT_NOP;
-}
+LTC_NOP_TEST(ecc_test)
 #endif

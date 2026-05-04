@@ -97,10 +97,5 @@ int scrypt_test(void)
 }
 
 #else
-
-int scrypt_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(scrypt_test)
 #endif

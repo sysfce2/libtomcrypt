@@ -72,13 +72,13 @@ int cipher_hash_test(void)
 #endif
    }
 #if defined(LTC_SHA256)
-      DO(sha256_c_test());
+   DO(sha256_c_test());
 #endif
 #if defined(LTC_SHA224)
-      DO(sha224_c_test());
+   DO(sha224_c_test());
 #endif
 #if defined(LTC_SHA1)
-      DO(sha1_c_test());
+   DO(sha1_c_test());
 #endif
 #ifdef LTC_SHA3
    /* SHAKE128 + SHAKE256 tests are a bit special */

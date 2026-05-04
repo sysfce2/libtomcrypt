@@ -879,10 +879,5 @@ print_hex("q", tmp, len);
 }
 
 #else
-
-int rsa_test(void)
-{
-   return CRYPT_NOP;
-}
-
+LTC_NOP_TEST(rsa_test)
 #endif

@@ -50,6 +50,9 @@ typedef void (*dir_cleanup_cb)(void* ctx);
 int test_process_dir(const char *path, void *ctx, dir_iter_cb iter, dir_fiter_cb fiter, dir_cleanup_cb cleanup, const char *test);
 #endif
 
+int ltc_test_nop(void);
+#define LTC_NOP_TEST(n) int n(void) { return CRYPT_NOP; }
+
 void run_cmd(int res, int line, const char *file, const char *cmd, const char *algorithm);
 
 void print_hex(const char* what, const void* v, const unsigned long l);

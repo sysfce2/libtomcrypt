@@ -66,6 +66,36 @@ const struct ltc_hash_descriptor sha3_512_desc =
    &sha3_512_test,
    NULL
 };
+
+const struct ltc_hash_descriptor shake128_desc =
+{
+   "shake128",                   /* name of hash */
+   34,                           /* internal ID */
+   32,                           /* Size of digest in octets */
+   168,                          /* Input block size in octets */
+   { 2,16,840,1,101,3,4,2,11 },  /* ASN.1 OID */
+   9,                            /* Length OID */
+   &sha3_shake128_init,
+   &sha3_process,
+   &sha3_shake128_done,
+   &sha3_shake128_test,
+   NULL
+};
+
+const struct ltc_hash_descriptor shake256_desc =
+{
+   "shake256",                   /* name of hash */
+   35,                           /* internal ID */
+   64,                           /* Size of digest in octets */
+   136,                          /* Input block size in octets */
+   { 2,16,840,1,101,3,4,2,12 },  /* ASN.1 OID */
+   9,                            /* Length OID */
+   &sha3_shake256_init,
+   &sha3_process,
+   &sha3_shake256_done,
+   &sha3_shake256_test,
+   NULL
+};
 #endif
 
 #ifdef LTC_KECCAK
@@ -272,6 +302,16 @@ static LTC_INLINE int s_sha3_shake_init(struct sha3_state *sha3, int num)
    return CRYPT_OK;
 }
 
+int sha3_shake128_init(hash_state *md)
+{
+   return s_sha3_shake_init(&md->sha3, 128);
+}
+
+int sha3_shake256_init(hash_state *md)
+{
+   return s_sha3_shake_init(&md->sha3, 256);
+}
+
 int sha3_shake_init(hash_state *md, int num)
 {
    return s_sha3_shake_init(&md->sha3, num);
@@ -404,6 +444,16 @@ static LTC_INLINE int s_sha3_shake_done(struct sha3_state *sha3, unsigned char *
 int sha3_shake_done(hash_state *md, unsigned char *out, unsigned long outlen)
 {
    return s_sha3_shake_done(&md->sha3, out, outlen, 0x1f, s_keccakf);
+}
+
+int sha3_shake128_done(hash_state *md, unsigned char *out)
+{
+   return sha3_shake_done(md, out, 32);
+}
+
+int sha3_shake256_done(hash_state *md, unsigned char *out)
+{
+   return sha3_shake_done(md, out, 64);
 }
 
 #if defined LTC_TURBO_SHAKE

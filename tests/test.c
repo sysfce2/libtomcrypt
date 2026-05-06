@@ -248,6 +248,8 @@ static void s_unregister_all(void)
   unregister_hash(&sha3_256_desc);
   unregister_hash(&sha3_384_desc);
   unregister_hash(&sha3_512_desc);
+  unregister_hash(&shake128_desc);
+  unregister_hash(&shake256_desc);
 #endif
 #ifdef LTC_KECCAK
   unregister_hash(&keccak_224_desc);

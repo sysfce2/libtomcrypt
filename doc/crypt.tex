@@ -3047,10 +3047,20 @@ The API functions are as follows.
 int sha3_shake_init(hash_state *md, int num);
 int sha3_shake_process(hash_state * md, const unsigned char *in, unsigned long inlen);
 int sha3_shake_done(hash_state *md, unsigned char *out, unsigned long outlen);
+
+int sha3_shake128_init(hash_state *md);
+int sha3_shake128_process(hash_state * md, const unsigned char *in, unsigned long inlen);
+int sha3_shake128_done(hash_state *md, unsigned char *out);
+
+int sha3_shake256_init(hash_state *md);
+int sha3_shake256_process(hash_state * md, const unsigned char *in, unsigned long inlen);
+int sha3_shake256_done(hash_state *md, unsigned char *out);
 \end{verbatim}
 \end{small}
 
-The process function \code{sha3\_shake\_process()} is implemented as a macro which calls \code{sha3\_process()}.
+The process functions \code{sha3\_shake\_process()}, \code{sha3\_shake128\_process()} and \code{sha3\_shake256\_process()}
+are implemented as macros which call \code{sha3\_process()}. The new \code{shake128\_desc} and \code{shake256\_desc}
+hash descriptors provide fixed-size outputs of 32 and 64 octets respectively, using the SHAKE digest lengths defined by RFC 8702.
 
 For further information see \url{https://en.wikipedia.org/wiki/SHA-3}
 
@@ -4539,6 +4549,8 @@ This \code{struct} is used in two places: first, embedded in \code{rsa\_key} whe
 in order to restrict the usage of the RSA key to the given set of parameters (the \code{rsa\_key.pss\_oaep} flag indicates whether
 the key is constrained). Its second use is explained below and defines the parameters used for an RSA operation.
 The hash algorithms are identified by their descriptor index (as returned by \code{find\_hash()}).
+For RFC 8702 PSS-SHAKE, set \code{hash\_idx} and \code{mgf1\_hash\_idx} to the \code{shake128} or \code{shake256} descriptor index.
+The mask generation function treats those two indexes as direct SHAKE mask generation functions, not as MGF1(SHAKE).
 
 \index{ltc\_rsa\_op\_parameters}
 \begin{small}

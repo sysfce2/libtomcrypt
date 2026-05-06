@@ -682,6 +682,126 @@ static int s_ecc_issue446(void)
    return CRYPT_OK;
 }
 
+#if defined(LTC_SHA3) && defined(LTC_DER)
+static int s_ecc_shake_wycheproof_test(void)
+{
+   const struct {
+      const char *hash, *curve;
+      struct {
+         int tc_id, valid;
+         const char *pub, *msg, *sig;
+      } tests[2];
+   } cases[] = {
+      { /* Project Wycheproof: testvectors_v1/ecdsa_secp256r1_shake128_test.json */
+         "shake128", "SECP256R1",
+         {
+            {
+               3, 1, /* valid */
+               "0404aaec73635726f213fb8a9e64da3b8632e41495a944d0045b522eba7240fad587d9315798aaa3a5ba01775787ced05eaaf7b4e09fc81d6d1aa546e8365d525d",
+               "313233343030",
+               "304402202472b597920aaa98fdf7c7519531b46934df912d61a55d14970124dcdfd040870220049d0db50c18a8ce3a5f572863dfd1f809e2356c2f8ce8f8eef940cb8e40e82f"
+            },
+            {
+               6, 0, /* invalid */
+               "042927b10512bae3eddcfe467828128bad2903269919f7086069c8c4df6c732838c7787964eaac00e5921fb1498a60f4606766b3d9685001558d1a974e7341513e",
+               "313233343030",
+               "304402207182f26bc75cb9735fe63539b290ef8c4828f2eea083aabca058bc2fb23a67c80220c96ce04ecaf994eb481e506669930f8232e89bc45848e9822d166066986ae097"
+            }
+         }
+      },
+      { /* Project Wycheproof: testvectors_v1/ecdsa_secp384r1_shake256_test.json */
+         "shake256", "SECP384R1",
+         {
+            {
+               3, 1, /* valid */
+               "0429bdb76d5fa741bfd70233cb3a66cc7d44beb3b0663d92a8136650478bcefb61ef182e155a54345a5e8e5e88f064e5bc9a525ab7f764dad3dae1468c2b419f3b62b9ba917d"
+               "5e8c4fb1ec47404a3fc76474b2713081be9db4c00e043ada9fc4a3",
+               "313233343030",
+               "3066023100ac1a2f58fa317f0cc20d6ca7c528da1270021429dd0989031d1efddd9fa5a2d63bd2f4b281707ceb66fa37f2d8344b9f0231009d984f3e6f6e5e114aaaaa91a2c8"
+               "c3e376b8304b8c2524e689008eb33048cebae4f98bf539550648f34be6eedeaa5182"
+            },
+            {
+               6, 0, /* invalid */
+               "042da57dda1089276a543f9ffdac0bff0d976cad71eb7280e7d9bfd9fee4bdb2f20f47ff888274389772d98cc5752138aa4b6d054d69dcf3e25ec49df870715e34883b183619"
+               "7d76f8ad962e78f6571bbc7407b0d6091f9e4d88f014274406174f",
+               "313233343030",
+               "306402300ecab5652755adfd5e804d1201ea4ce8a209bcdadb68c65fa049cc76adfc200f7fae56855cbdf25fd0d306ba15bef3450230d4a89a0f736e2fe79fad390b17f37d11"
+               "604b7091681c911ecb407d49f47be55f81d159e7ab23e34fff24c66f304397d8"
+            }
+         }
+      },
+      { /* Project Wycheproof: testvectors_v1/ecdsa_secp521r1_shake256_test.json */
+         "shake256", "SECP521R1",
+         {
+            {
+               3, 1, /* valid */
+               "04012a908bfc5b70e17bdfae74294994808bf2a42dab59af8b0523a026d640a2a3d6d344520b62177e2cfa339ca42fb0883ec425904fbda2833a3b5b0a9a00811365d8012333"
+               "d532f8f8eb1a623c378a3694651192bbda833e3b8d7b8f90b2bfc9b045f8a55e1b6a5fe1512c400c4bc9c86fd7c699d642f5cee9bb827c8b0abc0da01cef1e",
+               "313233343030",
+               "308187024136c3e9fe2eb20fdce3fca2f1b7f3b67c08982605f42cbf562f8476cebae976efbd2c26bcc1eb3a3ed0c08a6611c6a118fca54411155de5b4a8c014a865df0da55d"
+               "0242013e41e59581e9f65812c9f84088fe4d4bd139895ce05936da1bd0410aa4f4493ed0911e07894aef3a0c10e67dd72a6540fe7f270f1fe086660def1df27f51027ca4"
+            },
+            {
+               6, 0, /* invalid */
+               "04005c6457ec088d532f482093965ae53ccd07e556ed59e2af945cd8c7a95c1c644f8a56a8a8a3cd77392ddd861e8a924dac99c69069093bd52a52fa6c56004a074508007878"
+               "d6d42e4b4dd1e9c0696cb3e19f63033c3db4e60d473259b3ebe079aaf0a986ee6177f8217a78c68b813f7e149a4e56fd9562c07fed3d895942d7d101cb83f6",
+               "313233343030",
+               "308187024201f33bd8d0d201495be274a61b92565b80369f519af858a15a468651eefa84e8e7ae9be1e4577eaaa925646bbf7dec1ae63798c5571123514daa8f5e555b530d72"
+               "6b0241eae9de13cbbfbdd7b1ffcfefdd0452248a8702b339d04f4bcf0451bb3cc1bd1e3079ca27e6147c7f8f302c8fd61d3978d4cfc38117168e0907f39e5965d51be5c5"
+            }
+         }
+      }
+   };
+   const ltc_ecc_curve *cu;
+   ltc_ecc_sig_opts sig_opts = { .type = LTC_ECCSIG_ANSIX962 };
+   ecc_key key;
+   unsigned char pub[140], msg[64], sig[160], hash[64];
+   unsigned long publen, msglen, siglen, hashlen;
+   unsigned int i, j;
+
+   for (i = 0; i < LTC_ARRAY_SIZE(cases); ++i) {
+      int hash_idx = find_hash(cases[i].hash);
+
+      DO(hash_is_valid(hash_idx));
+      DO(ecc_find_curve(cases[i].curve, &cu));
+
+      for (j = 0; j < LTC_ARRAY_SIZE(cases[i].tests); ++j) {
+         int err, stat;
+         char name[64];
+
+         snprintf(name, sizeof(name), "Wycheproof %s/%d tcId=%d", cases[i].hash, hash_idx, cases[i].tests[j].tc_id);
+         publen = sizeof(pub);
+         msglen = sizeof(msg);
+         siglen = sizeof(sig);
+         DOX(base16_decode(cases[i].tests[j].pub, XSTRLEN(cases[i].tests[j].pub), pub, &publen), name);
+         DOX(base16_decode(cases[i].tests[j].msg, XSTRLEN(cases[i].tests[j].msg), msg, &msglen), name);
+         DOX(base16_decode(cases[i].tests[j].sig, XSTRLEN(cases[i].tests[j].sig), sig, &siglen), name);
+
+         hashlen = sizeof(hash);
+         DOX(hash_memory(hash_idx, msg, msglen, hash, &hashlen), name);
+
+         DO(ecc_set_curve(cu, &key));
+         if ((err = ecc_set_key(pub, publen, PK_PUBLIC, &key)) != CRYPT_OK) {
+            ecc_free(&key);
+            DOX(err, name);
+         }
+         stat = 0;
+         err = ecc_verify_hash_v2(sig, siglen, hash, hashlen, &sig_opts, &stat, &key);
+         ecc_free(&key);
+         if (cases[i].tests[j].valid) {
+            DOX(err, name);
+            ENSUREX(stat == 1, name);
+         }
+         else {
+            ENSUREX(err != CRYPT_OK || stat == 0, name);
+         }
+      }
+   }
+
+   return CRYPT_OK;
+}
+#endif
+
 static int s_ecc_test_mp(void)
 {
    void       *a, *modulus, *order;
@@ -2442,6 +2562,9 @@ int ecc_test(void)
    DO(s_ecc_wycheproof_bp224_wrong_curve());
 #endif
    DO(s_ecc_issue446());
+#if defined(LTC_SHA3) && defined(LTC_DER)
+   DO(s_ecc_shake_wycheproof_test());
+#endif
    DO(s_ecc_rfc6979());
    DO(s_ecc_old_api()); /* up to 1.18 */
    DO(s_ecc_new_api());

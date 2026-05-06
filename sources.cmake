@@ -146,6 +146,11 @@ src/mac/hmac/hmac_memory.c
 src/mac/hmac/hmac_memory_multi.c
 src/mac/hmac/hmac_process.c
 src/mac/hmac/hmac_test.c
+src/mac/kmac/kmac.c
+src/mac/kmac/kmac_file.c
+src/mac/kmac/kmac_memory.c
+src/mac/kmac/kmac_memory_multi.c
+src/mac/kmac/kmac_test.c
 src/mac/omac/omac_done.c
 src/mac/omac/omac_file.c
 src/mac/omac/omac_init.c

@@ -216,6 +216,7 @@
 #define LTC_IDEA
 #define LTC_SERPENT
 #define LTC_TEA
+#define LTC_ARIA
 
 /* stream ciphers */
 #define LTC_CHACHA

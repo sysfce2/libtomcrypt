@@ -336,6 +336,10 @@
 				>
 			</File>
 			<File
+				RelativePath="src\ciphers\aria.c"
+				>
+			</File>
+			<File
 				RelativePath="src\ciphers\blowfish.c"
 				>
 			</File>

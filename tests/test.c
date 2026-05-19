@@ -196,6 +196,9 @@ static void s_unregister_all(void)
 #ifdef LTC_SERPENT
   unregister_cipher(&serpent_desc);
 #endif
+#ifdef LTC_ARIA
+  unregister_cipher(&aria_desc);
+#endif
 
 #ifdef LTC_TIGER
   unregister_hash(&tiger2_desc);

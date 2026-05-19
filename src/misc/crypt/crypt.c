@@ -226,6 +226,9 @@ const char *crypt_build_settings =
 #if defined(LTC_BLAKE2B)
    "   BLAKE2B\n"
 #endif
+#if defined(LTC_SM3)
+   "   SM3\n"
+#endif
 #if defined(LTC_CHC_HASH)
    "   CHC_HASH\n"
 #endif

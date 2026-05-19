@@ -872,6 +872,10 @@
 				>
 			</File>
 			<File
+				RelativePath="src\hashes\sm3.c"
+				>
+			</File>
+			<File
 				RelativePath="src\hashes\tiger.c"
 				>
 			</File>

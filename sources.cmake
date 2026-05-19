@@ -107,6 +107,7 @@ src/hashes/sha2/sha512_224.c
 src/hashes/sha2/sha512_256.c
 src/hashes/sha3.c
 src/hashes/sha3_test.c
+src/hashes/sm3.c
 src/hashes/tiger.c
 src/hashes/whirl/whirl.c
 src/hashes/whirl/whirltab.c

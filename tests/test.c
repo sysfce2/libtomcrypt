@@ -501,6 +501,12 @@ int main(int argc, char **argv)
    XFREE(tinfo);
 #endif
 
+   if (cipher_descriptor[TAB_SIZE - 1].name != NULL)
+      printf("cipher_descriptor Table full\n");
+   if (hash_descriptor[TAB_SIZE - 1].name != NULL)
+      printf("hash_descriptor Table full\n");
+   if (prng_descriptor[TAB_SIZE - 1].name != NULL)
+      printf("prng_descriptor Table full\n");
    x = (fail > 0 || fail+pass+nop == 0) ? EXIT_FAILURE : EXIT_SUCCESS;
    printf("\n\n%s: passed=%d failed=%d nop=%d duration=%.1fsec real=%.1fsec\n", x ? "FAILURE" : "SUCCESS", pass, fail, nop, (double)(dur)/(1000*1000), (double)(real)/(1000*1000));
    return x;

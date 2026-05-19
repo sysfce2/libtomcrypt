@@ -51,7 +51,7 @@ int prng_test(void)
 #endif
 
    /* test prngs (test, import/export) */
-   for (x = 0; prng_descriptor[x].name != NULL; x++) {
+   for (x = 0; x < TAB_SIZE && prng_descriptor[x].name != NULL; x++) {
       if(strstr(prng_descriptor[x].name, "no_prng") == prng_descriptor[x].name) continue;
       DOX(prng_descriptor[x].test(), prng_descriptor[x].name);
       DOX(prng_descriptor[x].start(&nprng), prng_descriptor[x].name);

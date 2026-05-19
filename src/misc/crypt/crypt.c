@@ -321,6 +321,9 @@ const char *crypt_build_settings =
 #if defined(LTC_SIV_MODE)
     "   SIV\n"
 #endif
+#if defined(LTC_GCM_SIV_MODE)
+    "   GCM-SIV\n"
+#endif
 
     "\nPRNG:\n"
 #if defined(LTC_YARROW)

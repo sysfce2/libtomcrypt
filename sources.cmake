@@ -63,6 +63,8 @@ src/encauth/gcm/gcm_mult_h.c
 src/encauth/gcm/gcm_process.c
 src/encauth/gcm/gcm_reset.c
 src/encauth/gcm/gcm_test.c
+src/encauth/gcm_siv/gcm_siv.c
+src/encauth/gcm_siv/gcm_siv_test.c
 src/encauth/ocb3/ocb3_add_aad.c
 src/encauth/ocb3/ocb3_decrypt.c
 src/encauth/ocb3/ocb3_decrypt_last.c

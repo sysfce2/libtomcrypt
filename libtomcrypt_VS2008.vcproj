@@ -740,6 +740,18 @@
 				</File>
 			</Filter>
 			<Filter
+				Name="gcm_siv"
+				>
+				<File
+					RelativePath="src\encauth\gcm_siv\gcm_siv.c"
+					>
+				</File>
+				<File
+					RelativePath="src\encauth\gcm_siv\gcm_siv_test.c"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="ocb3"
 				>
 				<File

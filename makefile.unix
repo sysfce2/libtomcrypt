@@ -70,7 +70,8 @@ src/encauth/eax/eax_init.o src/encauth/eax/eax_test.o src/encauth/gcm/gcm_add_aa
 src/encauth/gcm/gcm_add_iv.o src/encauth/gcm/gcm_done.o src/encauth/gcm/gcm_gf_mult.o \
 src/encauth/gcm/gcm_init.o src/encauth/gcm/gcm_memory.o src/encauth/gcm/gcm_mult_h.o \
 src/encauth/gcm/gcm_process.o src/encauth/gcm/gcm_reset.o src/encauth/gcm/gcm_test.o \
-src/encauth/ocb3/ocb3_add_aad.o src/encauth/ocb3/ocb3_decrypt.o src/encauth/ocb3/ocb3_decrypt_last.o \
+src/encauth/gcm_siv/gcm_siv.o src/encauth/gcm_siv/gcm_siv_test.o src/encauth/ocb3/ocb3_add_aad.o \
+src/encauth/ocb3/ocb3_decrypt.o src/encauth/ocb3/ocb3_decrypt_last.o \
 src/encauth/ocb3/ocb3_decrypt_verify_memory.o src/encauth/ocb3/ocb3_done.o \
 src/encauth/ocb3/ocb3_encrypt.o src/encauth/ocb3/ocb3_encrypt_authenticate_memory.o \
 src/encauth/ocb3/ocb3_encrypt_last.o src/encauth/ocb3/ocb3_init.o src/encauth/ocb3/ocb3_int_ntz.o \

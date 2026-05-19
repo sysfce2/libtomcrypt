@@ -3981,6 +3981,112 @@ int blake2bmac_file(         const char *fname,
 Which will BLAKE2s/b--MAC the entire contents of the file specified by \textit{fname} using the key \textit{key} of
 length \textit{keylen} bytes. It will store the MAC in \textit{mac} with the same rules as blake2smac\_done().
 
+\mysection{KMAC}
+
+KMAC is a keyed message authentication code based on the Keccak permutation, standardised by NIST in
+SP 800--185. The library provides KMAC128 and KMAC256, each available in fixed--length and
+extendable--output (XOF) variants.
+
+The desired flavour is selected through the \textit{variant} argument, which must be exactly one of the
+following four named constants:
+
+\begin{center}
+\begin{tabular}{ll}
+\hline
+\textit{variant}             & resulting algorithm \\
+\hline
+\texttt{LTC\_KMAC128}        & KMAC128 \\
+\texttt{LTC\_KMAC256}        & KMAC256 \\
+\texttt{LTC\_KMAC128\_XOF}   & KMACXOF128 \\
+\texttt{LTC\_KMAC256\_XOF}   & KMACXOF256 \\
+\hline
+\end{tabular}
+\end{center}
+
+Any other value passed in \textit{variant} causes the init function to return \textbf{CRYPT\_INVALID\_ARG}.
+
+A KMAC state is initialised with the following function:
+\index{kmac\_init()}
+\begin{verbatim}
+int kmac_init(         kmac_state *st,
+                              int  variant,
+              const unsigned char *key,
+                    unsigned long  keylen,
+              const unsigned char *cust,
+                    unsigned long  custlen);
+\end{verbatim}
+This will initialise the KMAC state \textit{st} with the key in \textit{key} of length \textit{keylen} octets
+and the optional customisation string in \textit{cust} of length \textit{custlen} octets. The customisation
+string may be empty: pass \textbf{NULL} as \textit{cust} together with \textit{custlen} equal to zero.
+
+To process data through KMAC use the following function:
+\index{kmac\_process()}
+\begin{verbatim}
+int kmac_process(         kmac_state *st,
+                 const unsigned char *in,
+                       unsigned long  inlen);
+\end{verbatim}
+This will add the message octets pointed to by \textit{in} of length \textit{inlen} to the KMAC state pointed
+to by \textit{st}.
+
+To compute the MAC tag use:
+\index{kmac\_done()}
+\begin{verbatim}
+int kmac_done(   kmac_state *st,
+              unsigned char *out,
+              unsigned long *outlen);
+\end{verbatim}
+On entry \textit{outlen} holds the requested output size in octets; on exit it holds the number of octets
+actually written to \textit{out}. For the fixed--length variants the requested length is bound into the
+authentication tag, so callers must commit to it before calling kmac\_done(). For the XOF variants the
+requested length is independent of the tag computation and any output length may be asked for.
+
+Helper functions are provided to make hashing memory buffers and files easier:
+\index{kmac\_memory()}
+\begin{verbatim}
+int kmac_memory(                int  variant,
+                const unsigned char *key,
+                      unsigned long  keylen,
+                const unsigned char *cust,
+                      unsigned long  custlen,
+                const unsigned char *in,
+                      unsigned long  inlen,
+                      unsigned char *out,
+                      unsigned long *outlen);
+\end{verbatim}
+This will compute the KMAC of \textit{inlen} bytes of \textit{in} using the key \textit{key} of length
+\textit{keylen} bytes and the customisation string \textit{cust} of length \textit{custlen} bytes. The result
+is stored in \textit{out} following the same rules as kmac\_done().
+
+\index{kmac\_memory\_multi()}
+\begin{verbatim}
+int kmac_memory_multi(                int  variant,
+                      const unsigned char *key,
+                            unsigned long  keylen,
+                      const unsigned char *cust,
+                            unsigned long  custlen,
+                            unsigned char *out,
+                            unsigned long *outlen,
+                      const unsigned char *in,
+                            unsigned long  inlen, ...);
+\end{verbatim}
+The variadic form accepts an arbitrary number of (data, length) pairs, terminated by a \textbf{NULL} pointer.
+
+To KMAC a file use:
+\index{kmac\_file()}
+\begin{verbatim}
+int kmac_file(                int  variant,
+              const unsigned char *key,
+                    unsigned long  keylen,
+              const unsigned char *cust,
+                    unsigned long  custlen,
+              const          char *fname,
+                    unsigned char *out,
+                    unsigned long *outlen);
+\end{verbatim}
+Which will KMAC the entire contents of the file named \textit{fname} and store the tag in \textit{out}
+following the same rules as kmac\_done().
+
 \chapter{Pseudo-Random Number Generators}
 \mysection{Core Functions}
 The library provides an array of core functions for Pseudo-Random Number Generators (PRNGs) as well.  A cryptographic PRNG is

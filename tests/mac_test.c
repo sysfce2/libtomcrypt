@@ -47,6 +47,9 @@ int mac_test(void)
 #ifdef LTC_BLAKE2BMAC
    DO(blake2bmac_test());
 #endif
+#ifdef LTC_KMAC
+   DO(kmac_test());
+#endif
 #ifdef LTC_SIV_MODE
    DO(siv_test());
    DO(siv_wycheproof_test());

@@ -1160,6 +1160,30 @@
 				</File>
 			</Filter>
 			<Filter
+				Name="kmac"
+				>
+				<File
+					RelativePath="src\mac\kmac\kmac.c"
+					>
+				</File>
+				<File
+					RelativePath="src\mac\kmac\kmac_file.c"
+					>
+				</File>
+				<File
+					RelativePath="src\mac\kmac\kmac_memory.c"
+					>
+				</File>
+				<File
+					RelativePath="src\mac\kmac\kmac_memory_multi.c"
+					>
+				</File>
+				<File
+					RelativePath="src\mac\kmac\kmac_test.c"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="omac"
 				>
 				<File

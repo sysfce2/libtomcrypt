@@ -70,11 +70,12 @@ src/mac/blake2/blake2smac_memory_multi.obj src/mac/blake2/blake2smac_test.obj sr
 src/mac/f9/f9_file.obj src/mac/f9/f9_init.obj src/mac/f9/f9_memory.obj src/mac/f9/f9_memory_multi.obj \
 src/mac/f9/f9_process.obj src/mac/f9/f9_test.obj src/mac/hmac/hmac_done.obj src/mac/hmac/hmac_file.obj \
 src/mac/hmac/hmac_init.obj src/mac/hmac/hmac_memory.obj src/mac/hmac/hmac_memory_multi.obj \
-src/mac/hmac/hmac_process.obj src/mac/hmac/hmac_test.obj src/mac/omac/omac_done.obj src/mac/omac/omac_file.obj \
-src/mac/omac/omac_init.obj src/mac/omac/omac_memory.obj src/mac/omac/omac_memory_multi.obj \
-src/mac/omac/omac_process.obj src/mac/omac/omac_test.obj src/mac/pelican/pelican.obj \
-src/mac/pelican/pelican_memory.obj src/mac/pelican/pelican_test.obj src/mac/pmac/pmac_done.obj \
-src/mac/pmac/pmac_file.obj src/mac/pmac/pmac_init.obj src/mac/pmac/pmac_memory.obj \
+src/mac/hmac/hmac_process.obj src/mac/hmac/hmac_test.obj src/mac/kmac/kmac.obj src/mac/kmac/kmac_file.obj \
+src/mac/kmac/kmac_memory.obj src/mac/kmac/kmac_memory_multi.obj src/mac/kmac/kmac_test.obj \
+src/mac/omac/omac_done.obj src/mac/omac/omac_file.obj src/mac/omac/omac_init.obj src/mac/omac/omac_memory.obj \
+src/mac/omac/omac_memory_multi.obj src/mac/omac/omac_process.obj src/mac/omac/omac_test.obj \
+src/mac/pelican/pelican.obj src/mac/pelican/pelican_memory.obj src/mac/pelican/pelican_test.obj \
+src/mac/pmac/pmac_done.obj src/mac/pmac/pmac_file.obj src/mac/pmac/pmac_init.obj src/mac/pmac/pmac_memory.obj \
 src/mac/pmac/pmac_memory_multi.obj src/mac/pmac/pmac_ntz.obj src/mac/pmac/pmac_process.obj \
 src/mac/pmac/pmac_shift_xor.obj src/mac/pmac/pmac_test.obj src/mac/poly1305/poly1305.obj \
 src/mac/poly1305/poly1305_file.obj src/mac/poly1305/poly1305_memory.obj \

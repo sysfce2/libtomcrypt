@@ -52,7 +52,9 @@ int lrw_process(const unsigned char *pt, unsigned char *ct, unsigned long len, i
       for (; x < 16; x++) {
 #ifdef LTC_FAST
           for (y = 0; y < 16; y += sizeof(LTC_FAST_TYPE)) {
-              *(LTC_FAST_TYPE_PTR_CAST(lrw->pad + y)) ^= *(LTC_FAST_TYPE_PTR_CAST(&lrw->PC[x][lrw->IV[x]][y])) ^ *(LTC_FAST_TYPE_PTR_CAST(&lrw->PC[x][(lrw->IV[x]-1)&255][y]));
+              LTC_FAST_TYPE tmp;
+              LTC_FAST_TYPE_XOR3(&tmp, &lrw->PC[x][lrw->IV[x]][y], &lrw->PC[x][(lrw->IV[x]-1)&255][y]);
+              LTC_FAST_TYPE_XOR2(lrw->pad + y, &tmp);
           }
 #else
           for (y = 0; y < 16; y++) {
@@ -67,7 +69,7 @@ int lrw_process(const unsigned char *pt, unsigned char *ct, unsigned long len, i
       /* xor prod */
 #ifdef LTC_FAST
       for (x = 0; x < 16; x += sizeof(LTC_FAST_TYPE)) {
-           *(LTC_FAST_TYPE_PTR_CAST(ct + x)) = *(LTC_FAST_TYPE_PTR_CAST(pt + x)) ^ *(LTC_FAST_TYPE_PTR_CAST(prod + x));
+           LTC_FAST_TYPE_XOR3(ct + x, pt + x, prod + x);
       }
 #else
       for (x = 0; x < 16; x++) {
@@ -89,7 +91,7 @@ int lrw_process(const unsigned char *pt, unsigned char *ct, unsigned long len, i
       /* xor prod */
 #ifdef LTC_FAST
       for (x = 0; x < 16; x += sizeof(LTC_FAST_TYPE)) {
-           *(LTC_FAST_TYPE_PTR_CAST(ct + x)) = *(LTC_FAST_TYPE_PTR_CAST(ct + x)) ^ *(LTC_FAST_TYPE_PTR_CAST(prod + x));
+           LTC_FAST_TYPE_XOR3(ct + x, ct + x, prod + x);
       }
 #else
       for (x = 0; x < 16; x++) {

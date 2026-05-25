@@ -2558,18 +2558,44 @@ static int s_ecc_test_recovery(void)
 static int s_ecc_issue764(void)
 {
    const ltc_ecc_curve *cu;
-   ecc_key key;
+   ecc_key key, priv;
    int err;
+   unsigned char shared[14];
+   unsigned long sharedlen;
    const unsigned char pub[] = {
       0x04, /* uncompressed */
       0xB1,0xFD,0x8D,0xE1,0x27,0xD4,0x65,0x6B,0x57,0x3E,0xB5,0x13,0x98,0x4C, /* x = B1FD8DE127D4656B573EB513984C */
       0x2F,0x8C,0xD8,0x80,0x3D,0xB9,0x62,0x0F,0xA3,0xA6,0x0E,0x5B,0x31,0xE2  /* y = 2F8CD8803DB9620FA3A60E5B31E2 */
    };
    DO(ecc_find_curve("SECP112R2", &cu));
+
+   /* ecc_set_key must reject the malicious public key (verify_key Test 3) */
    DO(ecc_set_curve(cu, &key));
    err = ecc_set_key(pub, sizeof(pub), PK_PUBLIC, &key); /* must fail */
    if (err == CRYPT_OK) {
       ecc_free(&key);
+      return CRYPT_FAIL_TESTVECTOR;
+   }
+
+   /* ecc_shared_secret must reject the malicious peer key even when the caller bypassed ecc_set_key by directly loading the pubkey
+      priv.k = 4 (a multiple of the malicious point's order 4) so that k * pubkey is deterministically the point at infinity
+   */
+   DO(ecc_set_curve(cu, &priv));
+   DO(ltc_mp_set(priv.k, 4));
+   priv.type = PK_PRIVATE;
+
+   /* load the malicious point directly to simulate an attacker-supplied pubkey reaching ecc_shared_secret without import checks */
+   DO(ecc_set_curve(cu, &key));
+   DO(ltc_mp_read_unsigned_bin(key.pubkey.x, (unsigned char *)pub + 1,  14));
+   DO(ltc_mp_read_unsigned_bin(key.pubkey.y, (unsigned char *)pub + 15, 14));
+   DO(ltc_mp_set(key.pubkey.z, 1));
+   key.type = PK_PUBLIC;
+
+   sharedlen = sizeof(shared);
+   err = ecc_shared_secret(&priv, &key, shared, &sharedlen); /* must fail */
+   ecc_free(&priv);
+   ecc_free(&key);
+   if (err == CRYPT_OK) {
       return CRYPT_FAIL_TESTVECTOR;
    }
    return CRYPT_OK;

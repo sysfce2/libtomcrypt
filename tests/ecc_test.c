@@ -2549,6 +2549,33 @@ static int s_ecc_test_recovery(void)
 }
 #endif
 
+#ifdef LTC_ECC_SECP112R2
+/* https://github.com/libtom/libtomcrypt/issues/764 - small-subgroup attack regression test
+   SECP112R2 has cofactor 4, so the curve contains a subgroup of order 4 outside the prime-order generator subgroup
+   A point in that small subgroup is on the curve so Test 2 in ltc_ecc_verify_key passes. However n * P != O, so Test 3 must reject it
+   The point below has order 4: n * P gives -P, not the point at infinity. Therefore, importing it as a public key must fail
+*/
+static int s_ecc_issue764(void)
+{
+   const ltc_ecc_curve *cu;
+   ecc_key key;
+   int err;
+   const unsigned char pub[] = {
+      0x04, /* uncompressed */
+      0xB1,0xFD,0x8D,0xE1,0x27,0xD4,0x65,0x6B,0x57,0x3E,0xB5,0x13,0x98,0x4C, /* x = B1FD8DE127D4656B573EB513984C */
+      0x2F,0x8C,0xD8,0x80,0x3D,0xB9,0x62,0x0F,0xA3,0xA6,0x0E,0x5B,0x31,0xE2  /* y = 2F8CD8803DB9620FA3A60E5B31E2 */
+   };
+   DO(ecc_find_curve("SECP112R2", &cu));
+   DO(ecc_set_curve(cu, &key));
+   err = ecc_set_key(pub, sizeof(pub), PK_PUBLIC, &key); /* must fail */
+   if (err == CRYPT_OK) {
+      ecc_free(&key);
+      return CRYPT_FAIL_TESTVECTOR;
+   }
+   return CRYPT_OK;
+}
+#endif
+
 int ecc_test(void)
 {
    if (ltc_mp.name == NULL) return CRYPT_NOP;
@@ -2574,6 +2601,9 @@ int ecc_test(void)
    DO(s_ecc_issue443_447());
    DO(s_ecc_issue630());
    DO(s_ecc_issue116());
+#ifdef LTC_ECC_SECP112R2
+   DO(s_ecc_issue764());
+#endif
 #ifdef LTC_ECC_SHAMIR
    DO(s_ecc_test_shamir());
    DO(s_ecc_test_recovery());

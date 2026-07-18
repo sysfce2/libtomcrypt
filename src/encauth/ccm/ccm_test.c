@@ -267,6 +267,50 @@ int ccm_test(void)
       }
    }
 
+   /* invalid nonce lengths and nonce/L combinations must be rejected not silently adjusted */
+   {
+      unsigned char key[16]   = { 0 };
+      unsigned char nonce[16] = { 0 };
+      unsigned char pt[16]    = { 0 };
+      unsigned char ct[16];
+
+      /* CCM nonce is 7..13 bytes */
+      taglen = 8;
+      if (ccm_memory(idx, key, sizeof(key), NULL, nonce, 6, NULL, 0, pt, sizeof(pt), ct, tag, &taglen, CCM_ENCRYPT) != CRYPT_INVALID_ARG) {
+         return CRYPT_FAIL_TESTVECTOR;
+      }
+      taglen = 8;
+      if (ccm_memory(idx, key, sizeof(key), NULL, nonce, 14, NULL, 0, pt, sizeof(pt), ct, tag, &taglen, CCM_ENCRYPT) != CRYPT_INVALID_ARG) {
+         return CRYPT_FAIL_TESTVECTOR;
+      }
+      if ((err = ccm_init(&ccm, idx, key, sizeof(key), sizeof(pt), 8, 0)) != CRYPT_OK) {
+         return err;
+      }
+      if (ccm_add_nonce(&ccm, nonce, 6) != CRYPT_INVALID_ARG) {
+         return CRYPT_FAIL_TESTVECTOR;
+      }
+      if ((err = ccm_init(&ccm, idx, key, sizeof(key), sizeof(pt), 8, 0)) != CRYPT_OK) {
+         return err;
+      }
+      if (ccm_add_nonce(&ccm, nonce, 14) != CRYPT_INVALID_ARG) {
+         return CRYPT_FAIL_TESTVECTOR;
+      }
+      /* ptlen >= 2^16 forces L=3, so a 13-byte nonce no longer fits B_0 (13+3 > 15) */
+      if ((err = ccm_init(&ccm, idx, key, sizeof(key), 65536, 8, 0)) != CRYPT_OK) {
+         return err;
+      }
+      if (ccm_add_nonce(&ccm, nonce, 13) != CRYPT_INVALID_ARG) {
+         return CRYPT_FAIL_TESTVECTOR;
+      }
+      /* 12-byte nonce still fits (12+3 == 15) */
+      if ((err = ccm_init(&ccm, idx, key, sizeof(key), 65536, 8, 0)) != CRYPT_OK) {
+         return err;
+      }
+      if ((err = ccm_add_nonce(&ccm, nonce, 12)) != CRYPT_OK) {
+         return err;
+      }
+   }
+
    return CRYPT_OK;
 #endif
 }

@@ -1867,6 +1867,10 @@ have the same meaning as with those respective functions.
 The only difference is eax\_decrypt\_verify\_memory() does not emit a tag.  Instead you pass it a tag as input and it compares it against
 the tag it computed while decrypting the message.  If the tags match then it stores a $1$ in \textit{res}, otherwise it stores a $0$.
 
+The length of the tag is a security parameter of EAX mode: tags may be truncated and a zerolength tag is legal -- it simply
+provides no authenticity, which is the caller's choice.  A \textit{taglen} larger than the block size of the used cipher is rejected
+by eax\_decrypt\_verify\_memory() with \textbf{CRYPT\_INVALID\_ARG} (encrypt side can never emit such a tag).
+
 \mysection{OCB Mode}
 \subsection{Preface}
 

@@ -1354,7 +1354,7 @@ static void time_ccm(eac_ctx *ctx)
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = ccm_memory(ctx->cipher_idx, ctx->key, 16, NULL, ctx->IV, 16, NULL, 0, ctx->buf, ctx->size, ctx->buf, ctx->tag, &z, CCM_ENCRYPT)) != CRYPT_OK) {
+        if ((err = ccm_memory(ctx->cipher_idx, ctx->key, 16, NULL, ctx->IV, 13, NULL, 0, ctx->buf, ctx->size, ctx->buf, ctx->tag, &z, CCM_ENCRYPT)) != CRYPT_OK) {
            fprintf(stderr, "\nCCM error... %s\n", error_to_string(err));
            exit(EXIT_FAILURE);
         }
@@ -1369,7 +1369,7 @@ static void time_ccm(eac_ctx *ctx)
         t_start();
         t1 = t_read();
         z = 16;
-        if ((err = ccm_memory(ctx->cipher_idx, ctx->key, 16, &skey, ctx->IV, 16, NULL, 0, ctx->buf, ctx->size, ctx->buf, ctx->tag, &z, CCM_ENCRYPT)) != CRYPT_OK) {
+        if ((err = ccm_memory(ctx->cipher_idx, ctx->key, 16, &skey, ctx->IV, 13, NULL, 0, ctx->buf, ctx->size, ctx->buf, ctx->tag, &z, CCM_ENCRYPT)) != CRYPT_OK) {
            fprintf(stderr, "\nCCM error... %s\n", error_to_string(err));
            exit(EXIT_FAILURE);
         }

@@ -2556,6 +2556,7 @@ To encrypt and create a tag resp. decrypt and check the tag, the following API f
 \begin{verbatim}
 int siv_encrypt_memory(                int  cipher,
                        const unsigned char *key,    unsigned long  keylen,
+                             unsigned long adnum,
                        const unsigned char *ad[],   unsigned long  adlen[],
                        const unsigned char *pt,     unsigned long  ptlen,
                              unsigned char *ct,     unsigned long *ctlen);
@@ -2571,13 +2572,13 @@ The key to the encrypt operation is passed in \textit{key} of length  \textit{ke
 
 The AAD is passed as array of pointers in \textit{ad}. The length of each AAD is passed as array of
 \textit{unsigned long} in \textit{adlen}.
-As soon as an array element of \textit{ad} is hit which equals \texttt{NULL} or an array element of \textit{adlen}
-is hit which equals \texttt{0}, processing of the AAD is stopped.
+The number of AAD elements is passed in \textit{adnum}, when it equals \texttt{0} both \textit{ad} and \textit{adlen} may be \texttt{NULL}.
 
 \index{siv\_decrypt\_memory()}
 \begin{verbatim}
 int siv_decrypt_memory(                int  cipher,
                        const unsigned char *key,    unsigned long  keylen,
+                             unsigned long adnum,
                        const unsigned char *ad[],   unsigned long  adlen[],
                        const unsigned char *ct,     unsigned long  ctlen,
                              unsigned char *pt,     unsigned long *ptlen);
@@ -2609,9 +2610,10 @@ int main(void)
     * but a string is on most platforms defined as a "signed" `char*`. */
    if ((err = siv_encrypt_memory(find_cipher("aes"),
                                  ((unsigned char[32]) {0x0}), 32,
+                                 3,
                                  ((const unsigned char*[]) {(void*)"aad0", (void*)"aad1",
-                                                            (void*)"NONCE", NULL}),
-                                 ((unsigned long[]) {4, 4, 5, 0}),
+                                                            (void*)"NONCE"}),
+                                 ((unsigned long[]) {4, 4, 5}),
                                  plain, plainlen,
                                  ct, &ctlen)) != CRYPT_OK) {
       whine_and_pout(err);
@@ -2619,9 +2621,10 @@ int main(void)
 
    if ((err = siv_decrypt_memory(find_cipher("aes"),
                                  ((unsigned char[32]) {0x0}), 32,
+                                 3,
                                  ((const unsigned char*[]) {(void*)"aad0", (void*)"aad1",
-                                                            (void*)"NONCE", NULL}),
-                                 ((unsigned long[]) {4, 4, 5, 0}),
+                                                            (void*)"NONCE"}),
+                                 ((unsigned long[]) {4, 4, 5}),
                                  ct, ctlen,
                                  plain, &plainlen)) != CRYPT_OK) {
       whine_and_pout(err);
@@ -2641,6 +2644,7 @@ int siv_memory(                int  cipher,           int  direction,
                const unsigned char *key,    unsigned long  keylen,
                const unsigned char *in,     unsigned long  inlen,
                      unsigned char *out,    unsigned long *outlen,
+                     unsigned long adnum,
                                    ...);
 \end{verbatim}
 
@@ -2648,6 +2652,7 @@ This will execute a SIV operation of the \textit{direction} (\texttt{LTC\_ENCRYP
 using the \textit{cipher} with the \textit{key} of len \textit{keylen}.
 The AAD is optionally passed as varargs of the form \textit{(const unsigned char*, unsigned long)}, which musst be
 NULL terminated.
+Exactly \textit{adnum} such pairs are read; the terminating \texttt{NULL} does not delimit the list; see \ref{SIV_zero_vs_empty_ad}.
 The input is passed via the \textit{in} argument of length \textit{inlen}.
 The output is stored in the buffer pointer to by the \textit{out} argument where the length is passed as \textit{outlen}.
 \textit{outlen} shall contain the initial size of the buffer behind \textit{out} when calling the function and on
@@ -2677,7 +2682,7 @@ int main(void)
                          ((unsigned char[32]) {0x0}), 32,
                          plain, plainlen,
                          ct, &ctlen,
-                         "aad0", 4uL, "aad1", 4uL, "NONCE", 5uL, NULL)) != CRYPT_OK) {
+                         3, "aad0", 4uL, "aad1", 4uL, "NONCE", 5uL, NULL)) != CRYPT_OK) {
       whine_and_pout(err);
    }
 
@@ -2685,12 +2690,35 @@ int main(void)
                          ((unsigned char[32]) {0x0}), 32,
                          ct, ctlen,
                          plain, &plainlen,
-                         "aad0", 4uL, "aad1", 4uL, "NONCE", 5uL, NULL)) != CRYPT_OK) {
+                         3, "aad0", 4uL, "aad1", 4uL, "NONCE", 5uL, NULL)) != CRYPT_OK) {
       whine_and_pout(err);
    }
 
    return EXIT_SUCCESS;
 }
+\end{verbatim}
+\end{small}
+
+\subsection{No Associated Data vs. Empty Associated Data}
+\label{SIV_zero_vs_empty_ad}
+
+RFC 5297 computes the synthetic IV as $S2V(K_1, AD_1, \ldots, AD_m, P)$ i.e. S2V is fed a \textit{list} of strings
+and the result depends on the number of components not only on their contents.
+
+Passing \textbf{no} associated data ($m = 0$) is therefore \textbf{not} the same as passing \textbf{one empty}
+associated data string ($m = 1$). For the same key and plaintext the two produce a different ciphertext and one
+will not decrypt as the other. This is also why \textit{adnum} has to be passed explicitly: neither a \texttt{NULL}
+pointer nor a length of \texttt{0} can terminate the list as both are valid contents of a component.
+
+\begin{small}
+\begin{verbatim}
+/* no associated data, m = 0 */
+siv_encrypt_memory(cipher, key, keylen, 0, NULL, NULL, pt, ptlen, ct, &ctlen);
+siv_memory(cipher, LTC_ENCRYPT, key, keylen, pt, ptlen, ct, &ctlen, 0, NULL);
+
+/* one empty associated data string, m = 1 */
+siv_encrypt_memory(cipher, key, keylen, 1, ((const unsigned char*[]) {NULL}), ((unsigned long[]) {0}), pt, ptlen, ct, &ctlen);
+siv_memory(cipher, LTC_ENCRYPT, key, keylen, pt, ptlen, ct, &ctlen, 1, NULL, 0, NULL);
 \end{verbatim}
 \end{small}
 

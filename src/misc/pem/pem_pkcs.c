@@ -73,7 +73,7 @@ static int s_import_pkcs8(unsigned char *asn1_cert, unsigned long asn1_len, ltc_
 {
    int err;
    enum ltc_oid_id oid_id;
-   ltc_asn1_list *alg_id, *priv_key;
+   ltc_asn1_list *alg_id = NULL, *priv_key = NULL;
    ltc_asn1_list *p8_asn1 = NULL;
    if ((err = pkcs8_decode_flexi(asn1_cert, asn1_len, pw_ctx, &p8_asn1)) != CRYPT_OK) {
       goto cleanup;

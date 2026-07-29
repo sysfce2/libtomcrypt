@@ -372,8 +372,8 @@ struct bufp {
    char *start, *work, *end;
 };
 
-#define SET_BUFP(n, d, l) n.start = (char*)d, n.work = (char*)d, n.end = (char*)d + l + 1
-#define UPDATE_BUFP(n, d, w, l) n.start = (char*)d, n.work = (char*)d + w, n.end = (char*)d + l + 1
+#define SET_BUFP(n, d, l) n.start = (char*)d, n.work = (char*)d, n.end = (char*)d + l
+#define UPDATE_BUFP(n, d, w, l) n.start = (char*)d, n.work = (char*)d + w, n.end = (char*)d + l
 
 struct get_char;
 struct get_char_api {

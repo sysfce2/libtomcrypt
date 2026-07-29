@@ -21,7 +21,7 @@ static LTC_INLINE unsigned long s_bufp_alloc_len(struct bufp *buf)
 {
    if (buf->start == NULL || buf->end == NULL)
       return 0;
-   return buf->end - buf->start - 1;
+   return buf->end - buf->start;
 }
 
 static LTC_INLINE unsigned long s_bufp_used_len(struct bufp *buf)

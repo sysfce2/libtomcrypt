@@ -176,9 +176,6 @@ static const unsigned char openssl_rsautl_pkcs[] = {
    0xef, 0x57, 0x23, 0x4b, 0x3a, 0xa3, 0x24, 0x91, 0x4d, 0xfb, 0xb2, 0xd4, 0xe7, 0x5e, 0x41, 0x7e,
 };
 
-extern const char ltc_der_tests_cacert_root_cert[];
-extern const unsigned long ltc_der_tests_cacert_root_cert_size;
-
 static int rsa_compat_test(void)
 {
    rsa_key key, pubkey;

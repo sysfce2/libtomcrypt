@@ -109,7 +109,7 @@ static void LTC_NORETURN barf(const char *pname, const char *err)
  * Output:       CRYPT_OK if parsed OK, CRYPT_ERROR if not
  * Side Effects: infile's read pointer += 16
  */
-int parse_openssl_header(FILE *in, unsigned char *out)
+static int parse_openssl_header(FILE *in, unsigned char *out)
 {
    unsigned char tmp[SALT_LENGTH];
    if(fread(tmp, 1, sizeof(tmp), in) != sizeof(tmp))
@@ -129,7 +129,7 @@ int parse_openssl_header(FILE *in, unsigned char *out)
  * Output:       none
  * Side Effects: bytes printed as a hex blob, no lf at the end
  */
-void dump_bytes(unsigned char *in, unsigned long len)
+static void dump_bytes(unsigned char *in, unsigned long len)
 {
    unsigned long idx;
    for(idx=0; idx<len; idx++)
@@ -171,8 +171,8 @@ static size_t s_pkcs7_pad(union paddable *buf, size_t nb, int block_length,
  * Output:       CRYPT_OK if no error
  * Side Effects: bytes slurped from infile, pushed to outfile, fds updated.
  */
-int do_crypt(FILE *infd, FILE *outfd, unsigned char *key, unsigned char *iv,
-             int encrypt)
+static int do_crypt(FILE *infd, FILE *outfd, unsigned char *key, unsigned char *iv,
+                    int encrypt)
 {
    union paddable inbuf, outbuf;
    int cipher, ret;

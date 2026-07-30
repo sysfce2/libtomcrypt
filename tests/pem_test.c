@@ -24,7 +24,7 @@ static int s_pem_decode_ssh_f(FILE *f, void *key)
    return pem_decode_openssh_filehandle(f, key, &pw_ctx);
 }
 
-int s_authorized_key_cb(ltc_pka_key *k, const char *comment, void *ctx)
+static int s_authorized_key_cb(ltc_pka_key *k, const char *comment, void *ctx)
 {
    LTC_UNUSED_PARAM(comment);
    LTC_UNUSED_PARAM(ctx);

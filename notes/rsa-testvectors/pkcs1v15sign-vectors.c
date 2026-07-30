@@ -40,7 +40,7 @@ typedef struct testcase {
 #endif /* LTC_TEST_EXT */
 } testcase_t;
 
-testcase_t testcases_emsa[] =
+static testcase_t testcases_emsa[] =
     {
 {
   "Example 1: A 1024-bit RSA key pair",

@@ -18,7 +18,7 @@ struct test {
    const char *key;
 };
 
-struct test tests[] = {
+static struct test tests[] = {
    /* basic */
    { 4, 8, "password", 4, "salt", 32,
    "\x5b\xbf\x0c\xc2\x93\x58\x7f\x1c\x36\x35\x55\x5c\x27\x79\x65\x98"

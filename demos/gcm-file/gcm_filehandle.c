@@ -52,7 +52,7 @@
   @param res               [out] Result of the operation, 1==valid, 0==invalid
   @return CRYPT_OK on success
  */
-int gcm_filehandle(      int           cipher,
+static int gcm_filehandle(int          cipher,
                    const unsigned char *key,    unsigned long keylen,
                    const unsigned char *IV,     unsigned long IVlen,
                    const unsigned char *adata,  unsigned long adatalen,

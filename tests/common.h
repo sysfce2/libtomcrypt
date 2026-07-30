@@ -51,6 +51,7 @@ int test_process_dir(const char *path, void *ctx, dir_iter_cb iter, dir_fiter_cb
 #endif
 
 int ltc_test_nop(void);
+int nop_test(void);
 #define LTC_NOP_TEST(n) int n(void) { return CRYPT_NOP; }
 
 void run_cmd(int res, int line, const char *file, const char *cmd, const char *algorithm);

@@ -966,7 +966,11 @@ static void der_Xcode_run(const der_Xcode_t* x)
 }
 
 #if defined(_MSC_VER)
-#define typeof(x) x
+#define LTC_TYPEOF(x) x
+#elif defined(__GNUC__) && defined(__STRICT_ANSI__)
+#define LTC_TYPEOF(x) __typeof__(x) /* needed for build with -std=c99 */
+#else
+#define LTC_TYPEOF(x) typeof(x)
 #endif
 
 #define DER_XCODE_X(n, b, x) {  \
@@ -975,7 +979,7 @@ static void der_Xcode_run(const der_Xcode_t* x)
       b,                   \
       sizeof(b),           \
       x,                   \
-      sizeof(typeof(b[0])),\
+      sizeof(LTC_TYPEOF(b[0])),\
       #n                   \
 }
 

@@ -4,12 +4,6 @@
 #include "tomcrypt_private.h"
 
 #if defined(LTC_PEM_SSH)
-extern const struct blockcipher_info pem_dek_infos[];
-extern const unsigned long pem_dek_infos_num;
-
-extern const struct blockcipher_info ssh_ciphers[];
-extern const unsigned long ssh_ciphers_num;
-
 static const struct {
    const char *is, *should;
 } cipher_name_map[] = {

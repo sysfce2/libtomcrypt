@@ -412,6 +412,9 @@ typedef unsigned long ltc_mp_digit;
 #  define LTC_ATTRIBUTE(x)
 #endif
 
+#if __has_attribute(fallthrough)
+#  define LTC_FALLTHROUGH LTC_ATTRIBUTE((fallthrough))
+#endif
 #if __has_attribute(target)
 #  define LTC_TARGET(x) LTC_ATTRIBUTE((target(x)))
 #endif

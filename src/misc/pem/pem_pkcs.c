@@ -9,9 +9,6 @@
 
 #ifdef LTC_PEM
 
-extern const struct pem_header_id pem_std_headers[];
-extern const unsigned long pem_std_headers_num;
-
 static int s_decrypt_pem(unsigned char *asn1_cert, unsigned long *asn1_len, const struct pem_headers *hdr)
 {
    unsigned char iv[MAXBLOCKSIZE], key[MAXBLOCKSIZE];

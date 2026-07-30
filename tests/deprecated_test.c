@@ -41,10 +41,6 @@ static void s_ecc_test(void)
 #endif
 
 #ifdef LTC_MRSA
-extern const unsigned char ltc_rsa_private_test_key[];
-extern const unsigned long ltc_rsa_private_test_key_sz;
-extern const unsigned char ltc_openssl_public_rsa[];
-extern const unsigned long ltc_openssl_public_rsa_sz;
 static void s_rsa_test(void)
 {
    rsa_key key, pubkey;

@@ -272,7 +272,7 @@ typedef unsigned long ltc_mp_digit;
    #else
    typedef ulong32 __attribute__((__may_alias__)) LTC_FAST_TYPE;
    #endif
-   #define LTC_FAST_TYPE_XOR3(dst, src1, src2) \
+   #define LTC_FAST_XOR3(dst, src1, src2) \
       do { \
          LTC_FAST_TYPE fast_src1, fast_src2, fast_dst; \
          XMEMCPY(&fast_src1, (src1), sizeof(LTC_FAST_TYPE)); \
@@ -280,8 +280,8 @@ typedef unsigned long ltc_mp_digit;
          fast_dst = fast_src1 ^ fast_src2; \
          XMEMCPY((dst), &fast_dst, sizeof(LTC_FAST_TYPE)); \
       }while (0)
-   #define LTC_FAST_TYPE_XOR2(dst, src) LTC_FAST_TYPE_XOR3((dst), (dst), (src))
-   #define LTC_FAST_TYPE_MASK(dst, src, mask) \
+   #define LTC_FAST_XOR2(dst, src) LTC_FAST_XOR3((dst), (dst), (src))
+   #define LTC_FAST_MASK(dst, src, mask) \
       do { \
          LTC_FAST_TYPE fast_src, fast_mask, fast_dst; \
          XMEMCPY(&fast_src, (src), sizeof(LTC_FAST_TYPE)); \
@@ -289,7 +289,7 @@ typedef unsigned long ltc_mp_digit;
          fast_dst = fast_src & fast_mask; \
          XMEMCPY((dst), &fast_dst, sizeof(LTC_FAST_TYPE)); \
       }while (0)
-   #define LTC_FAST_TYPE_ASSIGN(dst, src) \
+   #define LTC_FAST_STORE(dst, src) \
       do { \
          LTC_FAST_TYPE fast_tmp; \
          XMEMCPY(&fast_tmp, (src), sizeof(LTC_FAST_TYPE)); \

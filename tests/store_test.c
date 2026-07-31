@@ -63,7 +63,7 @@ int store_test(void)
 
      /* now XOR it word for word */
      for (x = 0; x < y; x += sizeof(LTC_FAST_TYPE)) {
-        LTC_FAST_TYPE_XOR3(&buf[5*y+z+x], &buf[z+x], &buf[z+y+x+zz]);
+        LTC_FAST_XOR3(&buf[5*y+z+x], &buf[z+x], &buf[z+y+x+zz]);
      }
 
      if (memcmp(&buf[4*y+z], &buf[5*y+z], y)) {

@@ -56,8 +56,10 @@ int f8_encrypt(const unsigned char *pt, unsigned char *ct, unsigned long len, sy
          STORE32H(f8->blockcnt, (buf+(f8->ecb.blocklen-4)));
          ++(f8->blockcnt);
          for (x = 0; x < f8->ecb.blocklen; x += sizeof(LTC_FAST_TYPE)) {
-             *(LTC_FAST_TYPE_PTR_CAST(&ct[x])) = *(LTC_FAST_TYPE_PTR_CAST(&pt[x])) ^ *(LTC_FAST_TYPE_PTR_CAST(&f8->IV[x]));
-             *(LTC_FAST_TYPE_PTR_CAST(&f8->IV[x])) ^= *(LTC_FAST_TYPE_PTR_CAST(&f8->MIV[x])) ^ *(LTC_FAST_TYPE_PTR_CAST(&buf[x]));
+             LTC_FAST_TYPE tmp;
+             LTC_FAST_TYPE_XOR3(&ct[x], &pt[x], &f8->IV[x]);
+             LTC_FAST_TYPE_XOR3(&tmp, &f8->MIV[x], &buf[x]);
+             LTC_FAST_TYPE_XOR2(&f8->IV[x], &tmp);
          }
          if ((err = ecb_encrypt_block(f8->IV, f8->IV, &f8->ecb)) != CRYPT_OK) {
             return err;

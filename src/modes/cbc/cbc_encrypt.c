@@ -67,7 +67,7 @@ int cbc_encrypt(const unsigned char *pt, unsigned char *ct, unsigned long len, s
       /* store IV [ciphertext] for a future block */
 #if defined(LTC_FAST)
       for (x = 0; x < cbc->ecb.blocklen; x += sizeof(LTC_FAST_TYPE)) {
-         LTC_FAST_STORE((unsigned char *)cbc->IV + x, (unsigned char *)ct + x);
+         LTC_FAST_STOREP((unsigned char *)cbc->IV + x, (unsigned char *)ct + x);
       }
 #else
       for (x = 0; x < cbc->ecb.blocklen; x++) {

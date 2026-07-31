@@ -63,8 +63,8 @@ int cbc_decrypt(const unsigned char *ct, unsigned char *pt, unsigned long len, s
 #if defined(LTC_FAST)
       for (x = 0; x < cbc->ecb.blocklen; x += sizeof(LTC_FAST_TYPE)) {
          LTC_FAST_XOR3(&tmpy, (unsigned char *)cbc->IV + x, (unsigned char *)tmp + x);
-         LTC_FAST_STORE((unsigned char *)cbc->IV + x, (unsigned char *)ct + x);
-         LTC_FAST_STORE((unsigned char *)pt + x, &tmpy);
+         LTC_FAST_STOREP((unsigned char *)cbc->IV + x, (unsigned char *)ct + x);
+         LTC_FAST_STOREP((unsigned char *)pt + x, &tmpy);
       }
 #else
       for (x = 0; x < cbc->ecb.blocklen; x++) {

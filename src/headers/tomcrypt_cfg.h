@@ -44,13 +44,19 @@ LTC_EXPORT int   LTC_CALL XSTRCMP(const char *s1, const char *s2);
 #endif
 
 /* some compilers do not like "inline" (or maybe "static inline"), namely: HP cc, IBM xlc */
+#if !defined(LTC_NO_INLINE)
 #if defined(__GNUC__) || defined(__xlc__)
    #define LTC_INLINE __inline__
 #elif defined(_MSC_VER) || defined(__HP_cc)
    #define LTC_INLINE __inline
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
    #define LTC_INLINE inline
-#else
+#endif
+#endif
+#if !defined(LTC_INLINE)
+   #if !defined(LTC_NO_INLINE)
+      #define LTC_NO_INLINE
+   #endif
    #define LTC_INLINE
 #endif
 
@@ -272,29 +278,6 @@ typedef unsigned long ltc_mp_digit;
    #else
    typedef ulong32 LTC_FAST_TYPE;
    #endif
-   #define LTC_FAST_XOR3(dst, src1, src2) \
-      do { \
-         LTC_FAST_TYPE fast_src1, fast_src2, fast_dst; \
-         XMEMCPY(&fast_src1, (src1), sizeof(LTC_FAST_TYPE)); \
-         XMEMCPY(&fast_src2, (src2), sizeof(LTC_FAST_TYPE)); \
-         fast_dst = fast_src1 ^ fast_src2; \
-         XMEMCPY((dst), &fast_dst, sizeof(LTC_FAST_TYPE)); \
-      }while (0)
-   #define LTC_FAST_XOR2(dst, src) LTC_FAST_XOR3((dst), (dst), (src))
-   #define LTC_FAST_MASK(dst, src, mask) \
-      do { \
-         LTC_FAST_TYPE fast_src, fast_mask, fast_dst; \
-         XMEMCPY(&fast_src, (src), sizeof(LTC_FAST_TYPE)); \
-         fast_mask = ((LTC_FAST_TYPE)(mask)); \
-         fast_dst = fast_src & fast_mask; \
-         XMEMCPY((dst), &fast_dst, sizeof(LTC_FAST_TYPE)); \
-      }while (0)
-   #define LTC_FAST_STORE(dst, src) \
-      do { \
-         LTC_FAST_TYPE fast_tmp; \
-         XMEMCPY(&fast_tmp, (src), sizeof(LTC_FAST_TYPE)); \
-         XMEMCPY((dst), &fast_tmp, sizeof(LTC_FAST_TYPE)); \
-      }while (0)
 #endif
 
 #if !defined(ENDIAN_NEUTRAL) && (defined(ENDIAN_BIG) || defined(ENDIAN_LITTLE)) && !(defined(ENDIAN_32BITWORD) || defined(ENDIAN_64BITWORD))

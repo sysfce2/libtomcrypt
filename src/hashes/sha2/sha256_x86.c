@@ -15,7 +15,8 @@
 #pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
 #pragma GCC diagnostic ignored "-Wuninitialized"
 #pragma GCC diagnostic ignored "-Wunused-function"
-#elif defined(_MSC_VER)
+#endif
+#if defined(_MSC_VER)
 #include <intrin.h>
 #endif
 #include <emmintrin.h> /* SSE2 _mm_load_si128 _mm_loadu_si128 _mm_storeu_si128 _mm_set_epi64x _mm_add_epi32 _mm_shuffle_epi32 */

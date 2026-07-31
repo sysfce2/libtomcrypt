@@ -24,6 +24,10 @@ const struct ltc_hash_descriptor sha1_desc =
 
 #if defined LTC_SHA1_X86
 
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
 #if !defined (LTC_S_X86_CPUID)
 #define LTC_S_X86_CPUID
 static LTC_INLINE void s_x86_cpuid(int* regs, int leaf)

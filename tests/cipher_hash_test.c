@@ -4,6 +4,51 @@
 
 #include <tomcrypt_test.h>
 
+/* cloning a hash_state via memcpy must yield a working/independent copy */
+static int s_hash_state_clone_test(const struct ltc_hash_descriptor *desc, const char *name)
+{
+   hash_state md, clone1, *clone2;
+   unsigned char data[200], out[MAXBLOCKSIZE], expect1[MAXBLOCKSIZE], expect2[MAXBLOCKSIZE];
+   unsigned long i, hashsize = desc->hashsize;
+
+   for (i = 0; i < sizeof(data); i++) data[i] = (unsigned char)i;
+
+   /* reference digests: expect1 = H(data[0..149]), expect2 = H(data[0..99] || data[150..199]) */
+   DO(desc->init(&md));
+   DO(desc->process(&md, data, 100));
+   DO(desc->process(&md, data + 100, 50));
+   DO(desc->done(&md, expect1));
+   DO(desc->init(&md));
+   DO(desc->process(&md, data, 100));
+   DO(desc->process(&md, data + 150, 50));
+   DO(desc->done(&md, expect2));
+
+   /* clone the state after the common prefix, then let the original and the clone diverge */
+   DO(desc->init(&md));
+   DO(desc->process(&md, data, 100));
+   XMEMCPY(&clone1, &md, sizeof(hash_state));
+   DO(desc->process(&md, data + 100, 50));
+   DO(desc->done(&md, out));
+   COMPARE_TESTVECTOR(out, hashsize, expect1, hashsize, name, 0);
+   DO(desc->process(&clone1, data + 150, 50));
+   DO(desc->done(&clone1, out));
+   COMPARE_TESTVECTOR(out, hashsize, expect2, hashsize, name, 1);
+
+   /* clone into heap memory and wipe the original before using the clone */
+   DO(desc->init(&md));
+   DO(desc->process(&md, data, 100));
+   clone2 = XMALLOC(sizeof(hash_state));
+   if (clone2 == NULL) return CRYPT_MEM;
+   XMEMCPY(clone2, &md, sizeof(hash_state));
+   zeromem(&md, sizeof(hash_state));
+   DO(desc->process(clone2, data + 150, 50));
+   DO(desc->done(clone2, out));
+   XFREE(clone2);
+   COMPARE_TESTVECTOR(out, hashsize, expect2, hashsize, name, 2);
+
+   return CRYPT_OK;
+}
+
 int cipher_hash_test(void)
 {
    int           x;
@@ -57,28 +102,36 @@ int cipher_hash_test(void)
    /* test hashes */
    for (x = 0; hash_descriptor[x].name != NULL; x++) {
       DOX(hash_descriptor[x].test(), hash_descriptor[x].name);
+      /* test that state can be cloned via memcpy */
+      DOX(s_hash_state_clone_test(&hash_descriptor[x], hash_descriptor[x].name), hash_descriptor[x].name);
    }
 
    /* explicit SHA-NI + portable implementations tests */
    if (shani_is_supported()) {
 #if defined(LTC_SHA256) && defined(LTC_SHA256_X86)
       DO(sha256_x86_test());
+      DO(s_hash_state_clone_test(&sha256_x86_desc, "sha256-x86-clone"));
 #endif
 #if defined(LTC_SHA224) && defined(LTC_SHA224_X86)
       DO(sha224_x86_test());
+      DO(s_hash_state_clone_test(&sha224_x86_desc, "sha224-x86-clone"));
 #endif
 #if defined(LTC_SHA1) && defined(LTC_SHA1_X86)
       DO(sha1_x86_test());
+      DO(s_hash_state_clone_test(&sha1_x86_desc, "sha1-x86-clone"));
 #endif
    }
 #if defined(LTC_SHA256)
    DO(sha256_c_test());
+   DO(s_hash_state_clone_test(&sha256_portable_desc, "sha256-c-clone"));
 #endif
 #if defined(LTC_SHA224)
    DO(sha224_c_test());
+   DO(s_hash_state_clone_test(&sha224_portable_desc, "sha224-c-clone"));
 #endif
 #if defined(LTC_SHA1)
    DO(sha1_c_test());
+   DO(s_hash_state_clone_test(&sha1_portable_desc, "sha1-c-clone"));
 #endif
 #ifdef LTC_SHA3
    /* SHAKE128 + SHAKE256 tests are a bit special */

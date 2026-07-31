@@ -287,25 +287,25 @@ $(LIBMAIN_S): $(OBJECTS)
 
 #Demo tools/utilities
 hashsum.exe: demos/hashsum.c tests/common.c $(LIBMAIN_S)
-	cl $(LTC_CFLAGS) demos/hashsum.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
+	$(CC) $(LTC_CFLAGS) demos/hashsum.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
 crypt.exe: demos/crypt.c $(LIBMAIN_S)
-	cl $(LTC_CFLAGS) demos/crypt.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
+	$(CC) $(LTC_CFLAGS) demos/crypt.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
 small.exe: demos/small.c $(LIBMAIN_S)
-	cl $(LTC_CFLAGS) demos/small.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
+	$(CC) $(LTC_CFLAGS) demos/small.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
 tv_gen.exe: demos/tv_gen.c $(LIBMAIN_S)
-	cl $(LTC_CFLAGS) demos/tv_gen.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
+	$(CC) $(LTC_CFLAGS) demos/tv_gen.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
 sizes.exe: demos/sizes.c $(LIBMAIN_S)
-	cl $(LTC_CFLAGS) demos/sizes.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
+	$(CC) $(LTC_CFLAGS) demos/sizes.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
 constants.exe: demos/constants.c $(LIBMAIN_S)
-	cl $(LTC_CFLAGS) demos/constants.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
+	$(CC) $(LTC_CFLAGS) demos/constants.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
 timing.exe: demos/timing.c $(LIBMAIN_S)
-	cl $(LTC_CFLAGS) demos/timing.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
+	$(CC) $(LTC_CFLAGS) demos/timing.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
 der_print_flexi.exe: demos/der_print_flexi.c $(LIBMAIN_S)
-	cl $(LTC_CFLAGS) demos/der_print_flexi.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
+	$(CC) $(LTC_CFLAGS) demos/der_print_flexi.c tests/common.c $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
 
 #Tests
 test.exe: $(LIBMAIN_S) $(TOBJECTS)
-	cl $(LTC_CFLAGS) $(TOBJECTS) $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
+	$(CC) $(LTC_CFLAGS) $(TOBJECTS) $(LIBMAIN_S) $(LTC_LDFLAGS) /Fe$@
 	@echo NOTICE: start the tests by launching test.exe
 
 ALL_TEST=hashsum.exe crypt.exe small.exe tv_gen.exe sizes.exe constants.exe timing.exe test.exe

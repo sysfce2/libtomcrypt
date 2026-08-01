@@ -3066,52 +3066,75 @@ int unregister_hash(const struct ltc_hash_descriptor *hash);
 \end{verbatim}
 
 The following hashes are provided as of this release within the LibTomCrypt library:
-\index{Hash descriptor table}
+\index{Hash descriptor tables}
 
 \begin{figure}[H]
 \begin{center}
 \begin{tabular}{|c|c|c|c|}
-      \hline \textbf{Name} & \textbf{Descriptor Name} & \textbf{Size of Message Digest (bytes)} & \textbf{Id} \\
-      \hline WHIRLPOOL & whirlpool\_desc & 64 & 11 \\
-      \hline Keccak512 & keccak\_512\_desc & 64 & 32 \\
-      \hline SHA3-512 & sha3\_512\_desc & 64 & 20 \\
-      \hline SHA-512 & sha512\_desc & 64 & 5 \\
-      \hline BLAKE2B-512 & blake2b\_512\_desc & 64 & 28 \\
-      \hline Keccak384 & keccak\_384\_desc & 48 & 31 \\
-      \hline SHA3-384 & sha3\_384\_desc & 48 & 19 \\
-      \hline SHA-384 & sha384\_desc & 48 & 4 \\
-      \hline BLAKE2B-384 & blake2b\_384\_desc & 48 & 27 \\
-      \hline RIPEMD-320 & rmd160\_desc & 40 & 14 \\
-      \hline SHA-512/256 & sha512\_256\_desc & 32 & 16 \\
-      \hline Keccak256 & keccak\_256\_desc & 32 & 30 \\
-      \hline SHA3-256 & sha3\_256\_desc & 32 & 18 \\
-      \hline SHA-256 & sha256\_desc & 32 & 0 \\
-      \hline RIPEMD-256 & rmd160\_desc & 32 & 13 \\
-      \hline BLAKE2S-256 & blake2s\_256\_desc & 32 & 24 \\
-      \hline BLAKE2B-256 & blake2b\_256\_desc & 32 & 26 \\
-      \hline SM3 & sm3\_desc & 32 & 34 \\
-      \hline SHA-512/224 & sha512\_224\_desc & 28 & 15 \\
-      \hline Keccak224 & keccak\_224\_desc & 28 & 29 \\
-      \hline SHA3-224 & sha3\_224\_desc & 28 & 17 \\
-      \hline SHA-224 & sha224\_desc & 28 & 10 \\
-      \hline BLAKE2S-224 & blake2s\_224\_desc & 28 & 23 \\
-      \hline TIGER-192 & tiger\_desc & 24 & 1 \\
-      \hline TIGER2-192 & tiger2\_desc & 24 & 33 \\
-      \hline SHA-1 & sha1\_desc & 20 & 2 \\
-      \hline RIPEMD-160 & rmd160\_desc & 20 & 9 \\
-      \hline BLAKE2S-160 & blake2s\_160\_desc & 20 & 22 \\
-      \hline BLAKE2B-160 & blake2b\_160\_desc & 20 & 25 \\
-      \hline RIPEMD-128 & rmd128\_desc & 16 & 8 \\
-      \hline MD5 & md5\_desc & 16 & 3 \\
-      \hline MD4 & md4\_desc & 16 & 6 \\
-      \hline MD2 & md2\_desc & 16 & 7 \\
-      \hline BLAKE2S-128 & blake2s\_128\_desc & 16 & 21 \\
-      \hline
+\hline \textbf{Name} & \textbf{Descriptor Name} & \textbf{Size of Message Digest (bytes)} & \textbf{Id} \\
+
+\hline SHA512            & \code{sha512\_desc}              & 64 &  5 \\
+\hline WHIRLPOOL         & \code{whirlpool\_desc}           & 64 & 11 \\
+\hline SHA3-512          & \code{sha3\_512\_desc}           & 64 & 20 \\
+\hline BLAKE2B-512       & \code{blake2b\_512\_desc}        & 64 & 28 \\
+\hline KECCAK512         & \code{keccak512\_desc}           & 64 & 32 \\
+\hline SHAKE256          & \code{shake256\_desc}            & 64 & 35 \\
+\hline SHA384            & \code{sha384\_desc}              & 48 &  4 \\
+\hline SHA3-384          & \code{sha3\_384\_desc}           & 48 & 19 \\
+\hline BLAKE2B-384       & \code{blake2b\_384\_desc}        & 48 & 27 \\
+\hline KECCAK384         & \code{keccak384\_desc}           & 48 & 31 \\
+\hline RMD320            & \code{rmd320\_desc}              & 40 & 14 \\
+\hline SHA256            & \code{sha256\_desc}              & 32 &  0 \\
+\hline RMD256            & \code{rmd256\_desc}              & 32 & 13 \\
+\hline SHA512-256        & \code{sha512\_256\_desc}         & 32 & 16 \\
+\hline SHA3-256          & \code{sha3\_256\_desc}           & 32 & 18 \\
+\hline BLAKE2S-256       & \code{blake2s\_256\_desc}        & 32 & 24 \\
+\hline BLAKE2B-256       & \code{blake2b\_256\_desc}        & 32 & 26 \\
+\hline KECCAK256         & \code{keccak256\_desc}           & 32 & 30 \\
+\hline SHAKE128          & \code{shake128\_desc}            & 32 & 34 \\
+\hline SM3               & \code{sm3\_desc}                 & 32 & 36 \\
+\hline SHA224            & \code{sha224\_desc}              & 28 & 10 \\
+\hline SHA512-224        & \code{sha512\_224\_desc}         & 28 & 15 \\
+\hline SHA3-224          & \code{sha3\_224\_desc}           & 28 & 17 \\
+\hline BLAKE2S-224       & \code{blake2s\_224\_desc}        & 28 & 23 \\
+\hline KECCAK224         & \code{keccak224\_desc}           & 28 & 29 \\
+\hline TIGER             & \code{tiger\_desc}               & 24 &  1 \\
+\hline TIGER2            & \code{tiger2\_desc}              & 24 & 33 \\
+\hline SHA1              & \code{sha1\_desc}                & 20 &  2 \\
+\hline RMD160            & \code{rmd160\_desc}              & 20 &  9 \\
+\hline BLAKE2S-160       & \code{blake2s\_160\_desc}        & 20 & 22 \\
+\hline BLAKE2B-160       & \code{blake2b\_160\_desc}        & 20 & 25 \\
+\hline MD5               & \code{md5\_desc}                 & 16 &  3 \\
+\hline MD4               & \code{md4\_desc}                 & 16 &  6 \\
+\hline MD2               & \code{md2\_desc}                 & 16 &  7 \\
+\hline RMD128            & \code{rmd128\_desc}              & 16 &  8 \\
+\hline BLAKE2S-128       & \code{blake2s\_128\_desc}        & 16 & 21 \\
+
+\hline
 \end{tabular}
 \end{center}
-\caption{Built--In Software Hashes}
+\caption{Built--In Hashes}
 \end{figure}
-\vfil
+
+Additional to those standard descriptors, there exist the following target-specific hash descriptors:
+
+\begin{figure}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline \textbf{Name} & \textbf{Descriptor Name} & \textbf{Size of Message Digest (bytes)} & \textbf{Id} \\
+\hline SHA256            & \code{sha256\_portable\_desc}    & 32 &  0 \\
+\hline SHA256            & \code{sha256\_x86\_desc}         & 32 &  0 \\
+\hline SHA224            & \code{sha224\_portable\_desc}    & 28 & 10 \\
+\hline SHA224            & \code{sha224\_x86\_desc}         & 28 & 10 \\
+\hline SHA1              & \code{sha1\_portable\_desc}      & 20 &  2 \\
+\hline SHA1              & \code{sha1\_x86\_desc}           & 20 &  2 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Target--specific hash descriptors}
+\end{figure}
+
+Those descriptors don't necessarily exist in all builds and their usage may only make sense in some setups.
 
 \mysection{Cipher Hash Construction}
 \index{Cipher Hash Construction}

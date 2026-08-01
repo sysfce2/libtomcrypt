@@ -72,6 +72,8 @@ static off_t fsize(const char *filename)
    struct stat st;
 
    if (stat(filename, &st) == 0) {
+      if (S_ISDIR(st.st_mode))
+         return -2;
       /* filename is no regular file */
       if (!S_ISREG(st.st_mode))
          return 0;
@@ -135,7 +137,7 @@ int test_process_dir(const char *path, void *ctx, dir_iter_cb iter, dir_fiter_cb
       strcat(fname, "/");
       strcat(fname, de->d_name);
       fsz = fsize(fname);
-      if (fsz == 0)
+      if (fsz == -2)
          continue;
       if (fsz == -1) {
          err = CRYPT_FILE_NOTFOUND;

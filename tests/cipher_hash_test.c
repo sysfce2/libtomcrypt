@@ -54,7 +54,7 @@ int cipher_hash_test(void)
    int           x;
 
    /* test block ciphers */
-   for (x = 0; cipher_descriptor[x].name != NULL; x++) {
+   for (x = 0; x < TAB_SIZE && cipher_descriptor[x].name != NULL; x++) {
       DOX(cipher_descriptor[x].test(), cipher_descriptor[x].name);
    }
 
@@ -100,7 +100,7 @@ int cipher_hash_test(void)
 #endif
 
    /* test hashes */
-   for (x = 0; hash_descriptor[x].name != NULL; x++) {
+   for (x = 0; x < TAB_SIZE && hash_descriptor[x].name != NULL; x++) {
       DOX(hash_descriptor[x].test(), hash_descriptor[x].name);
       /* test that state can be cloned via memcpy */
       DOX(s_hash_state_clone_test(&hash_descriptor[x], hash_descriptor[x].name), hash_descriptor[x].name);

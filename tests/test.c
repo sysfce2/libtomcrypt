@@ -6,7 +6,7 @@
 #define GIT_VERSION "Undefined version"
 #endif
 
-#define LTC_TEST_FN(f)  { f, #f }
+#define LTC_TEST_FN(f)  { f ## _test, #f }
 
 typedef struct {
    int (*fn)(void);
@@ -15,41 +15,41 @@ typedef struct {
 
 static const test_function test_functions[] =
 {
-      LTC_TEST_FN(store_test),
-      LTC_TEST_FN(rotate_test),
-      LTC_TEST_FN(cipher_hash_test),
-      LTC_TEST_FN(misc_test),
-      LTC_TEST_FN(mpi_test),
-      LTC_TEST_FN(mac_test),
-      LTC_TEST_FN(modes_test),
-      LTC_TEST_FN(der_test),
-      LTC_TEST_FN(pkcs_1_test),
-      LTC_TEST_FN(pkcs_1_pss_test),
-      LTC_TEST_FN(pkcs_1_oaep_test),
-      LTC_TEST_FN(pkcs_1_emsa_test),
-      LTC_TEST_FN(pkcs_1_eme_test),
-      LTC_TEST_FN(rsa_test),
-      LTC_TEST_FN(dh_test),
-      LTC_TEST_FN(ecc_test),
-      LTC_TEST_FN(dsa_test),
-      LTC_TEST_FN(ed25519_test),
-      LTC_TEST_FN(ed25519_mpi_test),
-      LTC_TEST_FN(x25519_test),
-      LTC_TEST_FN(x25519_mpi_test),
-      LTC_TEST_FN(ed448_test),
-      LTC_TEST_FN(ed448_mpi_test),
-      LTC_TEST_FN(x448_test),
-      LTC_TEST_FN(x448_mpi_test),
-      LTC_TEST_FN(file_test),
-      LTC_TEST_FN(multi_test),
-      LTC_TEST_FN(pem_test),
-      LTC_TEST_FN(deprecated_test),
-      LTC_TEST_FN(nop_test),
+      LTC_TEST_FN(store),
+      LTC_TEST_FN(rotate),
+      LTC_TEST_FN(cipher_hash),
+      LTC_TEST_FN(misc),
+      LTC_TEST_FN(mpi),
+      LTC_TEST_FN(mac),
+      LTC_TEST_FN(modes),
+      LTC_TEST_FN(der),
+      LTC_TEST_FN(pkcs_1),
+      LTC_TEST_FN(pkcs_1_pss),
+      LTC_TEST_FN(pkcs_1_oaep),
+      LTC_TEST_FN(pkcs_1_emsa),
+      LTC_TEST_FN(pkcs_1_eme),
+      LTC_TEST_FN(rsa),
+      LTC_TEST_FN(dh),
+      LTC_TEST_FN(ecc),
+      LTC_TEST_FN(dsa),
+      LTC_TEST_FN(ed25519),
+      LTC_TEST_FN(ed25519_mpi),
+      LTC_TEST_FN(x25519),
+      LTC_TEST_FN(x25519_mpi),
+      LTC_TEST_FN(ed448),
+      LTC_TEST_FN(ed448_mpi),
+      LTC_TEST_FN(x448),
+      LTC_TEST_FN(x448_mpi),
+      LTC_TEST_FN(file),
+      LTC_TEST_FN(multi),
+      LTC_TEST_FN(pem),
+      LTC_TEST_FN(deprecated),
+      LTC_TEST_FN(nop),
       /* keep the prng_test always at the end as
        * it has to be handled specially when
        * testing with LTC_PTHREAD enabled
        */
-      LTC_TEST_FN(prng_test),
+      LTC_TEST_FN(prng),
 };
 
 
@@ -258,10 +258,10 @@ static void s_unregister_all(void)
   unregister_hash(&shake256_desc);
 #endif
 #ifdef LTC_KECCAK
-  unregister_hash(&keccak_224_desc);
-  unregister_hash(&keccak_256_desc);
-  unregister_hash(&keccak_384_desc);
-  unregister_hash(&keccak_512_desc);
+  unregister_hash(&keccak224_desc);
+  unregister_hash(&keccak256_desc);
+  unregister_hash(&keccak384_desc);
+  unregister_hash(&keccak512_desc);
 #endif
 #ifdef LTC_RIPEMD128
   unregister_hash(&rmd128_desc);
@@ -343,6 +343,21 @@ static void register_algs(void)
        exit(EXIT_FAILURE);
    }
 }
+static void LTC_NORETURN die(int status)
+{
+   FILE* o = status == EXIT_SUCCESS ? stdout : stderr;
+   fprintf(o,
+         "Usage: test [<-h|-l|case>] [mpi]\n\n"
+         "Run all built-in tests, or only the one given in <case>.\n\n"
+         "\tcase\tThe algorithms to test. Use the '-l' option to check for valid values.\n"
+         "\tmpi\tThe MPI provider to use.\n"
+         "\t-l\tList all tests that can be executed.\n"
+         "\t-h\tThe help you're looking at.\n\n"
+         "Examples:\n"
+         "\ttest rsa tfm\t\tWill run only the RSA tests with TomsFastMath as MPI provider.\n"
+   );
+   exit(status);
+}
 
 int main(int argc, char **argv)
 {
@@ -355,6 +370,23 @@ int main(int argc, char **argv)
    char *single_test = NULL;
    ulong64 ts;
    long delta, dur, real = 0;
+
+   if (argc > 1) {
+      if (strstr(argv[1], "-h")) {
+         die(EXIT_SUCCESS);
+      } else if (strstr(argv[1], "-l")) {
+         printf("The following tests are available:\n");
+         for (i = 0; i < LTC_ARRAY_SIZE(test_functions); ++i) {
+            if (i % 4 == 0)
+               putchar('\n');
+            printf("   %-13s", test_functions[i].name);
+         }
+         putchar('\n');
+         exit(0);
+      }
+   }
+
+
    register_algs();
 
    printf("LTC_VERSION  = %s\n%s\n\n", GIT_VERSION, crypt_build_settings);
@@ -412,7 +444,7 @@ int main(int argc, char **argv)
 #endif
    }
 
-   fn_len = fn_len + (4 - (fn_len % 4));
+   fn_len = fn_len + (8 - (fn_len % 8));
 
    /* single test name from commandline */
    if (argc > 1) single_test = argv[1];
@@ -469,6 +501,12 @@ int main(int argc, char **argv)
    XFREE(tinfo);
 #endif
 
+   if (cipher_descriptor[TAB_SIZE - 1].name != NULL)
+      printf("cipher_descriptor Table full\n");
+   if (hash_descriptor[TAB_SIZE - 1].name != NULL)
+      printf("hash_descriptor Table full\n");
+   if (prng_descriptor[TAB_SIZE - 1].name != NULL)
+      printf("prng_descriptor Table full\n");
    x = (fail > 0 || fail+pass+nop == 0) ? EXIT_FAILURE : EXIT_SUCCESS;
    printf("\n\n%s: passed=%d failed=%d nop=%d duration=%.1fsec real=%.1fsec\n", x ? "FAILURE" : "SUCCESS", pass, fail, nop, (double)(dur)/(1000*1000), (double)(real)/(1000*1000));
    return x;

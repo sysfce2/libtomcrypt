@@ -242,6 +242,22 @@ static int print_hash_descriptors(void)
 #ifdef LTC_SHA1_X86
                                      HASH_DESC(sha1_x86_desc),
 #endif
+                                     HASH_DESC(sha512_portable_desc),
+#ifdef LTC_SHA512_X86
+                                     HASH_DESC(sha512_x86_desc),
+#endif
+                                     HASH_DESC(sha384_portable_desc),
+#ifdef LTC_SHA384_X86
+                                     HASH_DESC(sha384_x86_desc),
+#endif
+                                     HASH_DESC(sha512_224_portable_desc),
+#ifdef LTC_SHA512_224_X86
+                                     HASH_DESC(sha512_224_x86_desc),
+#endif
+                                     HASH_DESC(sha512_256_portable_desc),
+#ifdef LTC_SHA512_256_X86
+                                     HASH_DESC(sha512_256_x86_desc),
+#endif
    };
    struct desc descs[TAB_SIZE + 1] = {0};
    int ids[TAB_SIZE + 1] = {0};

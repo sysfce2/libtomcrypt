@@ -121,6 +121,24 @@ int cipher_hash_test(void)
       DO(s_hash_state_clone_test(&sha1_x86_desc, "sha1-x86-clone"));
 #endif
    }
+   if (sha512ni_is_supported()) {
+#if defined(LTC_SHA512) && defined(LTC_SHA512_X86)
+      DO(sha512_x86_test());
+      DO(s_hash_state_clone_test(&sha512_x86_desc, "sha512-x86-clone"));
+#endif
+#if defined(LTC_SHA384) && defined(LTC_SHA384_X86)
+      DO(sha384_x86_test());
+      DO(s_hash_state_clone_test(&sha384_x86_desc, "sha384-x86-clone"));
+#endif
+#if defined(LTC_SHA512_224) && defined(LTC_SHA512_224_X86)
+      DO(sha512_224_x86_test());
+      DO(s_hash_state_clone_test(&sha512_224_x86_desc, "sha512-224-x86-clone"));
+#endif
+#if defined(LTC_SHA512_256) && defined(LTC_SHA512_256_X86)
+      DO(sha512_256_x86_test());
+      DO(s_hash_state_clone_test(&sha512_256_x86_desc, "sha512-256-x86-clone"));
+#endif
+   }
 #if defined(LTC_SHA256)
    DO(sha256_c_test());
    DO(s_hash_state_clone_test(&sha256_portable_desc, "sha256-c-clone"));
@@ -132,6 +150,22 @@ int cipher_hash_test(void)
 #if defined(LTC_SHA1)
    DO(sha1_c_test());
    DO(s_hash_state_clone_test(&sha1_portable_desc, "sha1-c-clone"));
+#endif
+#if defined(LTC_SHA512)
+   DO(sha512_c_test());
+   DO(s_hash_state_clone_test(&sha512_portable_desc, "sha512-c-clone"));
+#endif
+#if defined(LTC_SHA384)
+   DO(sha384_c_test());
+   DO(s_hash_state_clone_test(&sha384_portable_desc, "sha384-c-clone"));
+#endif
+#if defined(LTC_SHA512_224)
+   DO(sha512_224_c_test());
+   DO(s_hash_state_clone_test(&sha512_224_portable_desc, "sha512-224-c-clone"));
+#endif
+#if defined(LTC_SHA512_256)
+   DO(sha512_256_c_test());
+   DO(s_hash_state_clone_test(&sha512_256_portable_desc, "sha512-256-c-clone"));
 #endif
 #ifdef LTC_SHA3
    /* SHAKE128 + SHAKE256 tests are a bit special */

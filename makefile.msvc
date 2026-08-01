@@ -61,9 +61,12 @@ src/hashes/helper/hash_memory_multi.obj src/hashes/md2.obj src/hashes/md4.obj sr
 src/hashes/rmd128.obj src/hashes/rmd160.obj src/hashes/rmd256.obj src/hashes/rmd320.obj src/hashes/sha1.obj \
 src/hashes/sha1_desc.obj src/hashes/sha1_x86.obj src/hashes/sha2/sha224.obj src/hashes/sha2/sha224_desc.obj \
 src/hashes/sha2/sha224_x86.obj src/hashes/sha2/sha256.obj src/hashes/sha2/sha256_desc.obj \
-src/hashes/sha2/sha256_x86.obj src/hashes/sha2/sha384.obj src/hashes/sha2/sha512.obj \
-src/hashes/sha2/sha512_224.obj src/hashes/sha2/sha512_256.obj src/hashes/sha3.obj src/hashes/sha3_test.obj \
-src/hashes/sm3.obj src/hashes/tiger.obj src/hashes/whirl/whirl.obj src/mac/blake2/blake2bmac.obj \
+src/hashes/sha2/sha256_x86.obj src/hashes/sha2/sha384.obj src/hashes/sha2/sha384_desc.obj \
+src/hashes/sha2/sha384_x86.obj src/hashes/sha2/sha512.obj src/hashes/sha2/sha512_224.obj \
+src/hashes/sha2/sha512_224_desc.obj src/hashes/sha2/sha512_224_x86.obj src/hashes/sha2/sha512_256.obj \
+src/hashes/sha2/sha512_256_desc.obj src/hashes/sha2/sha512_256_x86.obj src/hashes/sha2/sha512_desc.obj \
+src/hashes/sha2/sha512_x86.obj src/hashes/sha3.obj src/hashes/sha3_test.obj src/hashes/sm3.obj \
+src/hashes/tiger.obj src/hashes/whirl/whirl.obj src/mac/blake2/blake2bmac.obj \
 src/mac/blake2/blake2bmac_file.obj src/mac/blake2/blake2bmac_memory.obj \
 src/mac/blake2/blake2bmac_memory_multi.obj src/mac/blake2/blake2bmac_test.obj src/mac/blake2/blake2smac.obj \
 src/mac/blake2/blake2smac_file.obj src/mac/blake2/blake2smac_memory.obj \

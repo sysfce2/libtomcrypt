@@ -345,7 +345,7 @@ static int LTC_SHA512_TARGET s_sha512_x86_compress(hash_state * md, const unsign
     state_b = ltc_mm256_blend_epi64(tmp_c, tmp_d, ltc_blend_epi64_k(0x1, 0x1, 0x0, 0x0));
     _mm256_storeu_si256(((__m256i*)(&md->sha512.state[0])), state_a);
     _mm256_storeu_si256(((__m256i*)(&md->sha512.state[4])), state_b);
-  return CRYPT_OK;
+    return CRYPT_OK;
 
 #undef ltc_permute_epi64_k
 #undef ltc_blend_epi32_k

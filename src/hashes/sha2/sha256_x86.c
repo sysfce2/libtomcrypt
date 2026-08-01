@@ -250,10 +250,10 @@ static int LTC_SHA_TARGET s_sha256_x86_compress(hash_state * md, const unsigned 
 #undef K
 
 #ifdef LTC_CLEAN_STACK
-static int s_sha256_compress(hash_state * md, const unsigned char *buf)
+static int s_sha256_x86_compress(hash_state * md, const unsigned char *buf)
 {
     int err;
-    err = ss_sha256_compress(md, buf);
+    err = ss_sha256_x86_compress(md, buf);
     burn_stack(sizeof(ulong32) * 74);
     return err;
 }

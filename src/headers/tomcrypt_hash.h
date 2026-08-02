@@ -161,6 +161,19 @@ struct blake2b_state {
 };
 #endif
 
+#ifdef LTC_BLAKE3
+struct blake3_state {
+    unsigned char input[64];    /* current input block (not yet compressed) */
+    ulong32 cv_buf[54 * 8];     /* chaining-value stack (54 levels x 8 words) */
+    ulong32 key[8];             /* mode key: IV, user key, or derived context key */
+    ulong32 cv_off;             /* top-of-stack index into cv_buf (units: 8 words) */
+    ulong32 bytes;              /* bytes buffered in input[] */
+    ulong32 block;              /* block index within current chunk (0-15) */
+    ulong32 flags;              /* mode flags ORed into every compress call */
+    ulong64 chunk;              /* completed-chunk counter */
+};
+#endif
+
 typedef union Hash_state {
     char dummy[1];
 #ifdef LTC_CHC_HASH
@@ -216,6 +229,9 @@ typedef union Hash_state {
 #endif
 #ifdef LTC_SM3
     struct sm3_state sm3;
+#endif
+#ifdef LTC_BLAKE3
+    struct blake3_state blake3;
 #endif
 
     void *data;
@@ -574,6 +590,16 @@ int sm3_process(hash_state * md, const unsigned char *in, unsigned long inlen);
 int sm3_done(hash_state * md, unsigned char *out);
 int sm3_test(void);
 extern const struct ltc_hash_descriptor sm3_desc;
+#endif
+
+#ifdef LTC_BLAKE3
+int blake3_init(hash_state *md);
+int blake3_keyed_init(hash_state *md, const unsigned char *key, unsigned long keylen);
+int blake3_derive_key_init(hash_state *md, const unsigned char *context, unsigned long contextlen);
+int blake3_process(hash_state *md, const unsigned char *in, unsigned long inlen);
+int blake3_done(hash_state *md, unsigned char *out);
+int blake3_test(void);
+extern const struct ltc_hash_descriptor blake3_desc;
 #endif
 
 #ifdef LTC_MD5

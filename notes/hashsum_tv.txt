@@ -6,6 +6,7 @@ blake2s-128: 7e1f9b6de11a3c597308f9d8aacd7321 *tests/test.key
 blake2s-160: 3d1c9ae1a0afe8a6ef8b61d5380de7b061cd353c *tests/test.key
 blake2s-224: 95dacd83d0421b2d69a52d92ee54143bb97c91a61450d917a88d4388 *tests/test.key
 blake2s-256: 92ac6dc88b9ce4a75b2a54783435a37919303f713396db0e9ccd976d8c55f1cf *tests/test.key
+blake3: 634ba3ee0627293fe3ef89fe7200434fdbf2c40b08266e0fd09708bfd486af0c *tests/test.key
 chc_hash: d50da1ea9b53c0b891c8bcb0a4c6e5e0 *tests/test.key
 keccak224: c056b64ec1d8066aeb148d38aded0ff96cdb1e17eecaaca407b3bf66 *tests/test.key
 keccak256: af91c0982f5f79d51df0f6ccb28c7f0075ef330e09371cbefa660119a74f28c3 *tests/test.key

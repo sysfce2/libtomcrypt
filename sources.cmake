@@ -80,6 +80,7 @@ src/encauth/ocb3/ocb3_test.c
 src/encauth/siv/siv.c
 src/hashes/blake2b.c
 src/hashes/blake2s.c
+src/hashes/blake3.c
 src/hashes/chc/chc.c
 src/hashes/helper/hash_file.c
 src/hashes/helper/hash_filehandle.c

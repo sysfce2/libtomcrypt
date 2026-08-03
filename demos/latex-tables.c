@@ -9,6 +9,7 @@ static const struct {
 } cipher_name_map[] = {
    { "", "none" },
    { "aes", "AES" },
+   { "aria", "ARIA" },
    { "blowfish", "Blowfish" },
    { "c20p1305", "ChaCha20Poly1305" },
    { "camellia", "Camellia" },

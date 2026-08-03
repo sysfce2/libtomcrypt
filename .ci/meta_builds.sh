@@ -24,6 +24,8 @@ function run_gcc() {
 
    make -j$(nproc) latex-tables V=0
 
+   ./latex-tables
+
    echo "verify docs..."
    while read -r line; do
      grep -q -e "$line" doc/crypt.tex || { echo "Failed to find \"$line\" in doc/crypt.tex"; exit 1; }

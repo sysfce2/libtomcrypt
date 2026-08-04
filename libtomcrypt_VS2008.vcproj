@@ -824,6 +824,10 @@
 				>
 			</File>
 			<File
+				RelativePath="src\hashes\blake3.c"
+				>
+			</File>
+			<File
 				RelativePath="src\hashes\md2.c"
 				>
 			</File>

@@ -66,11 +66,14 @@ int register_all_hashes(void)
    REGISTER_HASH(&blake2s_224_desc);
    REGISTER_HASH(&blake2s_256_desc);
 #endif
-#ifdef LTC_BLAKE2S
+#ifdef LTC_BLAKE2B
    REGISTER_HASH(&blake2b_160_desc);
    REGISTER_HASH(&blake2b_256_desc);
    REGISTER_HASH(&blake2b_384_desc);
    REGISTER_HASH(&blake2b_512_desc);
+#endif
+#ifdef LTC_BLAKE3
+   REGISTER_HASH(&blake3_desc);
 #endif
 #ifdef LTC_KECCAK
    REGISTER_HASH(&keccak224_desc);

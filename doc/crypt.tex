@@ -3093,6 +3093,7 @@ The following hashes are provided as of this release within the LibTomCrypt libr
 \hline KECCAK256         & \code{keccak256\_desc}           & 32 & 30 \\
 \hline SHAKE128          & \code{shake128\_desc}            & 32 & 34 \\
 \hline SM3               & \code{sm3\_desc}                 & 32 & 36 \\
+\hline BLAKE3            & \code{blake3\_desc}              & 32 & 37 \\
 \hline SHA224            & \code{sha224\_desc}              & 28 & 10 \\
 \hline SHA512-224        & \code{sha512\_224\_desc}         & 28 & 15 \\
 \hline SHA3-224          & \code{sha3\_224\_desc}           & 28 & 17 \\
@@ -3202,6 +3203,82 @@ int main(void)
     * [aside from pkcs...] */
 }
 \end{verbatim}
+
+\mysection{BLAKE3}
+\index{BLAKE3}
+BLAKE3 is a cryptographic hash function that also supports keyed hashing (MAC/PRF) and key derivation.
+The standard unkeyed hash uses the normal hash descriptor interface:
+
+\begin{verbatim}
+int blake3_init(hash_state *md);
+int blake3_process(hash_state *md, const unsigned char *in,
+                   unsigned long inlen);
+int blake3_done(hash_state *md, unsigned char *out);
+\end{verbatim}
+
+The default output is 32 bytes (256 bits).
+To enable BLAKE3, define \texttt{LTC\_BLAKE3} in \textit{tomcrypt\_custom.h}.
+
+\subsection{BLAKE3 Keyed Hash}
+\index{blake3\_keyed\_init()}
+BLAKE3 keyed hashing can be used as a MAC or PRF with a 32-byte key.  It replaces the need for a
+separate HMAC construction.
+
+\begin{verbatim}
+int blake3_keyed_init(hash_state *md, const unsigned char *key,
+                      unsigned long keylen);
+\end{verbatim}
+
+The \textit{keylen} parameter must be exactly 32.  After initialization, use the standard
+\texttt{blake3\_process()} and \texttt{blake3\_done()} to hash data and obtain the tag.
+
+\subsection{BLAKE3 Key Derivation}
+\index{blake3\_derive\_key\_init()}
+BLAKE3 key derivation uses a two-pass construction: first the application-specific context string is
+hashed internally, then the resulting context key is used to hash the input key material.
+
+\begin{verbatim}
+int blake3_derive_key_init(hash_state *md,
+                           const unsigned char *context,
+                           unsigned long contextlen);
+\end{verbatim}
+
+The \textit{context} should be a globally unique, application-specific string (e.g.\
+\texttt{"myapp 2024-01-01 session-key"}).  After initialization, feed the input key material via
+\texttt{blake3\_process()} and retrieve the derived key via \texttt{blake3\_done()}.
+
+\subsection{BLAKE3 Example code}
+
+\begin{small}
+\begin{verbatim}
+#include <tomcrypt.h>
+int main(void)
+{
+   hash_state md;
+   unsigned char out[32];
+   const unsigned char key[32] = "whats the Elvish word for friend";
+   const unsigned char msg[] = "hello";
+
+   /* Unkeyed hash */
+   blake3_init(&md);
+   blake3_process(&md, msg, 5);
+   blake3_done(&md, out);
+
+   /* Keyed hash (MAC) */
+   blake3_keyed_init(&md, key, 32);
+   blake3_process(&md, msg, 5);
+   blake3_done(&md, out);
+
+   /* Key derivation */
+   blake3_derive_key_init(&md,
+      (const unsigned char *)"myapp 2024-01-01 session-key", 28);
+   blake3_process(&md, key, 32);  /* input key material */
+   blake3_done(&md, out);         /* derived key */
+
+   return 0;
+}
+\end{verbatim}
+\end{small}
 
 \mysection{Extendable Output Functions (XOF)}
 Some algorithms provide a special XOF (Extendable Output Functions) mode which allow to generate message digests of an arbitrary length.

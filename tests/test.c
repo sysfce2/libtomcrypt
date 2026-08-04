@@ -294,6 +294,9 @@ static void s_unregister_all(void)
   unregister_hash(&blake2b_384_desc);
   unregister_hash(&blake2b_512_desc);
 #endif
+#ifdef LTC_BLAKE3
+  unregister_hash(&blake3_desc);
+#endif
 #ifdef LTC_CHC_HASH
   unregister_hash(&chc_desc);
 #endif

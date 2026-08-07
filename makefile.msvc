@@ -88,11 +88,11 @@ src/mac/xcbc/xcbc_file.obj src/mac/xcbc/xcbc_init.obj src/mac/xcbc/xcbc_memory.o
 src/mac/xcbc/xcbc_memory_multi.obj src/mac/xcbc/xcbc_process.obj src/mac/xcbc/xcbc_test.obj \
 src/math/fp/ltc_ecc_fp_mulmod.obj src/math/gmp_desc.obj src/math/ltm_desc.obj src/math/multi.obj \
 src/math/radix_to_bin.obj src/math/rand_bn.obj src/math/rand_prime.obj src/math/tfm_desc.obj src/misc/adler32.obj \
-src/misc/argon2/argon2.obj src/misc/base16/base16_decode.obj src/misc/base16/base16_encode.obj \
-src/misc/base32/base32_decode.obj src/misc/base32/base32_encode.obj src/misc/base64/base64_decode.obj \
-src/misc/base64/base64_encode.obj src/misc/bcrypt/bcrypt.obj src/misc/burn_stack.obj \
-src/misc/compare_testvector.obj src/misc/copy_or_zeromem.obj src/misc/crc32.obj src/misc/crypt/crypt.obj \
-src/misc/crypt/crypt_argchk.obj src/misc/crypt/crypt_cipher_descriptor.obj \
+src/misc/algname_match.obj src/misc/argon2/argon2.obj src/misc/base16/base16_decode.obj \
+src/misc/base16/base16_encode.obj src/misc/base32/base32_decode.obj src/misc/base32/base32_encode.obj \
+src/misc/base64/base64_decode.obj src/misc/base64/base64_encode.obj src/misc/bcrypt/bcrypt.obj \
+src/misc/burn_stack.obj src/misc/compare_testvector.obj src/misc/copy_or_zeromem.obj src/misc/crc32.obj \
+src/misc/crypt/crypt.obj src/misc/crypt/crypt_argchk.obj src/misc/crypt/crypt_cipher_descriptor.obj \
 src/misc/crypt/crypt_cipher_is_valid.obj src/misc/crypt/crypt_constants.obj \
 src/misc/crypt/crypt_find_cipher.obj src/misc/crypt/crypt_find_cipher_any.obj \
 src/misc/crypt/crypt_find_cipher_id.obj src/misc/crypt/crypt_find_hash.obj \

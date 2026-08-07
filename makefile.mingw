@@ -95,11 +95,11 @@ src/mac/xcbc/xcbc_file.o src/mac/xcbc/xcbc_init.o src/mac/xcbc/xcbc_memory.o \
 src/mac/xcbc/xcbc_memory_multi.o src/mac/xcbc/xcbc_process.o src/mac/xcbc/xcbc_test.o \
 src/math/fp/ltc_ecc_fp_mulmod.o src/math/gmp_desc.o src/math/ltm_desc.o src/math/multi.o \
 src/math/radix_to_bin.o src/math/rand_bn.o src/math/rand_prime.o src/math/tfm_desc.o src/misc/adler32.o \
-src/misc/argon2/argon2.o src/misc/base16/base16_decode.o src/misc/base16/base16_encode.o \
-src/misc/base32/base32_decode.o src/misc/base32/base32_encode.o src/misc/base64/base64_decode.o \
-src/misc/base64/base64_encode.o src/misc/bcrypt/bcrypt.o src/misc/burn_stack.o \
-src/misc/compare_testvector.o src/misc/copy_or_zeromem.o src/misc/crc32.o src/misc/crypt/crypt.o \
-src/misc/crypt/crypt_argchk.o src/misc/crypt/crypt_cipher_descriptor.o \
+src/misc/algname_match.o src/misc/argon2/argon2.o src/misc/base16/base16_decode.o \
+src/misc/base16/base16_encode.o src/misc/base32/base32_decode.o src/misc/base32/base32_encode.o \
+src/misc/base64/base64_decode.o src/misc/base64/base64_encode.o src/misc/bcrypt/bcrypt.o \
+src/misc/burn_stack.o src/misc/compare_testvector.o src/misc/copy_or_zeromem.o src/misc/crc32.o \
+src/misc/crypt/crypt.o src/misc/crypt/crypt_argchk.o src/misc/crypt/crypt_cipher_descriptor.o \
 src/misc/crypt/crypt_cipher_is_valid.o src/misc/crypt/crypt_constants.o \
 src/misc/crypt/crypt_find_cipher.o src/misc/crypt/crypt_find_cipher_any.o \
 src/misc/crypt/crypt_find_cipher_id.o src/misc/crypt/crypt_find_hash.o \

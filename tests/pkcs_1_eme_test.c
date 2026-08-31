@@ -2,7 +2,7 @@
 /* SPDX-License-Identifier: Unlicense */
 #include <tomcrypt_test.h>
 
-#if defined(LTC_PKCS_1)
+#if defined(LTC_MRSA)
 
 #include "../notes/rsa-testvectors/pkcs1v15crypt-vectors.c"
 

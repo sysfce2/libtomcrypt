@@ -256,6 +256,8 @@ int pkcs_1_mgf1(int                  hash_idx,
 {
    return ltc_pkcs_1_mgf1(hash_idx, seed, seedlen, mask, masklen);
 }
+
+#ifdef LTC_MRSA
 /**
   PKCS #1 v2.00 OAEP encode
   @param msg             The data to encode
@@ -379,6 +381,7 @@ int pkcs_1_pss_decode(const unsigned char *msghash, unsigned long msghashlen,
    }
    return ltc_pkcs_1_pss_decode_mgf1(msghash, msghashlen, sig, siglen, &params, modulus_bitlen, res);
 }
+#endif /* LTC_MRSA */
 
 
 /*! \brief PKCS #1 v1.5 encode.

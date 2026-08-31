@@ -7,7 +7,7 @@
   PKCS #1 PSS Signature Padding, Tom St Denis
 */
 
-#ifdef LTC_PKCS_1
+#ifdef LTC_MRSA
 
 /**
    PKCS #1 v2.00 Signature Verification
@@ -165,4 +165,4 @@ LBL_ERR:
    return err;
 }
 
-#endif /* LTC_PKCS_1 */
+#endif /* LTC_MRSA */

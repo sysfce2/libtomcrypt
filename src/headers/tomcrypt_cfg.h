@@ -257,16 +257,6 @@ typedef unsigned long ltc_mp_digit;
    #define LTC_NO_ROTATE
 #endif
 
-/* Just portable C implementations */
-#ifdef LTC_NO_ACCEL
-   #define LTC_NO_AES_NI
-   #define LTC_NO_GCM_PCLMUL
-   #define LTC_NO_GCM_PMULL
-   #define LTC_NO_SHA1_X86
-   #define LTC_NO_SHA224_X86
-   #define LTC_NO_SHA256_X86
-#endif
-
 /* No LTC_FAST if explicitly disabled */
 #if defined(LTC_NO_FAST)
    #undef LTC_FAST
@@ -322,6 +312,16 @@ typedef unsigned long ltc_mp_digit;
 
 #if (defined(__x86_64__) || defined(__i386__) || defined(_M_X64) || defined(_M_IX86))
    #define LTC_ARCH_X86
+#endif
+
+#if defined(__aarch64__) || defined(_M_ARM64)
+   #define LTC_ARCH_AARCH64
+#endif
+
+/* Just portable C implementations, LTC_NO_ACCEL disables all the CPU-specific ones at once */
+#ifndef LTC_NO_ACCEL
+
+#ifdef LTC_ARCH_X86
    #if !defined(LTC_NO_AES_NI)
       #define LTC_AES_NI
    #endif
@@ -359,15 +359,16 @@ typedef unsigned long ltc_mp_digit;
          #define LTC_SHA512_256_X86
       #endif
    #endif
-#endif
+#endif /* LTC_ARCH_X86 */
 
-#if defined(__aarch64__) || defined(_M_ARM64)
-   #define LTC_ARCH_AARCH64
+#ifdef LTC_ARCH_AARCH64
    #if !defined(LTC_NO_GCM_PMULL)
       #define LTC_GCM_PMULL
       #undef LTC_GCM_TABLES
    #endif
-#endif
+#endif /* LTC_ARCH_AARCH64 */
+
+#endif /* LTC_NO_ACCEL */
 
 #if defined(__GNUC__)
    #define LTC_ALIGN_MSVC(n)

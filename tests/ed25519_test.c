@@ -98,6 +98,21 @@ static int s_rfc_8410_10_test(void)
    return CRYPT_OK;
 }
 
+/* RFC 8410 requires the parameters field of the AlgorithmIdentifier to be absent */
+static int s_ed25519_pkcs8_params_test(void)
+{
+   /* RFC 8410 - 10.3.  Example Ed25519 Private Key, with a NULL parameters element added */
+   const char *b64 = "MDACAQAwBwYDK2VwBQAEIgQg1O5y2/kTWErVttjx92n4rTr+fCjL8dT74Jeoj0R1WEI=";
+   curve25519_key key;
+   unsigned char buf[1024];
+   unsigned long buflen = sizeof(buf);
+
+   DO(base64_decode(b64, XSTRLEN(b64), buf, &buflen));
+   SHOULD_FAIL_WITH(ed25519_import_pkcs8(buf, buflen, NULL, &key), CRYPT_INVALID_PACKET);
+
+   return CRYPT_OK;
+}
+
 typedef struct {
    const char* secret_key;
    const char* public_key;
@@ -458,6 +473,7 @@ int ed25519_mpi_test(void)
 {
    if (ltc_mp.name == NULL) return CRYPT_NOP;
    DO(s_rfc_8410_10_test());
+   DO(s_ed25519_pkcs8_params_test());
    return CRYPT_OK;
 }
 

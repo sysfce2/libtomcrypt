@@ -180,6 +180,21 @@ static int s_x25519_pkcs8_test(void)
    return CRYPT_OK;
 }
 
+/* RFC 8410 requires the parameters field of the AlgorithmIdentifier to be absent */
+static int s_x25519_pkcs8_params_test(void)
+{
+   /* `openssl genpkey -algorithm x25519`, with an OID parameters element added */
+   const char *b64 = "MDMCAQAwCgYDK2VuBgMrZXAEIgQgQAidpR3H59AV+CGkLPD9Z0i1FPf4Wc9KStT1NwhlNlY=";
+   curve25519_key key;
+   unsigned char buf[1024];
+   unsigned long buflen = sizeof(buf);
+
+   DO(base64_decode(b64, XSTRLEN(b64), buf, &buflen));
+   SHOULD_FAIL_WITH(x25519_import_pkcs8(buf, buflen, NULL, &key), CRYPT_INVALID_PACKET);
+
+   return CRYPT_OK;
+}
+
 static int s_x25519_compat_test(void)
 {
    curve25519_key priv, pub, imported;
@@ -258,6 +273,7 @@ int x25519_mpi_test(void)
 {
    if (ltc_mp.name == NULL) return CRYPT_NOP;
    DO(s_x25519_pkcs8_test());
+   DO(s_x25519_pkcs8_params_test());
    DO(s_rfc_8410_10_test());
    DO(s_x25519_compat_test());
    return CRYPT_OK;

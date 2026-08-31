@@ -72,7 +72,6 @@ int der_decode_integer(const unsigned char *in, unsigned long inlen, void *num)
    }
 
    return CRYPT_OK;
-
 }
 
 #endif

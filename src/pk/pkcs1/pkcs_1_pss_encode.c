@@ -70,7 +70,6 @@ int ltc_pkcs_1_pss_encode_mgf1(const unsigned char *msghash,       unsigned long
       return CRYPT_MEM;
    }
 
-
    /* generate random salt */
    if (saltlen > 0) {
       if (prng_descriptor[params->wprng].read(salt, saltlen, params->prng) != saltlen) {

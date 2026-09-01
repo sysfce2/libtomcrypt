@@ -28,9 +28,9 @@
 */
 int mem_neq(const void *a, const void *b, size_t len)
 {
-   unsigned char ret = 0;
-   const unsigned char* pa;
-   const unsigned char* pb;
+   volatile unsigned char ret = 0;
+   const volatile unsigned char *pa;
+   const volatile unsigned char *pb;
 
    LTC_ARGCHK(a != NULL);
    LTC_ARGCHK(b != NULL);

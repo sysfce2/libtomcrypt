@@ -88,14 +88,14 @@ int der_decode_generalizedtime(const unsigned char *in, unsigned long *inlen,
    }
 
    /* possible encodings are
-YYYYMMDDhhmmssZ
-YYYYMMDDhhmmss+hh'mm'
-YYYYMMDDhhmmss-hh'mm'
-YYYYMMDDhhmmss.fsZ
-YYYYMMDDhhmmss.fs+hh'mm'
-YYYYMMDDhhmmss.fs-hh'mm'
+      YYYYMMDDhhmmssZ
+      YYYYMMDDhhmmss+hh'mm'
+      YYYYMMDDhhmmss-hh'mm'
+      YYYYMMDDhhmmss.fsZ
+      YYYYMMDDhhmmss.fs+hh'mm'
+      YYYYMMDDhhmmss.fs-hh'mm'
 
-    So let's do a trivial decode upto [including] ss
+      So let's do a trivial decode upto [including] ss
    */
 
     x = 0;

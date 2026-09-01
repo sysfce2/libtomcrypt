@@ -8,7 +8,7 @@
    Russ Williams
 */
 
-#ifdef LTC_SSH
+#if defined(LTC_MECC) && defined(LTC_SSH)
 
 /**
   Curve/OID to SSH+ECDSA name string mapping

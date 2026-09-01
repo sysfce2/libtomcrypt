@@ -53,7 +53,25 @@ int pkcs8_get_children(const ltc_asn1_list *decoded_list, enum ltc_oid_id *pka, 
    if ((*alg_id == NULL) || ((*alg_id)->child == NULL) || (*priv_key == NULL)) {
       return CRYPT_INVALID_PACKET;
    }
-   return pk_get_oid_from_asn1((*alg_id)->child, pka);
+   if ((err = pk_get_oid_from_asn1((*alg_id)->child, pka)) != CRYPT_OK) {
+      return err;
+   }
+
+   switch (*pka) {
+      /* RFC 8410 requires the parameters field of the AlgorithmIdentifier to be absent */
+      case LTC_OID_X25519:
+      case LTC_OID_ED25519:
+      case LTC_OID_X448:
+      case LTC_OID_ED448:
+         if ((*alg_id)->child->next != NULL) {
+            return CRYPT_INVALID_PACKET;
+         }
+         break;
+      default:
+         break;
+   }
+
+   return CRYPT_OK;
 }
 
 #endif /* LTC_PKCS_8 */

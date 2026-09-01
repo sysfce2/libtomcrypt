@@ -7,7 +7,7 @@
   OAEP Padding for PKCS #1, Tom St Denis
 */
 
-#ifdef LTC_PKCS_1
+#ifdef LTC_MRSA
 /**
    PKCS #1 v2.00 OAEP decode
    @param msg              The encoded data to decode
@@ -170,4 +170,4 @@ LBL_ERR:
    return err;
 }
 
-#endif /* LTC_PKCS_1 */
+#endif /* LTC_MRSA */

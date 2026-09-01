@@ -2,7 +2,7 @@
 /* SPDX-License-Identifier: Unlicense */
 #include <tomcrypt_test.h>
 
-#ifdef LTC_PKCS_1
+#ifdef LTC_MRSA
 
 #ifdef LTC_TEST_REAL_RAND
 #define LTC_TEST_RAND_SEED  time(NULL)

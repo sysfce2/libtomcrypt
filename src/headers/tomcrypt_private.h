@@ -968,6 +968,8 @@ int ltc_pkcs_1_mgf1(int                  hash_idx,
                     const unsigned char *seed, unsigned long seedlen,
                           unsigned char *mask, unsigned long masklen);
 
+/* OAEP/PSS padding requires the RSA parameter helpers */
+#ifdef LTC_MRSA
 int ltc_pkcs_1_pss_encode_mgf1(const unsigned char *msghash,       unsigned long  msghashlen,
                              ltc_rsa_op_parameters *params,
                                      unsigned long  modulus_bitlen,
@@ -985,6 +987,7 @@ int ltc_pkcs_1_oaep_decode(const unsigned char *msg,    unsigned long msglen,
                                  unsigned long  modulus_bitlen,
                                  unsigned char *out,    unsigned long *outlen,
                                  int           *res);
+#endif /* LTC_MRSA */
 
 int ltc_pkcs_1_v1_5_encode(const unsigned char *msg,
                                  unsigned long  msglen,

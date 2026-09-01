@@ -70,7 +70,7 @@ int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
       if (opts->enable_recovery_id) {
          /* find recovery ID (if needed) */
          v = 0;
-         if (ltc_mp_copy(pubkey.pubkey.x, s) != CRYPT_OK)                      { goto error; }
+         if ((err = ltc_mp_copy(pubkey.pubkey.x, s)) != CRYPT_OK)              { goto error; }
          while (ltc_mp_cmp_d(s, 0) == LTC_MP_GT && ltc_mp_cmp(s, p) != LTC_MP_LT) {
             /* Compute x1 div n... this will almost never be reached for curves with order 1 */
             v += 2;
@@ -99,6 +99,7 @@ int ecc_sign_hash_internal(const unsigned char *in,  unsigned long inlen,
    } while (--max_iterations > 0);
 
    if (max_iterations == 0) {
+      err = CRYPT_ERROR;
       goto errnokey;
    }
 

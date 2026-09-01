@@ -297,13 +297,8 @@ int dh_export_key(void *out, unsigned long *outlen, int type, const dh_key *key)
 
 
 /* ---- ECC Routines ---- */
-#ifdef LTC_MECC
 
-/* size of our temp buffers for exported keys */
-#define ECC_BUF_SIZE 256
-
-/* max private key size */
-#define ECC_MAXSIZE  66
+/* the curve type is required even without LTC_MECC, e.g. by the SSH PEM decoder */
 
 /** Structure defines a GF(p) curve */
 typedef struct {
@@ -331,6 +326,14 @@ typedef struct {
    /** The OID */
    const char *OID;
 } ltc_ecc_curve;
+
+#ifdef LTC_MECC
+
+/* size of our temp buffers for exported keys */
+#define ECC_BUF_SIZE 256
+
+/* max private key size */
+#define ECC_MAXSIZE  66
 
 /** A point on a ECC curve, stored in Jacbobian format such that (x,y,z) => (x/z^2, y/z^3, 1) when interpretted as affine */
 typedef struct {

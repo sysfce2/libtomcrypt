@@ -7,7 +7,7 @@
   PKCS #1 PSS Signature Padding, Tom St Denis
 */
 
-#ifdef LTC_PKCS_1
+#ifdef LTC_MRSA
 
 /**
    PKCS #1 v2.00 Signature Encoding
@@ -69,7 +69,6 @@ int ltc_pkcs_1_pss_encode_mgf1(const unsigned char *msghash,       unsigned long
       }
       return CRYPT_MEM;
    }
-
 
    /* generate random salt */
    if (saltlen > 0) {
@@ -156,4 +155,4 @@ LBL_ERR:
    return err;
 }
 
-#endif /* LTC_PKCS_1 */
+#endif /* LTC_MRSA */

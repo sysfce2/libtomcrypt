@@ -59,7 +59,6 @@ int der_decode_short_integer(const unsigned char *in, unsigned long inlen, unsig
    *num = y;
 
    return CRYPT_OK;
-
 }
 
 #endif

@@ -7,7 +7,7 @@
   PKCS #1 PSS Signature Padding, Tom St Denis
 */
 
-#ifdef LTC_PKCS_1
+#ifdef LTC_MRSA
 
 /**
    PKCS #1 v2.00 Signature Verification
@@ -25,7 +25,7 @@ int ltc_pkcs_1_pss_decode_mgf1(const unsigned char *msghash, unsigned long  msgh
                                ltc_rsa_op_parameters *params,
                                      unsigned long  modulus_bitlen,    int *res)
 {
-   unsigned char *DB, *mask, *salt, *hash;
+   unsigned char *DB, *mask, *hash;
    unsigned long x, y, hLen, modulus_len, saltlen;
    int           err;
    hash_state    md;
@@ -54,20 +54,16 @@ int ltc_pkcs_1_pss_decode_mgf1(const unsigned char *msghash, unsigned long  msgh
       return CRYPT_PK_INVALID_SIZE;
    }
 
-   /* allocate ram for DB/mask/salt/hash of size modulus_len */
+   /* allocate ram for DB/mask/hash of size modulus_len */
    DB   = XMALLOC(modulus_len);
    mask = XMALLOC(modulus_len);
-   salt = XMALLOC(modulus_len);
    hash = XMALLOC(modulus_len);
-   if (DB == NULL || mask == NULL || salt == NULL || hash == NULL) {
+   if (DB == NULL || mask == NULL || hash == NULL) {
       if (DB != NULL) {
          XFREE(DB);
       }
       if (mask != NULL) {
          XFREE(mask);
-      }
-      if (salt != NULL) {
-         XFREE(salt);
       }
       if (hash != NULL) {
          XFREE(hash);
@@ -153,16 +149,14 @@ LBL_ERR:
 #ifdef LTC_CLEAN_STACK
    zeromem(DB,   modulus_len);
    zeromem(mask, modulus_len);
-   zeromem(salt, modulus_len);
    zeromem(hash, modulus_len);
 #endif
 
    XFREE(hash);
-   XFREE(salt);
    XFREE(mask);
    XFREE(DB);
 
    return err;
 }
 
-#endif /* LTC_PKCS_1 */
+#endif /* LTC_MRSA */
